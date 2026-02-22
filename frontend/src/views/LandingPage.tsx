@@ -6,6 +6,7 @@ import {
   ArrowUpLeft,
   BookOpen,
   CalendarDays,
+  ChevronUp,
   Flag,
   Globe2,
   Handshake,
@@ -113,6 +114,7 @@ export const LandingPage = () => {
   const [events, setEvents] = useState<EventItem[]>([])
   const [filters, setFilters] = useState({ branchId: '', month: '', year: '' })
   const [loadingEvents, setLoadingEvents] = useState(false)
+  const [showScrollTop, setShowScrollTop] = useState(false)
 
   const years = useMemo(() => {
     const currentYear = new Date().getFullYear()
@@ -133,6 +135,20 @@ export const LandingPage = () => {
       .then((result) => setEvents(result.items))
       .finally(() => setLoadingEvents(false))
   }, [filters])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 320)
+    }
+
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   useEffect(() => {
     if (!pageRef.current) return
@@ -189,13 +205,18 @@ export const LandingPage = () => {
     <div ref={pageRef} dir="rtl" className="min-h-screen bg-slate-50 text-slate-800">
       <header className="sticky top-0 z-30 border-b border-blue-100 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={scrollToTop}
+            className="flex items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+            aria-label="العودة إلى أعلى الصفحة"
+          >
             <img src="/ya_logo_color.svg" alt="شعار شؤون الشباب" className="h-12 w-12" />
             <div>
               <h1 className="text-xl font-bold text-primary">{content.organizationName}</h1>
               <p className="text-sm text-slate-600">{content.slogan}</p>
             </div>
-          </div>
+          </button>
           <div className="flex items-center gap-3 text-sm">
             <a href="#events" className="inline-flex items-center gap-1 text-slate-600 hover:text-primary">
               <CalendarDays className="h-4 w-4" />
@@ -428,6 +449,17 @@ export const LandingPage = () => {
           </p>
         </div>
       </footer>
+
+      <button
+        type="button"
+        onClick={scrollToTop}
+        aria-label="العودة للأعلى"
+        className={`fixed bottom-6 right-6 z-40 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-all duration-300 hover:scale-105 ${
+          showScrollTop ? 'pointer-events-auto translate-y-0 opacity-100' : 'pointer-events-none translate-y-4 opacity-0'
+        }`}
+      >
+        <ChevronUp className="h-6 w-6" />
+      </button>
     </div>
   )
 }
