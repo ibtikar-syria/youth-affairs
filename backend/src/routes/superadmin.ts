@@ -22,16 +22,6 @@ type AdminInput = {
   branchId: number
 }
 
-type ContentInput = {
-  organizationName: string
-  slogan: string
-  definitionText: string
-  visionText: string
-  missionText: string
-  goalsText: string
-  volunteerFormUrl: string
-}
-
 export const superadminRoutes = new Hono<AppEnv>()
 
 superadminRoutes.use('*', requireAuth, requireRole('superadmin'))
@@ -167,44 +157,5 @@ superadminRoutes.delete('/admins/:id', async (c) => {
   }
 
   await c.env.DB.prepare(`DELETE FROM users WHERE id = ? AND role = 'admin'`).bind(userId).run()
-  return c.json({ ok: true })
-})
-
-superadminRoutes.get('/content', async (c) => {
-  const content = await c.env.DB.prepare('SELECT * FROM site_content WHERE id = 1').first()
-  return c.json({ item: content })
-})
-
-superadminRoutes.put('/content', async (c) => {
-  const input = await parseJsonBody<ContentInput>(c)
-  if (
-    !input?.organizationName ||
-    !input.slogan ||
-    !input.definitionText ||
-    !input.visionText ||
-    !input.missionText ||
-    !input.goalsText ||
-    !input.volunteerFormUrl
-  ) {
-    return badRequest(c, 'All content fields are required')
-  }
-
-  await c.env.DB
-    .prepare(
-      `UPDATE site_content
-       SET organization_name = ?, slogan = ?, definition_text = ?, vision_text = ?, mission_text = ?, goals_text = ?, volunteer_form_url = ?, updated_at = CURRENT_TIMESTAMP
-       WHERE id = 1`
-    )
-    .bind(
-      input.organizationName.trim(),
-      input.slogan.trim(),
-      input.definitionText.trim(),
-      input.visionText.trim(),
-      input.missionText.trim(),
-      input.goalsText.trim(),
-      input.volunteerFormUrl.trim()
-    )
-    .run()
-
   return c.json({ ok: true })
 })

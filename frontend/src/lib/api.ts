@@ -1,4 +1,4 @@
-import type { AdminUser, AuthUser, Branch, EventItem, SiteContent } from './types'
+import type { AdminUser, AuthUser, Branch, EventItem } from './types'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? ''
 
@@ -32,7 +32,6 @@ export const api = {
       body: { username, password },
     }),
 
-  getPublicContent: () => request<SiteContent>('/api/public/content'),
   getPublicBranches: () => request<{ items: Branch[] }>('/api/public/branches'),
   getPublicEvents: (filters: { branchId?: string; month?: string; year?: string }) => {
     const params = new URLSearchParams()
@@ -73,7 +72,4 @@ export const api = {
   deleteAdmin: (token: string, id: number) =>
     request<{ ok: boolean }>(`/api/superadmin/admins/${id}`, { method: 'DELETE', token }),
 
-  getSuperContent: (token: string) => request<{ item: SiteContent }>('/api/superadmin/content', { token }),
-  updateSuperContent: (token: string, body: Record<string, unknown>) =>
-    request<{ ok: boolean }>('/api/superadmin/content', { method: 'PUT', token, body }),
 }

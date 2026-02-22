@@ -3,11 +3,6 @@ import type { AppEnv, BranchRecord, EventRecord } from '../lib/types'
 
 export const publicRoutes = new Hono<AppEnv>()
 
-publicRoutes.get('/content', async (c) => {
-  const content = await c.env.DB.prepare('SELECT * FROM site_content WHERE id = 1').first()
-  return c.json(content)
-})
-
 publicRoutes.get('/branches', async (c) => {
   const branches = await c.env.DB.prepare('SELECT * FROM branches ORDER BY governorate ASC').all<BranchRecord>()
   return c.json({ items: branches.results })

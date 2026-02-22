@@ -2,9 +2,28 @@ import { gsap } from 'gsap'
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../lib/api'
-import type { Branch, EventItem, SiteContent } from '../lib/types'
+import type { Branch, EventItem } from '../lib/types'
 
 const values = ['الانتماء', 'المسؤولية', 'الابتكار', 'الحوار', 'العدالة', 'الاستدامة', 'المبادرة', 'التطوع']
+const goals = [
+  'تنمية الشباب تنمية شاملة فكرياً واجتماعياً ومهارياً.',
+  'إعداد جيل قيادي ومبادر قادر على خدمة المجتمع.',
+  'حماية الهوية الثقافية الوطنية وتعزيز الانتماء.',
+  'تعزيز العمل التطوعي والمبادرات الشبابية المؤثرة.',
+  'إبراز النماذج الشبابية السورية المتميزة محلياً.',
+]
+
+const content = {
+  organizationName: 'شؤون الشباب',
+  slogan: 'جيل شبابي متمكن وقوي',
+  definition:
+    'مؤسسة رسمية وطنية تُعنى بتمكين الشباب فكرياً وسياسياً واجتماعياً لصناعة جيل واعٍ يسهم في بناء وطنه.',
+  vision:
+    'الريادة في صناعة جيل شبابي متمكن فكرياً، مؤهل سياسياً، فاعل اجتماعياً، ومعتز بهويته.',
+  mission:
+    'النهوض بالشباب عبر تنمية الوعي ورفع الكفاءة المعرفية والمهارات القيادية ليكون شريكاً حقيقياً في صناعة القرار وبناء الدولة.',
+  volunteerFormUrl: 'https://forms.google.com',
+}
 
 const monthOptions = Array.from({ length: 12 }).map((_, index) => {
   const month = String(index + 1).padStart(2, '0')
@@ -12,7 +31,6 @@ const monthOptions = Array.from({ length: 12 }).map((_, index) => {
 })
 
 export const LandingPage = () => {
-  const [content, setContent] = useState<SiteContent | null>(null)
   const [branches, setBranches] = useState<Branch[]>([])
   const [events, setEvents] = useState<EventItem[]>([])
   const [filters, setFilters] = useState({ branchId: '', month: '', year: '' })
@@ -25,8 +43,7 @@ export const LandingPage = () => {
 
   useEffect(() => {
     void (async () => {
-      const [contentResult, branchesResult] = await Promise.all([api.getPublicContent(), api.getPublicBranches()])
-      setContent(contentResult)
+      const branchesResult = await api.getPublicBranches()
       setBranches(branchesResult.items)
     })()
   }, [])
@@ -47,15 +64,15 @@ export const LandingPage = () => {
       stagger: 0.08,
       ease: 'power2.out',
     })
-  }, [content, branches, events])
+  }, [branches, events])
 
   return (
     <div dir="rtl" className="min-h-screen bg-slate-50 text-slate-800">
       <header className="sticky top-0 z-30 border-b border-blue-100 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
           <div>
-            <h1 className="text-xl font-bold text-primary">{content?.organization_name ?? 'شؤون الشباب'}</h1>
-            <p className="text-sm text-slate-600">{content?.slogan ?? 'جيل شبابي متمكن وقوي'}</p>
+            <h1 className="text-xl font-bold text-primary">{content.organizationName}</h1>
+            <p className="text-sm text-slate-600">{content.slogan}</p>
           </div>
           <div className="flex items-center gap-3 text-sm">
             <a href="#events" className="text-slate-600 hover:text-primary">
@@ -78,10 +95,10 @@ export const LandingPage = () => {
         <section className="bg-gradient-to-l from-primary to-accent py-16 text-white">
           <div className="animate-in mx-auto grid max-w-6xl gap-8 px-4 md:grid-cols-2 md:items-center">
             <div>
-              <h2 className="mb-4 text-3xl font-bold md:text-4xl">{content?.slogan ?? 'جيل شبابي متمكن وقوي'}</h2>
-              <p className="mb-6 text-base leading-8 md:text-lg">{content?.definition_text}</p>
+              <h2 className="mb-4 text-3xl font-bold md:text-4xl">{content.slogan}</h2>
+              <p className="mb-6 text-base leading-8 md:text-lg">{content.definition}</p>
               <a
-                href={content?.volunteer_form_url ?? 'https://forms.google.com'}
+                href={content.volunteerFormUrl}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-block rounded-xl bg-white px-6 py-3 font-bold text-primary"
@@ -91,10 +108,21 @@ export const LandingPage = () => {
             </div>
             <div className="rounded-2xl bg-white/15 p-6 backdrop-blur">
               <h3 className="mb-3 text-lg font-bold">رؤيتنا</h3>
-              <p className="mb-5 leading-8">{content?.vision_text}</p>
+              <p className="mb-5 leading-8">{content.vision}</p>
               <h3 className="mb-3 text-lg font-bold">رسالتنا</h3>
-              <p className="leading-8">{content?.mission_text}</p>
+              <p className="leading-8">{content.mission}</p>
             </div>
+          </div>
+        </section>
+
+        <section className="animate-in mx-auto max-w-6xl px-4 py-14">
+          <h3 className="mb-6 text-2xl font-bold text-primary">أهدافنا</h3>
+          <div className="grid gap-3 md:grid-cols-2">
+            {goals.map((goal) => (
+              <article key={goal} className="rounded-xl border border-blue-100 bg-white p-4 shadow-sm">
+                <p className="leading-7 text-slate-700">{goal}</p>
+              </article>
+            ))}
           </div>
         </section>
 
@@ -206,7 +234,9 @@ export const LandingPage = () => {
 
       <footer className="mt-12 bg-primary py-8 text-white">
         <div className="mx-auto max-w-6xl px-4 text-sm">
-          <p>{content?.organization_name ?? 'شؤون الشباب'} — {content?.slogan ?? ''}</p>
+          <p>
+            {content.organizationName} — {content.slogan}
+          </p>
         </div>
       </footer>
     </div>

@@ -41,38 +41,7 @@ const schemaStatements = [
     FOREIGN KEY (branch_id) REFERENCES branches (id),
     FOREIGN KEY (created_by) REFERENCES users (id)
   );`,
-  `CREATE TABLE IF NOT EXISTS site_content (
-    id INTEGER PRIMARY KEY CHECK (id = 1),
-    organization_name TEXT NOT NULL,
-    slogan TEXT NOT NULL,
-    definition_text TEXT NOT NULL,
-    vision_text TEXT NOT NULL,
-    mission_text TEXT NOT NULL,
-    goals_text TEXT NOT NULL,
-    volunteer_form_url TEXT NOT NULL,
-    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-  );`,
 ]
-
-const seedContent = `INSERT OR IGNORE INTO site_content (
-  id,
-  organization_name,
-  slogan,
-  definition_text,
-  vision_text,
-  mission_text,
-  goals_text,
-  volunteer_form_url
-) VALUES (
-  1,
-  'شؤون الشباب',
-  'جيل شبابي متمكن وقوي',
-  'مؤسسة رسمية وطنية تُعنى بتمكين الشباب فكرياً وسياسياً واجتماعياً لصناعة جيل واعٍ يسهم في بناء وطنه.',
-  'الريادة في صناعة جيل شبابي متمكن فكرياً، مؤهل سياسياً، فاعل اجتماعياً، ومعتز بهويته.',
-  'النهوض بالشباب عبر تنمية الوعي ورفع الكفاءة المعرفية والمهارات القيادية ليكون شريكاً حقيقياً في صناعة القرار وبناء الدولة.',
-  '1) تنمية الشباب تنمية شاملة\n2) إعداد جيل قيادي ومبادر\n3) حماية الهوية الثقافية\n4) تعزيز العمل التطوعي\n5) إبراز الرموز الشبابية السورية',
-  'https://forms.google.com'
-);`
 
 const seedBranches = [
   {
@@ -100,8 +69,6 @@ export const initializeDatabase = async (db: D1Database) => {
     for (const statement of schemaStatements) {
       await db.prepare(statement).run()
     }
-
-    await db.prepare(seedContent).run()
 
     for (const branch of seedBranches) {
       await db

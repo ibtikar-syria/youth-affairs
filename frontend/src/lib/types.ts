@@ -32,17 +32,6 @@ export type EventItem = {
   branch_governorate?: string
 }
 
-export type SiteContent = {
-  id: number
-  organization_name: string
-  slogan: string
-  definition_text: string
-  vision_text: string
-  mission_text: string
-  goals_text: string
-  volunteer_form_url: string
-}
-
 export type AdminUser = {
   id: number
   username: string

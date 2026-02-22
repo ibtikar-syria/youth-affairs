@@ -1,20 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../lib/api'
-import type { AdminUser, AuthUser, Branch, SiteContent } from '../lib/types'
+import type { AdminUser, AuthUser, Branch } from '../lib/types'
 
 const TOKEN_KEY = 'ya_superadmin_token'
-
-const defaultContent: SiteContent = {
-  id: 1,
-  organization_name: '',
-  slogan: '',
-  definition_text: '',
-  vision_text: '',
-  mission_text: '',
-  goals_text: '',
-  volunteer_form_url: '',
-}
 
 export const SuperAdminPage = () => {
   const [token, setToken] = useState<string>(localStorage.getItem(TOKEN_KEY) ?? '')
@@ -26,7 +15,6 @@ export const SuperAdminPage = () => {
 
   const [branches, setBranches] = useState<Branch[]>([])
   const [admins, setAdmins] = useState<AdminUser[]>([])
-  const [content, setContent] = useState<SiteContent>(defaultContent)
 
   const [branchForm, setBranchForm] = useState({
     name: '',
@@ -47,11 +35,10 @@ export const SuperAdminPage = () => {
   })
 
   const refreshData = async (activeToken: string) => {
-    const [me, branchesResult, adminsResult, contentResult] = await Promise.all([
+    const [me, branchesResult, adminsResult] = await Promise.all([
       api.getAdminMe(activeToken),
       api.getSuperBranches(activeToken),
       api.getSuperAdmins(activeToken),
-      api.getSuperContent(activeToken),
     ])
 
     if (me.user.role !== 'superadmin') {
@@ -61,7 +48,6 @@ export const SuperAdminPage = () => {
     setUser(me.user)
     setBranches(branchesResult.items)
     setAdmins(adminsResult.items)
-    setContent(contentResult.item ?? defaultContent)
   }
 
   useEffect(() => {
@@ -92,31 +78,6 @@ export const SuperAdminPage = () => {
       setToken(result.token)
     } catch (loginError) {
       setError(loginError instanceof Error ? loginError.message : 'فشل تسجيل الدخول')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleSaveContent = async (event: React.FormEvent) => {
-    event.preventDefault()
-    if (!token) {
-      return
-    }
-
-    setLoading(true)
-    setError('')
-    try {
-      await api.updateSuperContent(token, {
-        organizationName: content.organization_name,
-        slogan: content.slogan,
-        definitionText: content.definition_text,
-        visionText: content.vision_text,
-        missionText: content.mission_text,
-        goalsText: content.goals_text,
-        volunteerFormUrl: content.volunteer_form_url,
-      })
-    } catch (saveError) {
-      setError(saveError instanceof Error ? saveError.message : 'فشل حفظ المحتوى')
     } finally {
       setLoading(false)
     }
@@ -286,61 +247,6 @@ export const SuperAdminPage = () => {
       </div>
 
       {error && <p className="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
-
-      <form onSubmit={handleSaveContent} className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
-        <h2 className="mb-4 text-lg font-bold">إدارة محتوى الموقع</h2>
-        <div className="grid gap-3 md:grid-cols-2">
-          <input
-            className="rounded-lg border border-slate-300 px-3 py-2"
-            value={content.organization_name}
-            placeholder="اسم المؤسسة"
-            onChange={(event) => setContent((prev) => ({ ...prev, organization_name: event.target.value }))}
-          />
-          <input
-            className="rounded-lg border border-slate-300 px-3 py-2"
-            value={content.slogan}
-            placeholder="الشعار"
-            onChange={(event) => setContent((prev) => ({ ...prev, slogan: event.target.value }))}
-          />
-          <input
-            className="rounded-lg border border-slate-300 px-3 py-2 md:col-span-2"
-            value={content.volunteer_form_url}
-            placeholder="رابط نموذج التطوع (Google Form)"
-            onChange={(event) => setContent((prev) => ({ ...prev, volunteer_form_url: event.target.value }))}
-          />
-          <textarea
-            rows={3}
-            className="rounded-lg border border-slate-300 px-3 py-2 md:col-span-2"
-            value={content.definition_text}
-            placeholder="التعريف"
-            onChange={(event) => setContent((prev) => ({ ...prev, definition_text: event.target.value }))}
-          />
-          <textarea
-            rows={3}
-            className="rounded-lg border border-slate-300 px-3 py-2 md:col-span-2"
-            value={content.vision_text}
-            placeholder="الرؤية"
-            onChange={(event) => setContent((prev) => ({ ...prev, vision_text: event.target.value }))}
-          />
-          <textarea
-            rows={3}
-            className="rounded-lg border border-slate-300 px-3 py-2 md:col-span-2"
-            value={content.mission_text}
-            placeholder="الرسالة"
-            onChange={(event) => setContent((prev) => ({ ...prev, mission_text: event.target.value }))}
-          />
-          <textarea
-            rows={4}
-            className="rounded-lg border border-slate-300 px-3 py-2 md:col-span-2"
-            value={content.goals_text}
-            placeholder="الأهداف"
-            onChange={(event) => setContent((prev) => ({ ...prev, goals_text: event.target.value }))}
-          />
-        </div>
-        <button className="mt-4 rounded-lg bg-accent px-4 py-2 font-bold text-slate-900" disabled={loading}>
-          حفظ المحتوى
-        </button>
-      </form>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <form onSubmit={handleCreateBranch} className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">

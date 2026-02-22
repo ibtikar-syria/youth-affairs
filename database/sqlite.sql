@@ -38,15 +38,3 @@ CREATE TABLE IF NOT EXISTS events (
 	FOREIGN KEY (branch_id) REFERENCES branches (id),
 	FOREIGN KEY (created_by) REFERENCES users (id)
 );
-
-CREATE TABLE IF NOT EXISTS site_content (
-	id INTEGER PRIMARY KEY CHECK (id = 1),
-	organization_name TEXT NOT NULL,
-	slogan TEXT NOT NULL,
-	definition_text TEXT NOT NULL,
-	vision_text TEXT NOT NULL,
-	mission_text TEXT NOT NULL,
-	goals_text TEXT NOT NULL,
-	volunteer_form_url TEXT NOT NULL,
-	updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
