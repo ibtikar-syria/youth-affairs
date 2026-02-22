@@ -1,4 +1,3 @@
-import { gsap } from 'gsap'
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../lib/api'
@@ -55,16 +54,6 @@ export const LandingPage = () => {
       .then((result) => setEvents(result.items))
       .finally(() => setLoadingEvents(false))
   }, [filters])
-
-  useEffect(() => {
-    gsap.from('.animate-in', {
-      y: 18,
-      opacity: 0,
-      duration: 0.6,
-      stagger: 0.08,
-      ease: 'power2.out',
-    })
-  }, [branches, events])
 
   return (
     <div dir="rtl" className="min-h-screen bg-slate-50 text-slate-800">
