@@ -1,0 +1,52 @@
+CREATE TABLE IF NOT EXISTS branches (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	name TEXT NOT NULL,
+	governorate TEXT NOT NULL,
+	address TEXT NOT NULL,
+	phone TEXT NOT NULL,
+	whatsapp TEXT NOT NULL,
+	facebook TEXT,
+	telegram TEXT,
+	instagram TEXT,
+	created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS users (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	username TEXT NOT NULL UNIQUE,
+	display_name TEXT NOT NULL,
+	password_hash TEXT NOT NULL,
+	role TEXT NOT NULL CHECK (role IN ('superadmin', 'admin')),
+	branch_id INTEGER,
+	created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (branch_id) REFERENCES branches (id)
+);
+
+CREATE TABLE IF NOT EXISTS events (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	branch_id INTEGER NOT NULL,
+	title TEXT NOT NULL,
+	image_url TEXT NOT NULL,
+	announcement TEXT NOT NULL,
+	event_date TEXT NOT NULL,
+	location TEXT NOT NULL,
+	created_by INTEGER NOT NULL,
+	created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (branch_id) REFERENCES branches (id),
+	FOREIGN KEY (created_by) REFERENCES users (id)
+);
+
+CREATE TABLE IF NOT EXISTS site_content (
+	id INTEGER PRIMARY KEY CHECK (id = 1),
+	organization_name TEXT NOT NULL,
+	slogan TEXT NOT NULL,
+	definition_text TEXT NOT NULL,
+	vision_text TEXT NOT NULL,
+	mission_text TEXT NOT NULL,
+	goals_text TEXT NOT NULL,
+	volunteer_form_url TEXT NOT NULL,
+	updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
