@@ -1,5 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import {
   ArrowUpLeft,
   BookOpen,
@@ -106,6 +108,7 @@ const monthOptions = Array.from({ length: 12 }).map((_, index) => {
 })
 
 export const LandingPage = () => {
+  const pageRef = useRef<HTMLDivElement | null>(null)
   const [branches, setBranches] = useState<Branch[]>([])
   const [events, setEvents] = useState<EventItem[]>([])
   const [filters, setFilters] = useState({ branchId: '', month: '', year: '' })
@@ -131,8 +134,59 @@ export const LandingPage = () => {
       .finally(() => setLoadingEvents(false))
   }, [filters])
 
+  useEffect(() => {
+    if (!pageRef.current) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    gsap.registerPlugin(ScrollTrigger)
+
+    const ctx = gsap.context(() => {
+      gsap.from('.js-hero-reveal', {
+        opacity: 0,
+        y: 28,
+        duration: 0.8,
+        stagger: 0.12,
+        ease: 'power3.out',
+      })
+
+      gsap.utils.toArray<HTMLElement>('.js-reveal').forEach((section) => {
+        gsap.from(section, {
+          opacity: 0,
+          y: 34,
+          duration: 0.75,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top 84%',
+            toggleActions: 'play none none none',
+          },
+        })
+      })
+
+      gsap.utils.toArray<HTMLElement>('.js-stagger-cards').forEach((grid) => {
+        const cards = grid.querySelectorAll('.js-card')
+        if (!cards.length) return
+
+        gsap.from(cards, {
+          opacity: 0,
+          y: 22,
+          duration: 0.55,
+          stagger: 0.08,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: grid,
+            start: 'top 86%',
+            toggleActions: 'play none none none',
+          },
+        })
+      })
+    }, pageRef)
+
+    return () => ctx.revert()
+  }, [])
+
   return (
-    <div dir="rtl" className="min-h-screen bg-slate-50 text-slate-800">
+    <div ref={pageRef} dir="rtl" className="min-h-screen bg-slate-50 text-slate-800">
       <header className="sticky top-0 z-30 border-b border-blue-100 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
           <div className="flex items-center gap-3">
@@ -171,19 +225,19 @@ export const LandingPage = () => {
           />
           <div className="animate-in relative z-10 mx-auto grid max-w-6xl gap-8 px-4 md:grid-cols-2 md:items-center">
             <div>
-              <h2 className="mb-4 text-3xl font-bold md:text-4xl">{content.slogan}</h2>
-              <p className="mb-6 text-base leading-8 md:text-lg">{content.definition}</p>
+              <h2 className="js-hero-reveal mb-4 text-3xl font-bold md:text-4xl">{content.slogan}</h2>
+              <p className="js-hero-reveal mb-6 text-base leading-8 md:text-lg">{content.definition}</p>
               <a
                 href={content.volunteerFormUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-bold text-primary"
+                className="js-hero-reveal inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-bold text-primary"
               >
                 تطوع الآن
                 <ArrowUpLeft className="h-5 w-5" />
               </a>
             </div>
-            <div className="rounded-2xl bg-white/15 p-6 backdrop-blur">
+            <div className="js-hero-reveal rounded-2xl bg-white/15 p-6 backdrop-blur">
               <h3 className="mb-3 inline-flex items-center gap-2 text-lg font-bold">
                 <Target className="h-5 w-5" />
                 رؤيتنا
@@ -198,16 +252,16 @@ export const LandingPage = () => {
           </div>
         </section>
 
-        <section className="animate-in mx-auto max-w-6xl px-4 py-14">
+        <section className="animate-in js-reveal mx-auto max-w-6xl px-4 py-14">
           <h3 className="mb-6 inline-flex items-center gap-2 text-2xl font-bold text-primary">
             <Target className="h-6 w-6" />
             أهدافنا
           </h3>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="js-stagger-cards grid gap-4 md:grid-cols-2">
             {goals.map((goal, index) => {
               const Icon = goalIcons[index % goalIcons.length]
               return (
-              <article key={goal.title} className="rounded-xl border border-blue-100 bg-white p-5 shadow-sm">
+              <article key={goal.title} className="js-card rounded-xl border border-blue-100 bg-white p-5 shadow-sm">
                 <h4 className="mb-3 inline-flex items-center gap-2 text-lg font-bold text-slate-900">
                   <Icon className="h-5 w-5 text-primary" />
                   {goal.title}
@@ -226,16 +280,16 @@ export const LandingPage = () => {
           </div>
         </section>
 
-        <section className="animate-in mx-auto max-w-6xl px-4 py-14">
+        <section className="animate-in js-reveal mx-auto max-w-6xl px-4 py-14">
           <h3 className="mb-6 inline-flex items-center gap-2 text-2xl font-bold text-primary">
             <Shield className="h-6 w-6" />
             قيمنا
           </h3>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="js-stagger-cards grid grid-cols-2 gap-3 sm:grid-cols-4">
             {values.map((value) => {
               const Icon = value.icon
               return (
-              <div key={value.label} className="rounded-xl border border-blue-100 bg-white p-4 text-center font-semibold shadow-sm">
+              <div key={value.label} className="js-card rounded-xl border border-blue-100 bg-white p-4 text-center font-semibold shadow-sm">
                 <Icon className="mx-auto mb-2 h-5 w-5 text-primary" />
                 {value.label}
               </div>
@@ -244,24 +298,24 @@ export const LandingPage = () => {
           </div>
         </section>
 
-        <section className="animate-in mx-auto max-w-6xl px-4 py-14">
+        <section className="animate-in js-reveal mx-auto max-w-6xl px-4 py-14">
           <h3 className="mb-6 inline-flex items-center gap-2 text-2xl font-bold text-primary">
             <Globe2 className="h-6 w-6" />
             فضاء العمل
           </h3>
-          <article className="rounded-2xl border border-blue-100 bg-white p-6 shadow-sm">
+          <article className="js-card rounded-2xl border border-blue-100 bg-white p-6 shadow-sm">
             <p className="leading-8 text-slate-700">{content.workScope}</p>
           </article>
         </section>
 
-        <section id="branches" className="animate-in mx-auto max-w-6xl px-4 py-14">
+        <section id="branches" className="animate-in js-reveal mx-auto max-w-6xl px-4 py-14">
           <h3 className="mb-6 inline-flex items-center gap-2 text-2xl font-bold text-primary">
             <MapPin className="h-6 w-6" />
             دليل الأفرع
           </h3>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="js-stagger-cards grid gap-4 md:grid-cols-2">
             {branches.map((branch) => (
-              <article key={branch.id} className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
+              <article key={branch.id} className="js-card rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
                 <h4 className="text-lg font-bold text-slate-900">{branch.name}</h4>
                 <p className="mt-2 text-sm text-slate-600">{branch.address}</p>
                 <p className="inline-flex items-center gap-1 text-sm text-slate-600">
@@ -294,8 +348,8 @@ export const LandingPage = () => {
           </div>
         </section>
 
-        <section id="events" className="animate-in mx-auto max-w-6xl px-4 py-14">
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <section id="events" className="animate-in js-reveal mx-auto max-w-6xl px-4 py-14">
+          <div className="js-card mb-6 flex flex-wrap items-center justify-between gap-4">
             <h3 className="inline-flex items-center gap-2 text-2xl font-bold text-primary">
               <CalendarDays className="h-6 w-6" />
               الفعاليات
@@ -343,9 +397,9 @@ export const LandingPage = () => {
           {loadingEvents ? (
             <p className="text-slate-600">جار تحميل الفعاليات...</p>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="js-stagger-cards grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {events.map((eventItem) => (
-                <article key={eventItem.id} className="overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm">
+                <article key={eventItem.id} className="js-card overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm">
                   <img src={eventItem.image_url} alt={eventItem.title} className="h-44 w-full object-cover" />
                   <div className="p-4">
                     <h4 className="mb-2 text-lg font-bold">{eventItem.title}</h4>
