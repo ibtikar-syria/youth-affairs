@@ -11,7 +11,8 @@
     {
       "binding": "DB",
       "database_name": "youth-affairs-db",
-      "database_id": "replace-with-your-d1-database-id"
+      "database_id": "replace-with-your-d1-database-id",
+      "migrations_dir":"../database"
     }
   ]
   // "r2_buckets": [
@@ -20,6 +21,4 @@
   //     "bucket_name": "my-bucket"
   //   }
   // ],
-
-
 }
