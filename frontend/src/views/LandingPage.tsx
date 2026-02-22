@@ -1,9 +1,38 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import {
+  ArrowUpLeft,
+  BookOpen,
+  CalendarDays,
+  Flag,
+  Globe2,
+  Handshake,
+  Lightbulb,
+  MapPin,
+  Megaphone,
+  MessageCircle,
+  Phone,
+  Scale,
+  Send,
+  Shield,
+  Sprout,
+  Target,
+  Users,
+} from 'lucide-react'
 import { api } from '../lib/api'
 import type { Branch, EventItem } from '../lib/types'
 
-const values = ['الانتماء', 'المسؤولية', 'الابتكار', 'الحوار', 'العدالة', 'الاستدامة', 'المبادرة']
+const values = [
+  { label: 'الانتماء', icon: Flag },
+  { label: 'المسؤولية', icon: Shield },
+  { label: 'الابتكار', icon: Lightbulb },
+  { label: 'الحوار', icon: MessageCircle },
+  { label: 'العدالة', icon: Scale },
+  { label: 'الاستدامة', icon: Sprout },
+  { label: 'المبادرة', icon: Megaphone },
+]
+
+const goalIcons = [BookOpen, Users, Flag, Handshake, Target, MessageCircle, Globe2, Megaphone]
 
 const goals = [
   {
@@ -114,10 +143,12 @@ export const LandingPage = () => {
             </div>
           </div>
           <div className="flex items-center gap-3 text-sm">
-            <a href="#events" className="text-slate-600 hover:text-primary">
+            <a href="#events" className="inline-flex items-center gap-1 text-slate-600 hover:text-primary">
+              <CalendarDays className="h-4 w-4" />
               الفعاليات
             </a>
-            <a href="#branches" className="text-slate-600 hover:text-primary">
+            <a href="#branches" className="inline-flex items-center gap-1 text-slate-600 hover:text-primary">
+              <MapPin className="h-4 w-4" />
               الأفرع
             </a>
             <Link to="/admin" className="rounded-lg border border-primary px-3 py-2 text-primary">
@@ -146,65 +177,101 @@ export const LandingPage = () => {
                 href={content.volunteerFormUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-block rounded-xl bg-white px-6 py-3 font-bold text-primary"
+                className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-bold text-primary"
               >
                 تطوع الآن
+                <ArrowUpLeft className="h-5 w-5" />
               </a>
             </div>
             <div className="rounded-2xl bg-white/15 p-6 backdrop-blur">
-              <h3 className="mb-3 text-lg font-bold">رؤيتنا</h3>
+              <h3 className="mb-3 inline-flex items-center gap-2 text-lg font-bold">
+                <Target className="h-5 w-5" />
+                رؤيتنا
+              </h3>
               <p className="mb-5 leading-8">{content.vision}</p>
-              <h3 className="mb-3 text-lg font-bold">رسالتنا</h3>
+              <h3 className="mb-3 inline-flex items-center gap-2 text-lg font-bold">
+                <Send className="h-5 w-5" />
+                رسالتنا
+              </h3>
               <p className="leading-8">{content.mission}</p>
             </div>
           </div>
         </section>
 
         <section className="animate-in mx-auto max-w-6xl px-4 py-14">
-          <h3 className="mb-6 text-2xl font-bold text-primary">أهدافنا</h3>
+          <h3 className="mb-6 inline-flex items-center gap-2 text-2xl font-bold text-primary">
+            <Target className="h-6 w-6" />
+            أهدافنا
+          </h3>
           <div className="grid gap-4 md:grid-cols-2">
-            {goals.map((goal) => (
+            {goals.map((goal, index) => {
+              const Icon = goalIcons[index % goalIcons.length]
+              return (
               <article key={goal.title} className="rounded-xl border border-blue-100 bg-white p-5 shadow-sm">
-                <h4 className="mb-3 text-lg font-bold text-slate-900">{goal.title}</h4>
+                <h4 className="mb-3 inline-flex items-center gap-2 text-lg font-bold text-slate-900">
+                  <Icon className="h-5 w-5 text-primary" />
+                  {goal.title}
+                </h4>
                 <ul className="space-y-2 text-slate-700">
                   {goal.points.map((point) => (
-                    <li key={point} className="leading-7">
+                    <li key={point} className="relative pe-4 leading-7">
+                      <span className="absolute right-0 top-3 h-1.5 w-1.5 rounded-full bg-accent" />
                       {point}
                     </li>
                   ))}
                 </ul>
               </article>
-            ))}
+              )
+            })}
           </div>
         </section>
 
         <section className="animate-in mx-auto max-w-6xl px-4 py-14">
-          <h3 className="mb-6 text-2xl font-bold text-primary">قيمنا</h3>
+          <h3 className="mb-6 inline-flex items-center gap-2 text-2xl font-bold text-primary">
+            <Shield className="h-6 w-6" />
+            قيمنا
+          </h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {values.map((value) => (
-              <div key={value} className="rounded-xl border border-blue-100 bg-white p-4 text-center font-semibold shadow-sm">
-                {value}
+            {values.map((value) => {
+              const Icon = value.icon
+              return (
+              <div key={value.label} className="rounded-xl border border-blue-100 bg-white p-4 text-center font-semibold shadow-sm">
+                <Icon className="mx-auto mb-2 h-5 w-5 text-primary" />
+                {value.label}
               </div>
-            ))}
+              )
+            })}
           </div>
         </section>
 
         <section className="animate-in mx-auto max-w-6xl px-4 py-14">
-          <h3 className="mb-6 text-2xl font-bold text-primary">فضاء العمل</h3>
+          <h3 className="mb-6 inline-flex items-center gap-2 text-2xl font-bold text-primary">
+            <Globe2 className="h-6 w-6" />
+            فضاء العمل
+          </h3>
           <article className="rounded-2xl border border-blue-100 bg-white p-6 shadow-sm">
             <p className="leading-8 text-slate-700">{content.workScope}</p>
           </article>
         </section>
 
         <section id="branches" className="animate-in mx-auto max-w-6xl px-4 py-14">
-          <h3 className="mb-6 text-2xl font-bold text-primary">دليل الأفرع</h3>
+          <h3 className="mb-6 inline-flex items-center gap-2 text-2xl font-bold text-primary">
+            <MapPin className="h-6 w-6" />
+            دليل الأفرع
+          </h3>
           <div className="grid gap-4 md:grid-cols-2">
             {branches.map((branch) => (
               <article key={branch.id} className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
                 <h4 className="text-lg font-bold text-slate-900">{branch.name}</h4>
                 <p className="mt-2 text-sm text-slate-600">{branch.address}</p>
-                <p className="text-sm text-slate-600">الهاتف: {branch.phone}</p>
-                <p className="text-sm text-slate-600">واتساب: {branch.whatsapp}</p>
+                <p className="inline-flex items-center gap-1 text-sm text-slate-600">
+                  <Phone className="h-4 w-4" />
+                  الهاتف: {branch.phone}
+                </p>
+                <p className="inline-flex items-center gap-1 text-sm text-slate-600">
+                  <MessageCircle className="h-4 w-4" />
+                  واتساب: {branch.whatsapp}
+                </p>
                 <div className="mt-3 flex flex-wrap gap-2 text-sm">
                   {branch.facebook && (
                     <a className="rounded-lg bg-blue-50 px-3 py-1 text-primary" href={branch.facebook} target="_blank" rel="noreferrer">
@@ -229,7 +296,10 @@ export const LandingPage = () => {
 
         <section id="events" className="animate-in mx-auto max-w-6xl px-4 py-14">
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-            <h3 className="text-2xl font-bold text-primary">الفعاليات</h3>
+            <h3 className="inline-flex items-center gap-2 text-2xl font-bold text-primary">
+              <CalendarDays className="h-6 w-6" />
+              الفعاليات
+            </h3>
             <div className="flex flex-wrap gap-2">
               <select
                 className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
@@ -280,8 +350,14 @@ export const LandingPage = () => {
                   <div className="p-4">
                     <h4 className="mb-2 text-lg font-bold">{eventItem.title}</h4>
                     <p className="mb-3 text-sm text-slate-600">{eventItem.announcement}</p>
-                    <p className="text-sm text-slate-600">المكان: {eventItem.location}</p>
-                    <p className="text-sm text-slate-600">التاريخ: {eventItem.event_date}</p>
+                    <p className="inline-flex items-center gap-1 text-sm text-slate-600">
+                      <MapPin className="h-4 w-4" />
+                      المكان: {eventItem.location}
+                    </p>
+                    <p className="inline-flex items-center gap-1 text-sm text-slate-600">
+                      <CalendarDays className="h-4 w-4" />
+                      التاريخ: {eventItem.event_date}
+                    </p>
                     <p className="text-sm font-semibold text-primary">{eventItem.branch_name ?? eventItem.branch_governorate}</p>
                   </div>
                 </article>
