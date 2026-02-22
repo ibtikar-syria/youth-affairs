@@ -289,9 +289,9 @@ export const LandingPage = () => {
                 </h4>
                 <ul className="space-y-2 text-slate-700">
                   {goal.points.map((point) => (
-                    <li key={point} className="relative pe-4 leading-7">
-                      <span className="absolute right-0 top-3 h-1.5 w-1.5 rounded-full bg-accent" />
-                      {point}
+                    <li key={point} className="flex items-start gap-2 leading-7">
+                      <span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                      <span>{point}</span>
                     </li>
                   ))}
                 </ul>
