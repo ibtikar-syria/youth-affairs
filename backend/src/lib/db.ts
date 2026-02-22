@@ -98,10 +98,10 @@ export const initializeDatabase = async (db: D1Database) => {
 
   initPromise = (async () => {
     for (const statement of schemaStatements) {
-      await db.exec(statement)
+      await db.prepare(statement).run()
     }
 
-    await db.exec(seedContent)
+    await db.prepare(seedContent).run()
 
     for (const branch of seedBranches) {
       await db
