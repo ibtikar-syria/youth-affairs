@@ -59,9 +59,12 @@ export const LandingPage = () => {
     <div dir="rtl" className="min-h-screen bg-slate-50 text-slate-800">
       <header className="sticky top-0 z-30 border-b border-blue-100 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <div>
-            <h1 className="text-xl font-bold text-primary">{content.organizationName}</h1>
-            <p className="text-sm text-slate-600">{content.slogan}</p>
+          <div className="flex items-center gap-3">
+            <img src="/ya_logo_color.svg" alt="شعار شؤون الشباب" className="h-12 w-12" />
+            <div>
+              <h1 className="text-xl font-bold text-primary">{content.organizationName}</h1>
+              <p className="text-sm text-slate-600">{content.slogan}</p>
+            </div>
           </div>
           <div className="flex items-center gap-3 text-sm">
             <a href="#events" className="text-slate-600 hover:text-primary">
@@ -81,8 +84,14 @@ export const LandingPage = () => {
       </header>
 
       <main>
-        <section className="bg-gradient-to-l from-primary to-accent py-16 text-white">
-          <div className="animate-in mx-auto grid max-w-6xl gap-8 px-4 md:grid-cols-2 md:items-center">
+        <section className="relative overflow-hidden bg-gradient-to-l from-primary to-accent py-16 text-white">
+          <img
+            src="/ya_logo_gray.svg"
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute right-0 top-1/2 w-100 max-w-none -translate-x-1/2 -translate-y-1/2 opacity-25"
+          />
+          <div className="animate-in relative z-10 mx-auto grid max-w-6xl gap-8 px-4 md:grid-cols-2 md:items-center">
             <div>
               <h2 className="mb-4 text-3xl font-bold md:text-4xl">{content.slogan}</h2>
               <p className="mb-6 text-base leading-8 md:text-lg">{content.definition}</p>
