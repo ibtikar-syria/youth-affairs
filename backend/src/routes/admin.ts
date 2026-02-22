@@ -22,7 +22,60 @@ type EventInput = {
 
 export const adminRoutes = new Hono<AppEnv>()
 
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024
+const allowedImageTypes = new Set(['image/jpeg', 'image/png', 'image/webp'])
+
+const extensionForMimeType = (mimeType: string) => {
+  if (mimeType === 'image/png') return 'png'
+  if (mimeType === 'image/webp') return 'webp'
+  return 'jpg'
+}
+
 adminRoutes.use('*', requireAuth, requireRole('admin', 'superadmin'))
+
+adminRoutes.post('/r2/upload-image', async (c) => {
+  const bucket = c.env.R2_BUCKET
+  if (!bucket) {
+    return c.json({ error: 'R2 bucket binding is missing. Configure R2_BUCKET in wrangler and restart wrangler dev.' }, 500)
+  }
+
+  const authUser = c.get('authUser')
+  if (!authUser.branchId) {
+    return badRequest(c, 'Admin has no assigned branch')
+  }
+
+  const formData = await c.req.formData().catch(() => null)
+  if (!formData) {
+    return badRequest(c, 'Invalid multipart form data')
+  }
+
+  const fileEntry = formData.get('image')
+  if (!(fileEntry instanceof File)) {
+    return badRequest(c, 'Image file is required')
+  }
+
+  if (!allowedImageTypes.has(fileEntry.type)) {
+    return badRequest(c, 'Only JPG, PNG, and WEBP images are allowed')
+  }
+
+  if (fileEntry.size > MAX_IMAGE_BYTES) {
+    return badRequest(c, 'Image size must be 5MB or less')
+  }
+
+  const extension = extensionForMimeType(fileEntry.type)
+  const objectKey = `r2/${authUser.branchId}/${crypto.randomUUID()}.${extension}`
+
+  await bucket.put(objectKey, fileEntry.stream(), {
+    httpMetadata: {
+      contentType: fileEntry.type,
+    },
+  })
+
+  const url = new URL(c.req.url)
+  const imageUrl = `${url.origin}/api/public/images/${encodeURIComponent(objectKey)}`
+
+  return c.json({ imageUrl, key: objectKey }, 201)
+})
 
 adminRoutes.get('/me', (c) => c.json({ user: c.get('authUser') }))
 

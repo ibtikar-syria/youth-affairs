@@ -32,6 +32,7 @@ export const AdminPage = () => {
   const [events, setEvents] = useState<EventItem[]>([])
   const [eventForm, setEventForm] = useState<EventFormState>(emptyEvent)
   const [editingId, setEditingId] = useState<number | null>(null)
+  const [uploadingImage, setUploadingImage] = useState(false)
 
   const loadAdminData = async (activeToken: string) => {
     const [me, branchResult, eventsResult] = await Promise.all([
@@ -124,6 +125,23 @@ export const AdminPage = () => {
       setError(saveError instanceof Error ? saveError.message : 'فشل حفظ الفعالية')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleUploadR2Image = async (file: File) => {
+    if (!token) {
+      return
+    }
+
+    setUploadingImage(true)
+    setError('')
+    try {
+      const result = await api.uploadAdminR2Image(token, file)
+      setEventForm((prev) => ({ ...prev, imageUrl: result.imageUrl }))
+    } catch (uploadError) {
+      setError(uploadError instanceof Error ? uploadError.message : 'فشل رفع الصورة')
+    } finally {
+      setUploadingImage(false)
     }
   }
 
@@ -260,6 +278,27 @@ export const AdminPage = () => {
               value={eventForm.imageUrl}
               onChange={(event) => setEventForm((prev) => ({ ...prev, imageUrl: event.target.value }))}
             />
+            <div className="space-y-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <label className="block text-sm font-medium text-slate-700">أو ارفع صورة من جهازك</label>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(event) => {
+                  const file = event.target.files?.[0]
+                  if (file) {
+                    void handleUploadR2Image(file)
+                  }
+                  event.currentTarget.value = ''
+                }}
+                className="w-full text-sm"
+                disabled={loading || uploadingImage}
+              />
+              <p className="text-xs text-slate-500">الأنواع المسموحة: JPG, PNG, WEBP — الحد الأعلى 5MB</p>
+              {uploadingImage && <p className="text-sm text-primary">جار رفع الصورة...</p>}
+            </div>
+            {eventForm.imageUrl && (
+              <img src={eventForm.imageUrl} alt="معاينة صورة الفعالية" className="h-40 w-full rounded-lg object-cover" />
+            )}
             <textarea
               className="w-full rounded-lg border border-slate-300 px-3 py-2"
               placeholder="نص الإعلان"

@@ -3,6 +3,34 @@ import type { AppEnv, BranchRecord, EventRecord } from '../lib/types'
 
 export const publicRoutes = new Hono<AppEnv>()
 
+publicRoutes.get('/images/*', async (c) => {
+  const bucket = c.env.R2_BUCKET
+  if (!bucket) {
+    return c.json({ error: 'R2 bucket binding is missing. Configure R2_BUCKET in wrangler and restart wrangler dev.' }, 500)
+  }
+
+  const path = new URL(c.req.url).pathname
+  const prefix = '/api/public/images/'
+  const encodedKey = path.startsWith(prefix) ? path.slice(prefix.length) : ''
+  const objectKey = decodeURIComponent(encodedKey)
+
+  if (!objectKey) {
+    return c.json({ error: 'Image key is required' }, 400)
+  }
+
+  const object = await bucket.get(objectKey)
+  if (!object?.body) {
+    return c.json({ error: 'Image not found' }, 404)
+  }
+
+  const headers = new Headers()
+  object.writeHttpMetadata(headers)
+  headers.set('etag', object.httpEtag)
+  headers.set('cache-control', 'public, max-age=3600')
+
+  return new Response(object.body, { headers })
+})
+
 publicRoutes.get('/branches', async (c) => {
   const branches = await c.env.DB.prepare('SELECT * FROM branches ORDER BY governorate ASC').all<BranchRecord>()
   return c.json({ items: branches.results })

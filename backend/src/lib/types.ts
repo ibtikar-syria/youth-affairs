@@ -13,6 +13,7 @@ export type AuthUser = Omit<AuthTokenPayload, 'exp'>
 export type AppEnv = {
   Bindings: {
     DB: D1Database
+    R2_BUCKET?: R2Bucket
     JWT_SECRET: string
     CORS_ORIGIN?: string
   }

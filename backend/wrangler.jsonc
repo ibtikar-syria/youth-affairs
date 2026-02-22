@@ -14,11 +14,11 @@
       "database_id": "replace-with-your-d1-database-id",
       "migrations_dir":"../database"
     }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "R2_BUCKET",
+      "bucket_name": "youth-affairs-event-images"
+    }
   ]
-  // "r2_buckets": [
-  //   {
-  //     "binding": "MY_BUCKET",
-  //     "bucket_name": "my-bucket"
-  //   }
-  // ],
 }

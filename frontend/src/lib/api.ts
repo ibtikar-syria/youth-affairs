@@ -49,6 +49,25 @@ export const api = {
   getAdminEvents: (token: string) => request<{ items: EventItem[] }>('/api/admin/events', { token }),
   createAdminEvent: (token: string, body: Record<string, unknown>) =>
     request<{ ok: boolean }>('/api/admin/events', { method: 'POST', token, body }),
+  uploadAdminR2Image: async (token: string, file: File) => {
+    const formData = new FormData()
+    formData.append('image', file)
+
+    const response = await fetch(`${API_BASE}/api/admin/r2/upload-image`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    })
+
+    const data = await response.json().catch(() => null)
+    if (!response.ok) {
+      throw new Error((data as { error?: string } | null)?.error ?? 'فشل رفع الصورة')
+    }
+
+    return data as { imageUrl: string; key: string }
+  },
   updateAdminEvent: (token: string, id: number, body: Record<string, unknown>) =>
     request<{ ok: boolean }>(`/api/admin/events/${id}`, { method: 'PUT', token, body }),
   deleteAdminEvent: (token: string, id: number) =>
