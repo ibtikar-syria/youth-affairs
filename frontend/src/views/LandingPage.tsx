@@ -164,6 +164,7 @@ export const LandingPage = () => {
         duration: 0.8,
         stagger: 0.12,
         ease: 'power3.out',
+        immediateRender: false,
       })
 
       gsap.utils.toArray<HTMLElement>('.js-reveal').forEach((section) => {
@@ -172,10 +173,11 @@ export const LandingPage = () => {
           y: 34,
           duration: 0.75,
           ease: 'power2.out',
+          immediateRender: false,
           scrollTrigger: {
             trigger: section,
             start: 'top 84%',
-            toggleActions: 'play none none none',
+            once: true,
           },
         })
       })
@@ -190,10 +192,11 @@ export const LandingPage = () => {
           duration: 0.55,
           stagger: 0.08,
           ease: 'power2.out',
+          immediateRender: false,
           scrollTrigger: {
             trigger: grid,
             start: 'top 86%',
-            toggleActions: 'play none none none',
+            once: true,
           },
         })
       })
