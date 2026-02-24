@@ -208,28 +208,28 @@ export const LandingPage = () => {
           <button
             type="button"
             onClick={scrollToTop}
-            className="flex items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+            className="flex items-center gap-3 rounded-lg transition-transform duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
             aria-label="العودة إلى أعلى الصفحة"
           >
-            <img src="/ya_logo_color.svg" alt="شعار شؤون الشباب" className="h-12 w-12" />
+            <img src="/ya_logo_color.svg" alt="شعار شؤون الشباب" className="h-12 w-12 transition-transform duration-300 hover:rotate-6" />
             <div>
               <h1 className="text-xl font-bold text-primary">{content.organizationName}</h1>
               <p className="text-sm text-slate-600">{content.slogan}</p>
             </div>
           </button>
           <div className="flex items-center gap-3 text-sm">
-            <a href="#events" className="inline-flex items-center gap-1 text-slate-600 hover:text-primary">
+            <a href="#events" className="inline-flex items-center gap-1 text-slate-600 transition-all duration-200 hover:text-primary hover:translate-x-[-2px]">
               <CalendarDays className="h-4 w-4" />
               الفعاليات
             </a>
-            <a href="#branches" className="inline-flex items-center gap-1 text-slate-600 hover:text-primary">
+            <a href="#branches" className="inline-flex items-center gap-1 text-slate-600 transition-all duration-200 hover:text-primary hover:translate-x-[-2px]">
               <MapPin className="h-4 w-4" />
               الأفرع
             </a>
-            <Link to="/admin" className="rounded-lg border border-primary px-3 py-2 text-primary">
+            <Link to="/admin" className="rounded-lg border border-primary px-3 py-2 text-primary transition-all duration-200 hover:bg-primary/5 hover:shadow-md">
               دخول المشرف
             </Link>
-            <Link to="/superadmin" className="rounded-lg bg-primary px-3 py-2 text-white">
+            <Link to="/superadmin" className="rounded-lg bg-primary px-3 py-2 text-white transition-all duration-200 hover:bg-primary/90 hover:shadow-lg hover:scale-105">
               المدير العام
             </Link>
           </div>
@@ -252,13 +252,13 @@ export const LandingPage = () => {
                 href={content.volunteerFormUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="js-hero-reveal inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-bold text-primary"
+                className="js-hero-reveal inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-bold text-primary transition-all duration-300 hover:scale-105 hover:shadow-xl hover:bg-blue-50"
               >
                 تطوع الآن
-                <ArrowUpLeft className="h-5 w-5" />
+                <ArrowUpLeft className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-[-4px] group-hover:translate-y-[-4px]" />
               </a>
             </div>
-            <div className="js-hero-reveal rounded-2xl bg-white/15 p-6 backdrop-blur">
+            <div className="js-hero-reveal rounded-2xl bg-white/15 p-6 backdrop-blur transition-all duration-300 hover:bg-white/20 hover:shadow-2xl">
               <h3 className="mb-3 inline-flex items-center gap-2 text-lg font-bold">
                 <Target className="h-5 w-5" />
                 رؤيتنا
@@ -282,7 +282,7 @@ export const LandingPage = () => {
             {goals.map((goal, index) => {
               const Icon = goalIcons[index % goalIcons.length]
               return (
-              <article key={goal.title} className="js-card rounded-xl border border-blue-100 bg-white p-5 shadow-sm">
+              <article key={goal.title} className="js-card rounded-xl border border-blue-100 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02] hover:border-primary/30">
                 <h4 className="mb-3 inline-flex items-center gap-2 text-lg font-bold text-slate-900">
                   <Icon className="h-5 w-5 text-primary" />
                   {goal.title}
@@ -310,8 +310,8 @@ export const LandingPage = () => {
             {values.map((value) => {
               const Icon = value.icon
               return (
-              <div key={value.label} className="js-card rounded-xl border border-blue-100 bg-white p-4 text-center font-semibold shadow-sm">
-                <Icon className="mx-auto mb-2 h-5 w-5 text-primary" />
+              <div key={value.label} className="js-card rounded-xl border border-blue-100 bg-white p-4 text-center font-semibold shadow-sm transition-all duration-300 hover:shadow-md hover:scale-105 hover:bg-primary/5 hover:border-primary/40">
+                <Icon className="mx-auto mb-2 h-5 w-5 text-primary transition-transform duration-300 hover:scale-110" />
                 {value.label}
               </div>
               )
@@ -324,7 +324,7 @@ export const LandingPage = () => {
             <Globe2 className="h-6 w-6" />
             فضاء العمل
           </h3>
-          <article className="js-card rounded-2xl border border-blue-100 bg-white p-6 shadow-sm">
+          <article className="js-card rounded-2xl border border-blue-100 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-lg hover:border-primary/30">
             <p className="leading-8 text-slate-700">{content.workScope}</p>
           </article>
         </section>
@@ -336,7 +336,7 @@ export const LandingPage = () => {
           </h3>
           <div className="js-stagger-cards grid gap-4 md:grid-cols-2">
             {branches.map((branch) => (
-              <article key={branch.id} className="js-card rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
+              <article key={branch.id} className="js-card rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-primary/30">
                 <h4 className="text-lg font-bold text-slate-900">{branch.name}</h4>
                 <p className="mt-2 text-sm text-slate-600">{branch.address}</p>
                 <p className="inline-flex items-center gap-1 text-sm text-slate-600">
@@ -349,17 +349,17 @@ export const LandingPage = () => {
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2 text-sm">
                   {branch.facebook && (
-                    <a className="rounded-lg bg-blue-50 px-3 py-1 text-primary" href={branch.facebook} target="_blank" rel="noreferrer">
+                    <a className="rounded-lg bg-blue-50 px-3 py-1 text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md" href={branch.facebook} target="_blank" rel="noreferrer">
                       Facebook
                     </a>
                   )}
                   {branch.telegram && (
-                    <a className="rounded-lg bg-blue-50 px-3 py-1 text-primary" href={branch.telegram} target="_blank" rel="noreferrer">
+                    <a className="rounded-lg bg-blue-50 px-3 py-1 text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md" href={branch.telegram} target="_blank" rel="noreferrer">
                       Telegram
                     </a>
                   )}
                   {branch.instagram && (
-                    <a className="rounded-lg bg-blue-50 px-3 py-1 text-primary" href={branch.instagram} target="_blank" rel="noreferrer">
+                    <a className="rounded-lg bg-blue-50 px-3 py-1 text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md" href={branch.instagram} target="_blank" rel="noreferrer">
                       Instagram
                     </a>
                   )}
@@ -420,8 +420,8 @@ export const LandingPage = () => {
           ) : (
             <div className="js-stagger-cards grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {events.map((eventItem) => (
-                <article key={eventItem.id} className="js-card overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm">
-                  <img src={eventItem.image_url} alt={eventItem.title} className="h-44 w-full object-cover" />
+                <article key={eventItem.id} className="js-card group overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-primary/30">
+                  <img src={eventItem.image_url} alt={eventItem.title} className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-110" />
                   <div className="p-4">
                     <h4 className="mb-2 text-lg font-bold">{eventItem.title}</h4>
                     <p className="mb-3 text-sm text-slate-600">{eventItem.announcement}</p>
