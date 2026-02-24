@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import {
@@ -109,6 +109,7 @@ const monthOptions = Array.from({ length: 12 }).map((_, index) => {
 })
 
 export const LandingPage = () => {
+  const navigate = useNavigate()
   const pageRef = useRef<HTMLDivElement | null>(null)
   const [branches, setBranches] = useState<Branch[]>([])
   const [events, setEvents] = useState<EventItem[]>([])
@@ -371,10 +372,19 @@ export const LandingPage = () => {
 
         <section id="events" className="animate-in js-reveal mx-auto max-w-6xl px-4 py-14">
           <div className="js-card mb-6 flex flex-wrap items-center justify-between gap-4">
-            <h3 className="inline-flex items-center gap-2 text-2xl font-bold text-primary">
-              <CalendarDays className="h-6 w-6" />
-              الفعاليات
-            </h3>
+            <div className="flex flex-wrap items-center gap-4">
+              <h3 className="inline-flex items-center gap-2 text-2xl font-bold text-primary">
+                <CalendarDays className="h-6 w-6" />
+                الفعاليات
+              </h3>
+              <Link
+                to="/events"
+                className="inline-flex items-center gap-1 rounded-lg border border-primary bg-white px-4 py-2 text-sm font-semibold text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md"
+              >
+                عرض المزيد
+                <ArrowUpLeft className="h-4 w-4" />
+              </Link>
+            </div>
             <div className="flex flex-wrap gap-2">
               <select
                 className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
@@ -420,7 +430,11 @@ export const LandingPage = () => {
           ) : (
             <div className="js-stagger-cards grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {events.map((eventItem) => (
-                <article key={eventItem.id} className="js-card group overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-primary/30">
+                <article
+                  key={eventItem.id}
+                  onClick={() => navigate(`/events/${eventItem.id}`)}
+                  className="js-card group cursor-pointer overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-primary/30"
+                >
                   <img src={eventItem.image_url} alt={eventItem.title} className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-110" />
                   <div className="p-4">
                     <h4 className="mb-2 text-lg font-bold">{eventItem.title}</h4>
