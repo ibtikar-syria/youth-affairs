@@ -198,24 +198,24 @@ export const AdminPage = () => {
   }
 
   return (
-    <div dir="rtl" className="bg-slate-50">
-      <section className="border-b border-blue-100 bg-white shadow-sm">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-6">
-          <div>
-            <h1 className="text-2xl font-bold text-primary">لوحة مشرف الفرع</h1>
-            <p className="text-sm text-slate-600 text-right" dir='ltr'>{user.username}</p>
-          </div>
-          <button
-            onClick={logout}
-            className="inline-flex items-center gap-2 rounded-lg border border-primary px-4 py-2 text-primary transition hover:bg-primary hover:text-white"
-          >
-            <LogOut className="h-4 w-4" />
-            تسجيل الخروج
-          </button>
-        </div>
-      </section>
-
+    <div dir="rtl" className="min-h-screen bg-slate-50">
       <main className="mx-auto max-w-7xl space-y-6 px-4 py-8">
+        <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h1 className="text-2xl font-bold text-primary">لوحة مشرف الفرع</h1>
+              <p className="text-sm text-slate-600 text-right" dir='ltr'>{user.username}</p>
+            </div>
+            <button
+              onClick={logout}
+              className="inline-flex items-center gap-2 rounded-lg border border-primary px-4 py-2 text-primary transition hover:bg-primary hover:text-white"
+            >
+              <LogOut className="h-4 w-4" />
+              تسجيل الخروج
+            </button>
+          </div>
+        </section>
+
         <section className="grid gap-4 md:grid-cols-3">
           <article className="rounded-2xl border border-blue-100 bg-white p-4 shadow-sm">
             <div className="mb-2 inline-flex rounded-lg bg-primary/10 p-2 text-primary">
