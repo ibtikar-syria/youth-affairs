@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Building2, Check, LogOut, Pencil, ShieldCheck, UserCog, Users, X } from 'lucide-react'
+import { Building2, Check, LogOut, Pencil, ShieldCheck, Trash2, UserCog, Users, X } from 'lucide-react'
 import { api } from '../lib/api'
 import type { AdminUser, AuthUser, Branch } from '../lib/types'
 
@@ -68,6 +68,21 @@ export const SuperAdminPage = () => {
     message: '',
     confirmText: '',
     targetBranch: null,
+  })
+  const [branchDeleteState, setBranchDeleteState] = useState<{
+    open: boolean
+    branchId: number | null
+    branchName: string
+    adminsCount: number
+    eventsCount: number
+    loadingRelations: boolean
+  }>({
+    open: false,
+    branchId: null,
+    branchName: '',
+    adminsCount: 0,
+    eventsCount: 0,
+    loadingRelations: false,
   })
   const [editingAdminId, setEditingAdminId] = useState<number | null>(null)
   const [editingAdminForm, setEditingAdminForm] = useState<{ branchId: string } | null>(null)
@@ -358,6 +373,71 @@ export const SuperAdminPage = () => {
       setAdmins(result.items)
     } catch (adminError) {
       setError(adminError instanceof Error ? adminError.message : 'فشل إضافة المشرف')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const openBranchDeleteModal = async (branch: Branch) => {
+    if (!token) {
+      return
+    }
+
+    setBranchDeleteState({
+      open: true,
+      branchId: branch.id,
+      branchName: branch.name,
+      adminsCount: Number(branch.admins_count ?? 0),
+      eventsCount: Number(branch.events_count ?? 0),
+      loadingRelations: true,
+    })
+
+    try {
+      const result = await api.getSuperBranchRelations(token, branch.id)
+      setBranchDeleteState((prev) => ({
+        ...prev,
+        adminsCount: result.item.adminsCount,
+        eventsCount: result.item.eventsCount,
+        loadingRelations: false,
+      }))
+    } catch (relationsError) {
+      setError(relationsError instanceof Error ? relationsError.message : 'تعذر تحميل العلاقات المرتبطة بالفرع')
+      setBranchDeleteState((prev) => ({ ...prev, loadingRelations: false }))
+    }
+  }
+
+  const closeBranchDeleteModal = () => {
+    setBranchDeleteState({
+      open: false,
+      branchId: null,
+      branchName: '',
+      adminsCount: 0,
+      eventsCount: 0,
+      loadingRelations: false,
+    })
+  }
+
+  const confirmDeleteBranch = async () => {
+    if (!token || !branchDeleteState.branchId || branchDeleteState.loadingRelations) {
+      return
+    }
+
+    if (branchDeleteState.adminsCount > 0 || branchDeleteState.eventsCount > 0) {
+      return
+    }
+
+    setLoading(true)
+    setError('')
+    try {
+      await api.deleteSuperBranch(token, branchDeleteState.branchId)
+      if (editingBranchId === branchDeleteState.branchId) {
+        clearBranchEditing()
+      }
+      const result = await api.getSuperBranches(token)
+      setBranches(result.items)
+      closeBranchDeleteModal()
+    } catch (deleteError) {
+      setError(deleteError instanceof Error ? deleteError.message : 'فشل حذف الفرع')
     } finally {
       setLoading(false)
     }
@@ -709,7 +789,7 @@ export const SuperAdminPage = () => {
                     </button>
                   </div>
                 ) : (
-                  <div className="mb-2 flex justify-end">
+                  <div className="mb-2 flex justify-end gap-2">
                     <button
                       type="button"
                       onClick={() => startBranchEditing(branch)}
@@ -717,6 +797,14 @@ export const SuperAdminPage = () => {
                     >
                       <Pencil className="h-4 w-4" />
                       تعديل
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void openBranchDeleteModal(branch)}
+                      className="inline-flex items-center gap-1 rounded-lg border border-red-300 bg-white px-3 py-1 text-sm font-semibold text-red-600 transition hover:bg-red-50"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      حذف
                     </button>
                   </div>
                 )}
@@ -925,6 +1013,64 @@ export const SuperAdminPage = () => {
                 >
                   {branchConfirmState.confirmText}
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {branchDeleteState.open && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4">
+            <div className="w-full max-w-2xl rounded-2xl border border-blue-100 bg-white p-6 shadow-xl">
+              <h3 className="mb-2 text-xl font-bold text-slate-900">تأكيد حذف الفرع</h3>
+              <p className="mb-4 text-sm text-slate-600">
+                الفرع: <span className="font-semibold text-slate-900">{branchDeleteState.branchName}</span>
+              </p>
+
+              {branchDeleteState.loadingRelations ? (
+                <p className="rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-600">جار تحميل العلاقات المرتبطة...</p>
+              ) : (
+                <div className="space-y-4">
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                      <p className="text-sm text-slate-500">عدد الفعاليات المرتبطة</p>
+                      <p className="text-2xl font-bold text-slate-900">{branchDeleteState.eventsCount}</p>
+                    </div>
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                      <p className="text-sm text-slate-500">عدد المشرفين المرتبطين</p>
+                      <p className="text-2xl font-bold text-slate-900">{branchDeleteState.adminsCount}</p>
+                    </div>
+                  </div>
+
+                  {branchDeleteState.adminsCount > 0 || branchDeleteState.eventsCount > 0 ? (
+                    <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+                      لا يمكن حذف الفرع حالياً. يجب حذف أو نقل جميع الفعاليات والمشرفين المرتبطين بهذا الفرع أولاً.
+                    </p>
+                  ) : (
+                    <p className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                      لا توجد أي سجلات مرتبطة بهذا الفرع. يمكنك المتابعة بالحذف.
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <div className="mt-6 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={closeBranchDeleteModal}
+                  className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+                >
+                  إغلاق
+                </button>
+                {branchDeleteState.adminsCount === 0 && branchDeleteState.eventsCount === 0 && !branchDeleteState.loadingRelations && (
+                  <button
+                    type="button"
+                    onClick={() => void confirmDeleteBranch()}
+                    className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={loading}
+                  >
+                    حذف الفرع
+                  </button>
+                )}
               </div>
             </div>
           </div>
