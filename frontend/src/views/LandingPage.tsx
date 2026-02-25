@@ -23,6 +23,7 @@ import {
   Users,
 } from 'lucide-react'
 import { api } from '../lib/api'
+import { EventsExplorer } from '../components/EventsExplorer'
 import type { Branch, EventItem } from '../lib/types'
 
 const values = [
@@ -102,11 +103,6 @@ const content = {
     'يمتد عمل المؤسسة ليشمل الشباب السوري من مختلف الفئات العمرية وعلى المستوى الوطني، مع إمكانية تنفيذ أنشطة مشتركة إقليمياً أو دولياً بما لا يتعارض مع القوانين والسيادة الوطنية.',
   volunteerFormUrl: 'https://forms.google.com',
 }
-
-const monthOptions = Array.from({ length: 12 }).map((_, index) => {
-  const month = String(index + 1).padStart(2, '0')
-  return { value: month, label: `الشهر ${index + 1}` }
-})
 
 export const LandingPage = () => {
   const navigate = useNavigate()
@@ -414,7 +410,7 @@ export const LandingPage = () => {
         </section>
 
         <section id="events" className="animate-in js-reveal mx-auto max-w-6xl px-4 py-14">
-          <div className="js-card mb-6 flex flex-wrap items-center justify-between gap-4">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-4">
               <h3 className="inline-flex items-center gap-2 text-2xl font-bold text-primary">
                 <CalendarDays className="h-6 w-6" />
@@ -428,74 +424,18 @@ export const LandingPage = () => {
                 <ArrowUpLeft className="h-4 w-4" />
               </Link>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <select
-                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
-                value={filters.branchId}
-                onChange={(event) => setFilters((prev) => ({ ...prev, branchId: event.target.value }))}
-              >
-                <option value="">كل المحافظات</option>
-                {branches.map((branch) => (
-                  <option key={branch.id} value={branch.id}>
-                    {branch.governorate}
-                  </option>
-                ))}
-              </select>
-              <select
-                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
-                value={filters.month}
-                onChange={(event) => setFilters((prev) => ({ ...prev, month: event.target.value }))}
-              >
-                <option value="">كل الأشهر</option>
-                {monthOptions.map((month) => (
-                  <option key={month.value} value={month.value}>
-                    {month.label}
-                  </option>
-                ))}
-              </select>
-              <select
-                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
-                value={filters.year}
-                onChange={(event) => setFilters((prev) => ({ ...prev, year: event.target.value }))}
-              >
-                <option value="">كل السنوات</option>
-                {years.map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
-            </div>
           </div>
 
-          {loadingEvents ? (
-            <p className="text-slate-600">جار تحميل الفعاليات...</p>
-          ) : (
-            <div className="js-stagger-cards grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {events.map((eventItem) => (
-                <article
-                  key={eventItem.id}
-                  onClick={() => navigate(`/events/${eventItem.id}`)}
-                  className="js-card group cursor-pointer overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-primary/30"
-                >
-                  <img src={eventItem.image_url} alt={eventItem.title} className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                  <div className="p-4">
-                    <h4 className="mb-2 text-lg font-bold">{eventItem.title}</h4>
-                    <p className="mb-3 text-sm text-slate-600">{eventItem.announcement}</p>
-                    <p className="inline-flex items-center gap-1 text-sm text-slate-600">
-                      <MapPin className="h-4 w-4" />
-                      المكان: {eventItem.location}
-                    </p>
-                    <p className="inline-flex items-center gap-1 text-sm text-slate-600">
-                      <CalendarDays className="h-4 w-4" />
-                      التاريخ: {eventItem.event_date}
-                    </p>
-                    <p className="text-sm font-semibold text-primary">{eventItem.branch_name ?? eventItem.branch_governorate}</p>
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
+          <EventsExplorer
+            variant="landing"
+            branches={branches}
+            events={events}
+            filters={filters}
+            years={years}
+            loadingEvents={loadingEvents}
+            onFiltersChange={setFilters}
+            onEventClick={(eventId) => navigate(`/events/${eventId}`)}
+          />
         </section>
       </main>
 
