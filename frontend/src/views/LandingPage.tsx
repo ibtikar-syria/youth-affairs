@@ -266,6 +266,9 @@ export const LandingPage = () => {
                   aria-hidden="true"
                   className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(148,163,184,0.16)_1px,transparent_0)] [background-size:12px_12px] opacity-50 transition-opacity duration-300 group-hover:opacity-50"
                 />
+                <span aria-hidden="true" className="pointer-events-none absolute -bottom-5 -left-5 text-primary/50">
+                  <Icon className="h-20 w-20 rotate-[-18deg]" strokeWidth={1.4} />
+                </span>
                 <h4 className="relative z-10 mb-4 flex items-start justify-between gap-3 text-lg font-bold text-slate-900">
                   <span className="inline-flex items-start gap-2">
                     <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
