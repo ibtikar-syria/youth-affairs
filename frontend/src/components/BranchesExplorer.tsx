@@ -11,6 +11,15 @@ type BranchesExplorerProps = {
 export const BranchesExplorer = ({ branches, loadingBranches, variant }: BranchesExplorerProps) => {
   const isLanding = variant === 'landing'
 
+  const getWhatsappLink = (whatsapp: string) => {
+    if (whatsapp.startsWith('http://') || whatsapp.startsWith('https://')) {
+      return whatsapp
+    }
+
+    const normalizedNumber = whatsapp.replace(/\D/g, '')
+    return normalizedNumber ? `https://wa.me/${normalizedNumber}` : ''
+  }
+
   if (loadingBranches) {
     if (isLanding) {
       return <p className="text-slate-600">جار تحميل الأفرع...</p>
@@ -62,10 +71,6 @@ export const BranchesExplorer = ({ branches, loadingBranches, variant }: Branche
               <Phone className="h-4 w-4 shrink-0 text-primary/80" />
               <span>{branch.phone || 'غير متوفر'}</span>
             </div>
-            <div className="flex items-center gap-2 rounded-lg bg-white px-2.5 py-2">
-              <MessageCircle className="h-4 w-4 shrink-0 text-primary/80" />
-              <span>{branch.whatsapp || 'غير متوفر'}</span>
-            </div>
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2 text-sm">
@@ -103,6 +108,18 @@ export const BranchesExplorer = ({ branches, loadingBranches, variant }: Branche
                 title="Instagram"
               >
                 <Instagram className="h-4 w-4" />
+              </a>
+            )}
+            {branch.whatsapp && getWhatsappLink(branch.whatsapp) && (
+              <a
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md"
+                href={getWhatsappLink(branch.whatsapp)}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="WhatsApp"
+                title="WhatsApp"
+              >
+                <MessageCircle className="h-4 w-4" />
               </a>
             )}
           </div>
