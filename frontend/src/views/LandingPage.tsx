@@ -230,11 +230,8 @@ export const LandingPage = () => {
               <MapPin className="h-4 w-4" />
               الأفرع
             </a>
-            <Link to="/admin" className="rounded-lg border border-primary px-3 py-2 text-primary transition-all duration-200 hover:bg-primary/5 hover:shadow-md">
-              دخول المشرف
-            </Link>
-            <Link to="/superadmin" className="rounded-lg bg-primary px-3 py-2 text-white transition-all duration-200 hover:bg-primary/90 hover:shadow-lg hover:scale-105">
-              المدير العام
+            <Link to="/login" className="rounded-lg bg-primary px-3 py-2 text-white transition-all duration-200 hover:bg-primary/90 hover:shadow-lg hover:scale-105">
+              تسجيل الدخول
             </Link>
           </div>
         </div>

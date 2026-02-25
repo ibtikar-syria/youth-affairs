@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Building2, Check, LogOut, Pencil, ShieldCheck, Trash2, UserCog, Users, X } from 'lucide-react'
+import { Navigate } from 'react-router-dom'
+import { Building2, Check, LogOut, Pencil, Trash2, UserCog, Users, X } from 'lucide-react'
 import { api } from '../lib/api'
 import type { AdminUser, AuthUser, Branch } from '../lib/types'
 
@@ -14,7 +14,6 @@ export const SuperAdminPage = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const [loginForm, setLoginForm] = useState({ username: '', password: '' })
   const [user, setUser] = useState<AuthUser | null>(null)
 
   const [branches, setBranches] = useState<Branch[]>([])
@@ -144,25 +143,6 @@ export const SuperAdminPage = () => {
       })
       .finally(() => setLoading(false))
   }, [token])
-
-  const handleLogin = async (event: React.FormEvent) => {
-    event.preventDefault()
-    setLoading(true)
-    setError('')
-    try {
-      const result = await api.login(loginForm.username, loginForm.password)
-      if (result.user.role !== 'superadmin') {
-        setError('صلاحية غير كافية')
-        return
-      }
-      localStorage.setItem(TOKEN_KEY, result.token)
-      setToken(result.token)
-    } catch (loginError) {
-      setError(loginError instanceof Error ? loginError.message : 'فشل تسجيل الدخول')
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const handleCreateBranch = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -653,51 +633,14 @@ export const SuperAdminPage = () => {
     setUser(null)
   }
 
-  if (!token || !user) {
+  if (!token) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (!user) {
     return (
-      <div dir="rtl" className="min-h-screen bg-slate-50 px-4 py-10">
-        <div className="mx-auto max-w-lg">
-          <Link to="/" className="mb-6 inline-flex items-center text-sm font-medium text-primary transition hover:opacity-90">
-            العودة إلى الصفحة الرئيسية
-          </Link>
-
-          <div className="rounded-2xl border border-blue-100 bg-white p-6 shadow-sm">
-            <div className="mb-6 flex items-center gap-3">
-              <div className="rounded-xl bg-primary/10 p-3 text-primary">
-                <ShieldCheck className="h-5 w-5" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-primary">دخول المدير العام</h1>
-                <p className="text-sm text-slate-600">الوصول إلى إدارة الأفرع والمشرفين</p>
-              </div>
-            </div>
-
-            <form onSubmit={handleLogin} className="space-y-3">
-              <input
-                dir="ltr"
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                placeholder="اسم المستخدم"
-                value={loginForm.username}
-                onChange={(event) => setLoginForm((prev) => ({ ...prev, username: event.target.value }))}
-              />
-              <input
-                type="password"
-                dir="ltr"
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                placeholder="كلمة المرور"
-                value={loginForm.password}
-                onChange={(event) => setLoginForm((prev) => ({ ...prev, password: event.target.value }))}
-              />
-              <button
-                className="w-full rounded-lg bg-primary px-4 py-2 font-bold text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
-                disabled={loading}
-              >
-                {loading ? 'جار تسجيل الدخول...' : 'تسجيل الدخول'}
-              </button>
-              {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
-            </form>
-          </div>
-        </div>
+      <div dir="rtl" className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">
+        <p className="text-sm font-medium text-slate-600">جارٍ تحميل بيانات الحساب...</p>
       </div>
     )
   }
