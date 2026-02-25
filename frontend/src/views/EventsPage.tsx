@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 import { api } from '../lib/api'
 import { EventsExplorer } from '../components/EventsExplorer'
@@ -7,9 +7,17 @@ import type { Branch, EventItem } from '../lib/types'
 
 export const EventsPage = () => {
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [branches, setBranches] = useState<Branch[]>([])
   const [events, setEvents] = useState<EventItem[]>([])
-  const [filters, setFilters] = useState({ branchId: '', month: '', year: '' })
+  const [filters, setFilters] = useState(() => {
+    const params = new URLSearchParams(window.location.search)
+    return {
+      branchId: params.get('branchId') ?? '',
+      month: params.get('month') ?? '',
+      year: params.get('year') ?? '',
+    }
+  })
   const [loadingEvents, setLoadingEvents] = useState(false)
 
   const years = useMemo(() => {
@@ -23,6 +31,40 @@ export const EventsPage = () => {
       setBranches(branchesResult.items)
     })()
   }, [])
+
+  useEffect(() => {
+    const nextFilters = {
+      branchId: searchParams.get('branchId') ?? '',
+      month: searchParams.get('month') ?? '',
+      year: searchParams.get('year') ?? '',
+    }
+
+    setFilters({
+      branchId: nextFilters.branchId,
+      month: nextFilters.month,
+      year: nextFilters.year,
+    })
+  }, [searchParams])
+
+  useEffect(() => {
+    const currentBranchId = searchParams.get('branchId') ?? ''
+    const currentMonth = searchParams.get('month') ?? ''
+    const currentYear = searchParams.get('year') ?? ''
+
+    if (
+      currentBranchId === filters.branchId &&
+      currentMonth === filters.month &&
+      currentYear === filters.year
+    ) {
+      return
+    }
+
+    const params = new URLSearchParams()
+    if (filters.branchId) params.set('branchId', filters.branchId)
+    if (filters.month) params.set('month', filters.month)
+    if (filters.year) params.set('year', filters.year)
+    setSearchParams(params, { replace: true })
+  }, [filters, searchParams, setSearchParams])
 
   useEffect(() => {
     setLoadingEvents(true)

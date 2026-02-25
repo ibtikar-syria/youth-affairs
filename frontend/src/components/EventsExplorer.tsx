@@ -61,10 +61,10 @@ export const EventsExplorer = ({
             value={filters.branchId}
             onChange={(event) => onFiltersChange({ ...filters, branchId: event.target.value })}
           >
-            <option value="">كل المحافظات</option>
+            <option value="">كل الأفرع</option>
             {branches.map((branch) => (
               <option key={branch.id} value={branch.id}>
-                {branch.governorate}
+                {branch.name}
               </option>
             ))}
           </select>

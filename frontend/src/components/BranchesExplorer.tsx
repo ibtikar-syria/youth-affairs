@@ -1,4 +1,5 @@
 import { MapPin, MessageCircle, Phone } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import type { Branch } from '../lib/types'
 
 type BranchesExplorerProps = {
@@ -99,6 +100,13 @@ export const BranchesExplorer = ({ branches, loadingBranches, variant }: Branche
               </a>
             )}
           </div>
+
+          <Link
+            to={`/events?branchId=${branch.id}`}
+            className="mt-4 inline-flex w-fit items-center rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white transition-all duration-200 hover:bg-primary/90 hover:shadow-md"
+          >
+            فعاليات هذا الفرع
+          </Link>
         </article>
       ))}
     </div>
