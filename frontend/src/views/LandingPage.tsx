@@ -252,7 +252,7 @@ export const LandingPage = () => {
             {goals.map((goal, index) => {
               const Icon = goalIcons[index % goalIcons.length]
               return (
-              <article key={goal.title} className="js-card rounded-xl border border-blue-100 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02] hover:border-primary/30">
+              <article key={goal.title} className="js-card rounded-xl border border-blue-100 bg-white p-5 shadow-sm transition-all duration-300 hover:rounded-l-[3rem] hover:shadow-lg hover:scale-[1.02] hover:border-primary/30">
                 <h4 className="mb-3 inline-flex items-center gap-2 text-lg font-bold text-slate-900">
                   <Icon className="h-5 w-5 text-primary" />
                   {goal.title}
