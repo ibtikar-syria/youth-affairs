@@ -162,12 +162,12 @@ export const EventsExplorer = ({
                     {eventItem.title}
                   </h4>
                   <p className="mb-3 line-clamp-2 text-sm text-slate-600">{eventItem.announcement}</p>
-                  <div className="space-y-1">
-                    <p className="inline-flex items-center gap-1 text-xs text-slate-600">
+                  <div className="flex flex-wrap gap-2">
+                    <p className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700">
                       <MapPin className="h-3.5 w-3.5" />
                       {eventItem.location}
                     </p>
-                    <p className="inline-flex items-center gap-1 text-xs text-slate-600">
+                    <p className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700">
                       <CalendarDays className="h-3.5 w-3.5" />
                       {eventItem.event_date}
                     </p>
