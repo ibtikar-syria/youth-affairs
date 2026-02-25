@@ -34,6 +34,12 @@ export const AdminPage = () => {
   const [eventForm, setEventForm] = useState<EventFormState>(emptyEvent)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [showEventForm, setShowEventForm] = useState(false)
+  const [eventDeleteState, setEventDeleteState] = useState<{ open: boolean; eventId: number | null; title: string }>({
+    open: false,
+    eventId: null,
+    title: '',
+  })
 
   const loadAdminData = async (activeToken: string) => {
     const [me, branchResult, eventsResult] = await Promise.all([
@@ -122,6 +128,7 @@ export const AdminPage = () => {
       setEvents(updated.items)
       setEventForm(emptyEvent)
       setEditingId(null)
+      setShowEventForm(false)
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : 'فشل حفظ الفعالية')
     } finally {
@@ -157,6 +164,7 @@ export const AdminPage = () => {
       await api.deleteAdminEvent(token, eventId)
       const updated = await api.getAdminEvents(token)
       setEvents(updated.items)
+      setEventDeleteState({ open: false, eventId: null, title: '' })
     } catch (deleteError) {
       setError(deleteError instanceof Error ? deleteError.message : 'فشل حذف الفعالية')
     } finally {
@@ -170,6 +178,14 @@ export const AdminPage = () => {
     setUser(null)
     setBranch(null)
     setEvents([])
+  }
+
+  const openDeleteEventModal = (eventItem: EventItem) => {
+    setEventDeleteState({ open: true, eventId: eventItem.id, title: eventItem.title })
+  }
+
+  const closeDeleteEventModal = () => {
+    setEventDeleteState({ open: false, eventId: null, title: '' })
   }
 
   if (!token || !user) {
@@ -341,106 +357,129 @@ export const AdminPage = () => {
         )}
 
         <div className="grid gap-6 lg:grid-cols-2">
-          <form onSubmit={handleSaveEvent} className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
+          <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h2 className="text-lg font-bold">{editingId ? 'تعديل فعالية' : 'إضافة فعالية جديدة'}</h2>
-                <p className="text-sm text-slate-500">أدخل تفاصيل الفعالية وبياناتها الأساسية</p>
+                <h2 className="text-lg font-bold">الفعاليات</h2>
+                <p className="text-sm text-slate-500">إدارة الفعاليات وإضافة فعاليات جديدة</p>
               </div>
-              {editingId && <span className="rounded-lg bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">وضع التعديل</span>}
-            </div>
-            <div className="space-y-3">
-              <label className="space-y-1 text-sm text-slate-600">
-                <span className="font-semibold">اسم الفعالية</span>
-                <input
-                  dir="auto"
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  value={eventForm.title}
-                  onChange={(event) => setEventForm((prev) => ({ ...prev, title: event.target.value }))}
-                />
-              </label>
-              <label className="space-y-1 text-sm text-slate-600">
-                <span className="font-semibold">رابط الصورة</span>
-                <input
-                  dir="ltr"
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  value={eventForm.imageUrl}
-                  onChange={(event) => setEventForm((prev) => ({ ...prev, imageUrl: event.target.value }))}
-                />
-              </label>
-              <div className="space-y-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
-                <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-                  <Image className="h-4 w-4" />
-                  أو ارفع صورة من جهازك
-                </div>
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  onChange={(event) => {
-                    const file = event.target.files?.[0]
-                    if (file) {
-                      void handleUploadR2Image(file)
-                    }
-                    event.currentTarget.value = ''
-                  }}
-                  className="w-full text-sm"
-                  disabled={loading || uploadingImage}
-                />
-                <p className="text-xs text-slate-500">الأنواع المسموحة: JPG, PNG, WEBP — الحد الأعلى 5MB</p>
-                {uploadingImage && <p className="text-sm text-primary">جار رفع الصورة...</p>}
-              </div>
-              {eventForm.imageUrl && (
-                <img src={eventForm.imageUrl} alt="معاينة صورة الفعالية" className="h-40 w-full rounded-lg object-cover" />
-              )}
-              <label className="space-y-1 text-sm text-slate-600">
-                <span className="font-semibold">نص الإعلان</span>
-                <textarea
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  rows={4}
-                  value={eventForm.announcement}
-                  onChange={(event) => setEventForm((prev) => ({ ...prev, announcement: event.target.value }))}
-                />
-              </label>
-              <label className="space-y-1 text-sm text-slate-600">
-                <span className="font-semibold">تاريخ الفعالية</span>
-                <input
-                  type="date"
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  value={eventForm.eventDate}
-                  onChange={(event) => setEventForm((prev) => ({ ...prev, eventDate: event.target.value }))}
-                />
-              </label>
-              <label className="space-y-1 text-sm text-slate-600">
-                <span className="font-semibold">المكان</span>
-                <input
-                  dir="auto"
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  value={eventForm.location}
-                  onChange={(event) => setEventForm((prev) => ({ ...prev, location: event.target.value }))}
-                />
-              </label>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
               <button
-                className="rounded-lg bg-primary px-4 py-2 font-bold text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
-                disabled={loading}
+                type="button"
+                onClick={() => setShowEventForm((prev) => !prev)}
+                className="rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary hover:text-white"
               >
-                {editingId ? 'حفظ التعديلات' : 'إضافة الفعالية'}
+                {showEventForm ? 'إخفاء الإضافة' : 'إضافة جديدة'}
               </button>
-              {editingId && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditingId(null)
-                    setEventForm(emptyEvent)
-                  }}
-                  className="rounded-lg border border-slate-300 px-4 py-2 text-slate-700 transition hover:bg-slate-100"
-                >
-                  إلغاء
-                </button>
-              )}
             </div>
-          </form>
+
+            {(showEventForm || editingId) && (
+              <form onSubmit={handleSaveEvent} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <h3 className="text-base font-bold">{editingId ? 'تعديل فعالية' : 'إضافة فعالية جديدة'}</h3>
+                    <p className="text-sm text-slate-500">أدخل تفاصيل الفعالية وبياناتها الأساسية</p>
+                  </div>
+                  {editingId && <span className="rounded-lg bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">وضع التعديل</span>}
+                </div>
+                <div className="space-y-3">
+                  <label className="space-y-1 text-sm text-slate-600">
+                    <span className="font-semibold">اسم الفعالية</span>
+                    <input
+                      dir="auto"
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                      value={eventForm.title}
+                      onChange={(event) => setEventForm((prev) => ({ ...prev, title: event.target.value }))}
+                    />
+                  </label>
+                  <label className="space-y-1 text-sm text-slate-600">
+                    <span className="font-semibold">رابط الصورة</span>
+                    <input
+                      dir="ltr"
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                      value={eventForm.imageUrl}
+                      onChange={(event) => setEventForm((prev) => ({ ...prev, imageUrl: event.target.value }))}
+                    />
+                  </label>
+                  <div className="space-y-2 rounded-lg border border-slate-200 bg-white/60 p-3">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                      <Image className="h-4 w-4" />
+                      أو ارفع صورة من جهازك
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={(event) => {
+                        const file = event.target.files?.[0]
+                        if (file) {
+                          void handleUploadR2Image(file)
+                        }
+                        event.currentTarget.value = ''
+                      }}
+                      className="w-full text-sm"
+                      disabled={loading || uploadingImage}
+                    />
+                    <p className="text-xs text-slate-500">الأنواع المسموحة: JPG, PNG, WEBP — الحد الأعلى 5MB</p>
+                    {uploadingImage && <p className="text-sm text-primary">جار رفع الصورة...</p>}
+                  </div>
+                  {eventForm.imageUrl && (
+                    <img
+                      src={eventForm.imageUrl}
+                      alt="معاينة صورة الفعالية"
+                      className="h-40 w-full rounded-lg object-cover"
+                    />
+                  )}
+                  <label className="space-y-1 text-sm text-slate-600">
+                    <span className="font-semibold">نص الإعلان</span>
+                    <textarea
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                      rows={4}
+                      value={eventForm.announcement}
+                      onChange={(event) => setEventForm((prev) => ({ ...prev, announcement: event.target.value }))}
+                    />
+                  </label>
+                  <label className="space-y-1 text-sm text-slate-600">
+                    <span className="font-semibold">تاريخ الفعالية</span>
+                    <input
+                      type="date"
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                      value={eventForm.eventDate}
+                      onChange={(event) => setEventForm((prev) => ({ ...prev, eventDate: event.target.value }))}
+                    />
+                  </label>
+                  <label className="space-y-1 text-sm text-slate-600">
+                    <span className="font-semibold">المكان</span>
+                    <input
+                      dir="auto"
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                      value={eventForm.location}
+                      onChange={(event) => setEventForm((prev) => ({ ...prev, location: event.target.value }))}
+                    />
+                  </label>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <button
+                    className="rounded-lg bg-primary px-4 py-2 font-bold text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={loading}
+                  >
+                    {editingId ? 'حفظ التعديلات' : 'إضافة الفعالية'}
+                  </button>
+                  {editingId && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingId(null)
+                        setEventForm(emptyEvent)
+                        setShowEventForm(false)
+                      }}
+                      className="rounded-lg border border-slate-300 px-4 py-2 text-slate-700 transition hover:bg-slate-100"
+                    >
+                      إلغاء
+                    </button>
+                  )}
+                </div>
+              </form>
+            )}
+          </section>
 
           <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -492,13 +531,14 @@ export const AdminPage = () => {
                             eventDate: eventItem.event_date,
                             location: eventItem.location,
                           })
+                          setShowEventForm(true)
                         }}
                         className="rounded-lg border border-primary px-3 py-1 text-primary transition hover:bg-primary hover:text-white"
                       >
                         تعديل
                       </button>
                       <button
-                        onClick={() => void handleDeleteEvent(eventItem.id)}
+                        onClick={() => openDeleteEventModal(eventItem)}
                         className="rounded-lg border border-red-300 px-3 py-1 text-red-600 transition hover:bg-red-50"
                       >
                         حذف
@@ -510,6 +550,36 @@ export const AdminPage = () => {
             )}
           </section>
         </div>
+
+        {eventDeleteState.open && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4">
+            <div className="w-full max-w-md rounded-2xl border border-blue-100 bg-white p-5 shadow-xl">
+              <h3 className="mb-2 text-lg font-bold text-slate-900">تأكيد حذف الفعالية</h3>
+              <p className="mb-5 text-sm text-slate-600">هل أنت متأكد من حذف الفعالية: {eventDeleteState.title}؟</p>
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={closeDeleteEventModal}
+                  className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+                >
+                  إلغاء
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (eventDeleteState.eventId) {
+                      void handleDeleteEvent(eventDeleteState.eventId)
+                    }
+                  }}
+                  className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  disabled={loading}
+                >
+                  حذف الفعالية
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   )
