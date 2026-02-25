@@ -54,11 +54,11 @@ export const EventDetailPage = () => {
     return (
       <div dir="rtl" className="bg-slate-50">
         <main className="mx-auto max-w-4xl px-4 py-12">
-          <div className="rounded-xl border border-blue-100 bg-white p-12 text-center shadow-sm">
+          <div className="rounded-xl border border-blue-100 bg-white p-8 text-center shadow-sm sm:p-12">
             <CalendarDays className="mx-auto h-16 w-16 text-slate-300" />
             <h1 className="mt-4 text-2xl font-bold text-slate-900">الفعالية غير موجودة</h1>
             <p className="mt-2 text-slate-600">لم نتمكن من العثور على الفعالية المطلوبة</p>
-            <div className="mt-6 flex justify-center gap-3">
+            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
               <Link
                 to="/events"
                 className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-bold text-white transition-all duration-200 hover:scale-105 hover:shadow-lg"
@@ -84,23 +84,23 @@ export const EventDetailPage = () => {
     <div dir="rtl" className="bg-slate-50">
       <main className="mx-auto max-w-5xl px-4 py-8">
         <article className="overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-lg">
-          <div className="relative h-96 overflow-hidden">
+          <div className="relative h-64 overflow-hidden sm:h-80 md:h-96">
             <img
               src={event.image_url}
               alt={event.title}
               className="h-full w-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
-            <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+            <div className="absolute bottom-0 left-0 right-0 p-4 text-white sm:p-6 md:p-8">
               <div className="mb-2 inline-flex items-center gap-2 rounded-lg bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-sm">
                 <Building2 className="h-3.5 w-3.5" />
                 {event.branch_name ?? event.branch_governorate}
               </div>
-              <h1 className="text-4xl font-bold leading-tight">{event.title}</h1>
+              <h1 className="text-2xl font-bold leading-tight sm:text-3xl md:text-4xl">{event.title}</h1>
             </div>
           </div>
 
-          <div className="p-8">
+          <div className="p-4 sm:p-6 md:p-8">
             <div className="mb-6 grid gap-4 sm:grid-cols-2">
               <div className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
                 <Calendar className="mt-0.5 h-5 w-5 text-primary" />
@@ -118,7 +118,7 @@ export const EventDetailPage = () => {
               </div>
             </div>
 
-            <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-6">
+            <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4 sm:p-6">
               <h2 className="mb-4 flex items-center gap-2 text-xl font-bold text-slate-900">
                 <CalendarDays className="h-5 w-5 text-primary" />
                 تفاصيل الفعالية
@@ -129,7 +129,7 @@ export const EventDetailPage = () => {
             </div>
 
             {event.urls.length > 0 && (
-              <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6">
+              <div className="mt-6 rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
                 <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-slate-900">
                   <Link2 className="h-5 w-5 text-primary" />
                   روابط مرفقة

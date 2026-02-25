@@ -230,28 +230,28 @@ export const LandingPage = () => {
   return (
     <div ref={pageRef} dir="rtl" className="bg-slate-50 text-slate-800">
       <main>
-        <section className="relative overflow-hidden bg-gradient-to-l from-primary to-accent py-16 text-white">
+        <section className="relative overflow-hidden bg-gradient-to-l from-primary to-accent py-12 text-white md:py-16">
           <img
             src="/ya_logo_gray.svg"
             alt=""
             aria-hidden="true"
-            className="pointer-events-none absolute right-0 top-1/2 w-100 max-w-none -translate-x-1/2 -translate-y-1/2 opacity-50"
+            className="pointer-events-none absolute right-0 top-1/2 w-64 max-w-none -translate-x-1/2 -translate-y-1/2 opacity-50 sm:w-80 md:w-[26rem]"
           />
           <div className="animate-in relative z-10 mx-auto grid max-w-6xl gap-8 px-4 md:grid-cols-2 md:items-center">
             <div>
-              <h2 className="js-hero-reveal mb-4 text-3xl font-bold md:text-4xl">{content.slogan}</h2>
+              <h2 className="js-hero-reveal mb-4 text-2xl font-bold leading-tight sm:text-3xl md:text-4xl">{content.slogan}</h2>
               <p className="js-hero-reveal mb-6 text-base leading-8 md:text-lg">{content.definition}</p>
               <a
                 href={content.volunteerFormUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="js-hero-reveal inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-bold text-primary transition-all duration-300 hover:scale-105 hover:shadow-xl hover:bg-blue-50"
+                className="js-hero-reveal inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-primary transition-all duration-300 hover:scale-105 hover:shadow-xl hover:bg-blue-50 sm:px-6 sm:text-base"
               >
                 تطوع الآن
                 <ArrowUpLeft className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-[-4px] group-hover:translate-y-[-4px]" />
               </a>
             </div>
-            <div className="js-hero-reveal group relative overflow-hidden rounded-2xl border border-white/30 bg-white/10 p-6 backdrop-blur-xl transition-all duration-500 hover:-translate-y-1 hover:bg-white/15 hover:shadow-[0_20px_45px_rgba(15,23,42,0.35)] hover:ring-1 hover:ring-white/40">
+            <div className="js-hero-reveal group relative overflow-hidden rounded-2xl border border-white/30 bg-white/10 p-4 backdrop-blur-xl transition-all duration-500 hover:-translate-y-1 hover:bg-white/15 hover:shadow-[0_20px_45px_rgba(15,23,42,0.35)] hover:ring-1 hover:ring-white/40 sm:p-6">
               <span
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/35 via-white/10 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-100"
@@ -292,7 +292,7 @@ export const LandingPage = () => {
             {goals.map((goal, index) => {
               const Icon = goalIcons[index % goalIcons.length]
               return (
-              <article key={goal.title} className="js-card group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:rounded-l-[3.5rem] hover:border-primary/35 hover:shadow-xl">
+              <article key={goal.title} className="js-card group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:rounded-l-[3.5rem] hover:border-primary/35 hover:shadow-xl sm:p-6">
                 <span
                   aria-hidden="true"
                   className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-primary/70 to-accent/70 transition-all duration-300 group-hover:w-1.5"
@@ -421,7 +421,7 @@ export const LandingPage = () => {
         <section id="branches" className="animate-in js-reveal mx-auto max-w-6xl px-4 py-14">
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-4">
-              <h3 className="inline-flex items-center gap-2 text-2xl font-bold text-primary">
+              <h3 className="inline-flex items-center gap-2 text-xl font-bold text-primary sm:text-2xl">
                 <MapPin className="h-6 w-6" />
                 دليل الأفرع
               </h3>
@@ -446,7 +446,7 @@ export const LandingPage = () => {
         <section id="events" className="animate-in js-reveal mx-auto max-w-6xl px-4 py-14">
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-4">
-              <h3 className="inline-flex items-center gap-2 text-2xl font-bold text-primary">
+              <h3 className="inline-flex items-center gap-2 text-xl font-bold text-primary sm:text-2xl">
                 <CalendarDays className="h-6 w-6" />
                 الفعاليات
               </h3>
@@ -477,7 +477,7 @@ export const LandingPage = () => {
         type="button"
         onClick={scrollToTop}
         aria-label="العودة للأعلى"
-        className={`fixed bottom-6 right-6 z-40 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-all duration-300 hover:scale-105 ${
+        className={`fixed bottom-4 right-4 z-40 inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-all duration-300 hover:scale-105 sm:bottom-6 sm:right-6 sm:h-12 sm:w-12 ${
           showScrollTop ? 'pointer-events-auto translate-y-0 opacity-100' : 'pointer-events-none translate-y-4 opacity-0'
         }`}
       >

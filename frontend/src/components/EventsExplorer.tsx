@@ -53,12 +53,12 @@ export const EventsExplorer = ({
             تصفية النتائج
           </div>
         )}
-        <div className="flex flex-wrap gap-3">
+        <div className="grid gap-2 sm:flex sm:flex-wrap sm:gap-3">
           <select
             className={
               isLanding
-                ? 'rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm'
-                : 'rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm transition-all duration-200 hover:border-primary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20'
+                ? 'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm sm:w-auto'
+                : 'w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm transition-all duration-200 hover:border-primary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:w-auto'
             }
             value={filters.branchId}
             onChange={(event) => onFiltersChange({ ...filters, branchId: event.target.value })}
@@ -73,8 +73,8 @@ export const EventsExplorer = ({
           <select
             className={
               isLanding
-                ? 'rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm'
-                : 'rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm transition-all duration-200 hover:border-primary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20'
+                ? 'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm sm:w-auto'
+                : 'w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm transition-all duration-200 hover:border-primary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:w-auto'
             }
             value={filters.month}
             onChange={(event) => onFiltersChange({ ...filters, month: event.target.value })}
@@ -89,8 +89,8 @@ export const EventsExplorer = ({
           <select
             className={
               isLanding
-                ? 'rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm'
-                : 'rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm transition-all duration-200 hover:border-primary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20'
+                ? 'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm sm:w-auto'
+                : 'w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm transition-all duration-200 hover:border-primary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:w-auto'
             }
             value={filters.year}
             onChange={(event) => onFiltersChange({ ...filters, year: event.target.value })}
@@ -106,7 +106,7 @@ export const EventsExplorer = ({
             <button
               type="button"
               onClick={() => onFiltersChange({ branchId: '', month: '', year: '' })}
-              className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition-all duration-200 hover:bg-slate-200"
+              className="w-full rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition-all duration-200 hover:bg-slate-200 sm:w-auto"
             >
               إعادة تعيين
             </button>

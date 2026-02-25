@@ -69,9 +69,9 @@ export const BranchesExplorer = ({ branches, loadingBranches, variant }: Branche
           </div>
 
           <div className="mb-4 flex flex-wrap gap-2">
-            <p className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700">
+            <p className="inline-flex max-w-full items-start gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700">
               <MapPin className="h-3.5 w-3.5" />
-              {branch.address || 'لا يوجد عنوان مضاف بعد.'}
+              <span className="break-words">{branch.address || 'لا يوجد عنوان مضاف بعد.'}</span>
             </p>
             <p className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700">
               <Phone className="h-3.5 w-3.5" />
@@ -171,10 +171,10 @@ export const BranchesExplorer = ({ branches, loadingBranches, variant }: Branche
             )}
           </div>
 
-          <div className="mt-auto flex items-end justify-between gap-3 pt-4">
+          <div className="mt-auto flex flex-col-reverse items-stretch gap-3 pt-4 sm:flex-row sm:items-end sm:justify-between">
             <Link
               to={`/events?branchId=${branch.id}`}
-              className="inline-flex w-fit items-center gap-2 rounded-xl border border-primary/25 bg-primary/10 px-3.5 py-2 text-sm font-semibold text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-primary/25 bg-primary/10 px-3.5 py-2 text-sm font-semibold text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 sm:w-fit"
             >
               <CalendarDays className="h-4 w-4" />
               فعاليات هذا الفرع

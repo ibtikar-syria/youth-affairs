@@ -22,8 +22,8 @@ export const BranchesPage = () => {
         <section className="mb-6 rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
           <div>
             <div>
-              <h1 className="inline-flex items-center gap-2 text-3xl font-bold text-primary">
-                <MapPin className="h-7 w-7" />
+              <h1 className="inline-flex items-center gap-2 text-2xl font-bold text-primary sm:text-3xl">
+                <MapPin className="h-6 w-6 sm:h-7 sm:w-7" />
                 دليل الأفرع
               </h1>
               <p className="mt-1 text-sm text-slate-600">تصفح جميع الأفرع ومعلومات التواصل</p>
