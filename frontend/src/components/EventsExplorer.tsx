@@ -10,11 +10,11 @@ type EventsFilters = {
 type EventsExplorerProps = {
   branches: Branch[]
   events: EventItem[]
-  filters: EventsFilters
-  years: number[]
+  filters?: EventsFilters
+  years?: number[]
   loadingEvents: boolean
   variant: 'landing' | 'events-page'
-  onFiltersChange: (filters: EventsFilters) => void
+  onFiltersChange?: (filters: EventsFilters) => void
   onEventClick: (eventId: number) => void
 }
 
@@ -27,41 +27,31 @@ export const EventsExplorer = ({
   branches,
   events,
   filters,
-  years,
+  years = [],
   loadingEvents,
   variant,
   onFiltersChange,
   onEventClick,
 }: EventsExplorerProps) => {
-  const hasActiveFilters = Boolean(filters.branchId || filters.month || filters.year)
   const isLanding = variant === 'landing'
+  const hasFilterControls = !isLanding && Boolean(filters) && Boolean(onFiltersChange)
+  const hasActiveFilters = Boolean(filters?.branchId || filters?.month || filters?.year)
   const displayedEvents = isLanding ? events.slice(0, 3) : events
   const remainingEventsCount = Math.max(events.length - displayedEvents.length, 0)
 
   return (
     <>
-      <div
-        className={
-          isLanding
-            ? 'js-card mb-6 flex flex-wrap gap-2'
-            : 'mb-6 rounded-xl border border-blue-100 bg-white p-4 shadow-sm'
-        }
-      >
-        {!isLanding && (
+      {hasFilterControls && (
+        <div className="mb-6 rounded-xl border border-blue-100 bg-white p-4 shadow-sm">
           <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-700">
             <Filter className="h-4 w-4" />
             تصفية النتائج
           </div>
-        )}
-        <div className="grid gap-2 sm:flex sm:flex-wrap sm:gap-3">
+          <div className="grid gap-2 sm:flex sm:flex-wrap sm:gap-3">
           <select
-            className={
-              isLanding
-                ? 'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm sm:w-auto'
-                : 'w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm transition-all duration-200 hover:border-primary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:w-auto'
-            }
-            value={filters.branchId}
-            onChange={(event) => onFiltersChange({ ...filters, branchId: event.target.value })}
+            className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm transition-all duration-200 hover:border-primary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:w-auto"
+            value={filters?.branchId ?? ''}
+            onChange={(event) => onFiltersChange?.({ ...(filters ?? { branchId: '', month: '', year: '' }), branchId: event.target.value })}
           >
             <option value="">كل الأفرع</option>
             {branches.map((branch) => (
@@ -71,13 +61,9 @@ export const EventsExplorer = ({
             ))}
           </select>
           <select
-            className={
-              isLanding
-                ? 'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm sm:w-auto'
-                : 'w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm transition-all duration-200 hover:border-primary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:w-auto'
-            }
-            value={filters.month}
-            onChange={(event) => onFiltersChange({ ...filters, month: event.target.value })}
+            className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm transition-all duration-200 hover:border-primary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:w-auto"
+            value={filters?.month ?? ''}
+            onChange={(event) => onFiltersChange?.({ ...(filters ?? { branchId: '', month: '', year: '' }), month: event.target.value })}
           >
             <option value="">كل الأشهر</option>
             {monthOptions.map((month) => (
@@ -87,13 +73,9 @@ export const EventsExplorer = ({
             ))}
           </select>
           <select
-            className={
-              isLanding
-                ? 'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm sm:w-auto'
-                : 'w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm transition-all duration-200 hover:border-primary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:w-auto'
-            }
-            value={filters.year}
-            onChange={(event) => onFiltersChange({ ...filters, year: event.target.value })}
+            className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm transition-all duration-200 hover:border-primary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:w-auto"
+            value={filters?.year ?? ''}
+            onChange={(event) => onFiltersChange?.({ ...(filters ?? { branchId: '', month: '', year: '' }), year: event.target.value })}
           >
             <option value="">كل السنوات</option>
             {years.map((year) => (
@@ -105,14 +87,15 @@ export const EventsExplorer = ({
           {!isLanding && hasActiveFilters && (
             <button
               type="button"
-              onClick={() => onFiltersChange({ branchId: '', month: '', year: '' })}
+              onClick={() => onFiltersChange?.({ branchId: '', month: '', year: '' })}
               className="w-full rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition-all duration-200 hover:bg-slate-200 sm:w-auto"
             >
               إعادة تعيين
             </button>
           )}
+          </div>
         </div>
-      </div>
+      )}
 
       {loadingEvents ? (
         isLanding ? (

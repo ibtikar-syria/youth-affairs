@@ -109,16 +109,10 @@ export const LandingPage = () => {
   const [branches, setBranches] = useState<Branch[]>([])
   const [events, setEvents] = useState<EventItem[]>([])
   const [loadingBranches, setLoadingBranches] = useState(false)
-  const [filters, setFilters] = useState({ branchId: '', month: '', year: '' })
   const [loadingEvents, setLoadingEvents] = useState(false)
   const [showScrollTop, setShowScrollTop] = useState(false)
 
   const landingBranches = useMemo(() => branches.slice(0, 6), [branches])
-
-  const years = useMemo(() => {
-    const currentYear = new Date().getFullYear()
-    return [currentYear - 1, currentYear, currentYear + 1]
-  }, [])
 
   useEffect(() => {
     setLoadingBranches(true)
@@ -131,10 +125,10 @@ export const LandingPage = () => {
   useEffect(() => {
     setLoadingEvents(true)
     void api
-      .getPublicEvents(filters)
+      .getPublicEvents({})
       .then((result) => setEvents(result.items))
       .finally(() => setLoadingEvents(false))
-  }, [filters])
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -464,10 +458,7 @@ export const LandingPage = () => {
             variant="landing"
             branches={branches}
             events={events}
-            filters={filters}
-            years={years}
             loadingEvents={loadingEvents}
-            onFiltersChange={setFilters}
             onEventClick={(eventId) => navigate(`/events/${eventId}`)}
           />
         </section>
