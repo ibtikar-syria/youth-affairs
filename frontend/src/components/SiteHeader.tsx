@@ -40,29 +40,20 @@ export const SiteHeader = ({ isLanding = false, onLogoClick }: SiteHeaderProps) 
         )}
 
         <div className="flex items-center gap-3 text-sm">
-          {isLanding ? (
-            <>
-              <a href="#events" className="inline-flex items-center gap-1 text-slate-600 transition-all duration-200 hover:text-primary hover:translate-x-[-2px]">
-                <CalendarDays className="h-4 w-4" />
-                الفعاليات
-              </a>
-              <a href="#branches" className="inline-flex items-center gap-1 text-slate-600 transition-all duration-200 hover:text-primary hover:translate-x-[-2px]">
-                <MapPin className="h-4 w-4" />
-                الأفرع
-              </a>
-            </>
-          ) : (
-            <>
-              <Link to="/events" className="inline-flex items-center gap-1 text-slate-600 transition-all duration-200 hover:text-primary hover:translate-x-[-2px]">
-                <CalendarDays className="h-4 w-4" />
-                الفعاليات
-              </Link>
-              <Link to="/branches" className="inline-flex items-center gap-1 text-slate-600 transition-all duration-200 hover:text-primary hover:translate-x-[-2px]">
-                <MapPin className="h-4 w-4" />
-                الأفرع
-              </Link>
-            </>
-          )}
+          <Link
+            to="/events"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 font-medium text-slate-700 transition-all duration-200 hover:border-primary/30 hover:bg-primary/10 hover:text-primary hover:shadow-sm"
+          >
+            <CalendarDays className="h-4 w-4" />
+            الفعاليات
+          </Link>
+          <Link
+            to="/branches"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 font-medium text-slate-700 transition-all duration-200 hover:border-primary/30 hover:bg-primary/10 hover:text-primary hover:shadow-sm"
+          >
+            <MapPin className="h-4 w-4" />
+            الأفرع
+          </Link>
           <Link to="/login" className="rounded-lg bg-primary px-3 py-2 text-white transition-all duration-200 hover:bg-primary/90 hover:shadow-lg hover:scale-105">
             تسجيل الدخول
           </Link>
