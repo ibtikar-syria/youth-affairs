@@ -85,8 +85,8 @@ export const SuperAdminPage = () => {
     loadingRelations: false,
   })
   const [editingAdminId, setEditingAdminId] = useState<number | null>(null)
-  const [editingAdminForm, setEditingAdminForm] = useState<{ branchId: string } | null>(null)
-  const [editingAdminInitialForm, setEditingAdminInitialForm] = useState<{ branchId: string } | null>(null)
+  const [editingAdminForm, setEditingAdminForm] = useState<{ username: string; displayName: string; branchId: string } | null>(null)
+  const [editingAdminInitialForm, setEditingAdminInitialForm] = useState<{ username: string; displayName: string; branchId: string } | null>(null)
   const [adminConfirmState, setAdminConfirmState] = useState<{
     open: boolean
     action: AdminConfirmAction | null
@@ -443,24 +443,6 @@ export const SuperAdminPage = () => {
     }
   }
 
-  const handleChangeAdminBranch = async (adminId: number, branchId: number) => {
-    if (!token) {
-      return
-    }
-
-    setLoading(true)
-    setError('')
-    try {
-      await api.setAdminBranch(token, adminId, branchId)
-      const result = await api.getSuperAdmins(token)
-      setAdmins(result.items)
-    } catch (changeError) {
-      setError(changeError instanceof Error ? changeError.message : 'فشل تحديث محافظة المشرف')
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const handleDeleteAdmin = async (adminId: number) => {
     if (!token) {
       return
@@ -484,7 +466,11 @@ export const SuperAdminPage = () => {
       return false
     }
 
-    return editingAdminForm.branchId !== editingAdminInitialForm.branchId
+    return (
+      editingAdminForm.branchId !== editingAdminInitialForm.branchId ||
+      editingAdminForm.username !== editingAdminInitialForm.username ||
+      editingAdminForm.displayName !== editingAdminInitialForm.displayName
+    )
   }
 
   const clearAdminEditing = () => {
@@ -496,8 +482,16 @@ export const SuperAdminPage = () => {
   const applyStartAdminEditing = (admin: AdminUser) => {
     const branchIdValue = String(admin.branch_id ?? '')
     setEditingAdminId(admin.id)
-    setEditingAdminForm({ branchId: branchIdValue })
-    setEditingAdminInitialForm({ branchId: branchIdValue })
+    setEditingAdminForm({
+      username: admin.username,
+      displayName: admin.display_name,
+      branchId: branchIdValue,
+    })
+    setEditingAdminInitialForm({
+      username: admin.username,
+      displayName: admin.display_name,
+      branchId: branchIdValue,
+    })
   }
 
   const openAdminConfirm = (
@@ -585,14 +579,28 @@ export const SuperAdminPage = () => {
         return
       }
 
-      if (!editingAdminForm.branchId) {
-        setError('يرجى اختيار محافظة للمشرف')
+      if (!editingAdminForm.branchId || !editingAdminForm.username.trim() || !editingAdminForm.displayName.trim()) {
+        setError('يرجى تعبئة جميع الحقول المطلوبة للمشرف')
         closeAdminConfirm()
         return
       }
 
-      await handleChangeAdminBranch(adminConfirmState.targetAdmin.id, Number(editingAdminForm.branchId))
-      clearAdminEditing()
+      setLoading(true)
+      setError('')
+      try {
+        await api.updateSuperAdmin(token!, adminConfirmState.targetAdmin.id, {
+          username: editingAdminForm.username.trim(),
+          displayName: editingAdminForm.displayName.trim(),
+          branchId: Number(editingAdminForm.branchId),
+        })
+        const result = await api.getSuperAdmins(token!)
+        setAdmins(result.items)
+        clearAdminEditing()
+      } catch (updateError) {
+        setError(updateError instanceof Error ? updateError.message : 'فشل تحديث بيانات المشرف')
+      } finally {
+        setLoading(false)
+      }
       closeAdminConfirm()
       return
     }
@@ -967,11 +975,25 @@ export const SuperAdminPage = () => {
                   <div className="grid gap-2 md:grid-cols-2">
                     <div>
                       <p className="mb-1 text-xs font-semibold text-slate-600">الاسم الكامل</p>
-                      <p className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900">{admin.display_name}</p>
+                      <input
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                        value={editingAdminId === admin.id ? editingAdminForm?.displayName ?? '' : admin.display_name}
+                        disabled={editingAdminId !== admin.id}
+                        onChange={(event) =>
+                          setEditingAdminForm((prev) => (prev ? { ...prev, displayName: event.target.value } : prev))
+                        }
+                      />
                     </div>
                     <div>
                       <p className="mb-1 text-xs font-semibold text-slate-600">اسم المستخدم</p>
-                      <p className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900">{admin.username}</p>
+                      <input
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                        value={editingAdminId === admin.id ? editingAdminForm?.username ?? '' : admin.username}
+                        disabled={editingAdminId !== admin.id}
+                        onChange={(event) =>
+                          setEditingAdminForm((prev) => (prev ? { ...prev, username: event.target.value } : prev))
+                        }
+                      />
                     </div>
                   </div>
                   <div className="mt-2 flex flex-wrap items-end gap-2">
