@@ -987,7 +987,7 @@ export const SuperAdminPage = () => {
                       </button>
                     </div>
                   ) : (
-                    <div className="mb-2 flex justify-end">
+                    <div className="mb-2 flex justify-end gap-2">
                       <button
                         type="button"
                         onClick={() => startAdminEditing(admin)}
@@ -995,6 +995,22 @@ export const SuperAdminPage = () => {
                       >
                         <Pencil className="h-4 w-4" />
                         تعديل
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          openAdminConfirm(
+                            'delete',
+                            'تأكيد حذف المشرف',
+                            `هل أنت متأكد من حذف المشرف ${admin.display_name}؟`,
+                            'حذف المشرف',
+                            admin,
+                          )
+                        }
+                        className="inline-flex items-center gap-1 rounded-lg border border-red-300 bg-white px-3 py-1 text-sm font-semibold text-red-600 transition hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        حذف
                       </button>
                     </div>
                   )}
@@ -1066,21 +1082,6 @@ export const SuperAdminPage = () => {
                         ))}
                       </select>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        openAdminConfirm(
-                          'delete',
-                          'تأكيد حذف المشرف',
-                          `هل أنت متأكد من حذف المشرف ${admin.display_name}؟`,
-                          'حذف المشرف',
-                          admin,
-                        )
-                      }
-                      className="rounded-lg border border-red-300 bg-white px-3 py-1 text-red-600 transition hover:bg-red-50"
-                    >
-                      حذف
-                    </button>
                   </div>
                 </article>
               ))}
