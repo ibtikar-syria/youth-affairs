@@ -673,14 +673,16 @@ export const SuperAdminPage = () => {
 
             <form onSubmit={handleLogin} className="space-y-3">
               <input
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                dir="ltr"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 placeholder="اسم المستخدم"
                 value={loginForm.username}
                 onChange={(event) => setLoginForm((prev) => ({ ...prev, username: event.target.value }))}
               />
               <input
                 type="password"
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                dir="ltr"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 placeholder="كلمة المرور"
                 value={loginForm.password}
                 onChange={(event) => setLoginForm((prev) => ({ ...prev, password: event.target.value }))}
@@ -923,12 +925,14 @@ export const SuperAdminPage = () => {
           {showAddAdminForm && (
             <form onSubmit={handleCreateAdmin} className="mb-4 grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
               <input
-                className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                dir="ltr"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 placeholder="اسم المستخدم"
                 value={adminForm.username}
                 onChange={(event) => setAdminForm((prev) => ({ ...prev, username: event.target.value }))}
               />
               <input
+                dir="auto"
                 className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 placeholder="الاسم الكامل"
                 value={adminForm.displayName}
@@ -936,7 +940,8 @@ export const SuperAdminPage = () => {
               />
               <input
                 type="password"
-                className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                dir="ltr"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 placeholder="كلمة المرور"
                 value={adminForm.password}
                 onChange={(event) => setAdminForm((prev) => ({ ...prev, password: event.target.value }))}
@@ -1019,6 +1024,7 @@ export const SuperAdminPage = () => {
                     <div>
                       <p className="mb-1 text-xs font-semibold text-slate-600">الاسم الكامل</p>
                       <input
+                        dir="auto"
                         className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
                         value={editingAdminId === admin.id ? editingAdminForm?.displayName ?? '' : admin.display_name}
                         disabled={editingAdminId !== admin.id}
@@ -1030,7 +1036,8 @@ export const SuperAdminPage = () => {
                     <div>
                       <p className="mb-1 text-xs font-semibold text-slate-600">اسم المستخدم</p>
                       <input
-                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                        dir="ltr"
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
                         value={editingAdminId === admin.id ? editingAdminForm?.username ?? '' : admin.username}
                         disabled={editingAdminId !== admin.id}
                         onChange={(event) =>
@@ -1055,7 +1062,8 @@ export const SuperAdminPage = () => {
                       <p className="mb-1 text-xs font-semibold text-slate-600">كلمة المرور الجديدة</p>
                       <input
                         type="password"
-                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                        dir="ltr"
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                         value={editingAdminForm?.password ?? ''}
                         placeholder="اتركه فارغاً لعدم التغيير"
                         onChange={(event) =>
