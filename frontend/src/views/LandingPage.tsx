@@ -280,7 +280,7 @@ export const LandingPage = () => {
             {values.map((value) => {
               const Icon = value.icon
               return (
-              <div key={value.label} className="js-card rounded-xl border border-blue-100 bg-white p-4 text-center font-semibold shadow-sm transition-all duration-300 hover:shadow-md hover:scale-105 hover:bg-primary/5 hover:border-primary/40">
+              <div key={value.label} className="js-card rounded-xl border border-blue-100 bg-white p-4 text-center font-semibold shadow-sm transition-all duration-300 hover:rounded-3xl hover:shadow-md hover:scale-105 hover:bg-primary/5 hover:border-primary/40">
                 <Icon className="mx-auto mb-2 h-5 w-5 text-primary transition-transform duration-300 hover:scale-110" />
                 {value.label}
               </div>
