@@ -10,6 +10,8 @@ type BranchesExplorerProps = {
 
 export const BranchesExplorer = ({ branches, loadingBranches, variant }: BranchesExplorerProps) => {
   const isLanding = variant === 'landing'
+  const displayedBranches = isLanding ? branches.slice(0, 3) : branches
+  const remainingBranchesCount = Math.max(branches.length - displayedBranches.length, 0)
 
   const getWhatsappLink = (whatsapp: string | null) => {
     if (!whatsapp) {
@@ -50,8 +52,9 @@ export const BranchesExplorer = ({ branches, loadingBranches, variant }: Branche
   }
 
   return (
-    <div className={isLanding ? 'js-stagger-cards grid gap-4 md:grid-cols-2 xl:grid-cols-3' : 'grid gap-4 md:grid-cols-2 xl:grid-cols-3'}>
-      {branches.map((branch) => (
+    <>
+      <div className={isLanding ? 'js-stagger-cards grid gap-4 md:grid-cols-2 xl:grid-cols-3' : 'grid gap-4 md:grid-cols-2 xl:grid-cols-3'}>
+      {displayedBranches.map((branch) => (
         <article
           key={branch.id}
           className={`group flex h-full flex-col rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-primary/30 ${
@@ -178,6 +181,10 @@ export const BranchesExplorer = ({ branches, loadingBranches, variant }: Branche
           </Link>
         </article>
       ))}
-    </div>
+      </div>
+      {isLanding && remainingBranchesCount > 0 && (
+        <div className="mt-3 text-sm text-slate-600">+{remainingBranchesCount} فرع آخر</div>
+      )}
+    </>
   )
 }
