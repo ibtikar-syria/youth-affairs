@@ -12,6 +12,7 @@
       "binding": "DB",
       "database_name": "youth-affairs-db",
       "database_id": "replace-with-your-d1-database-id",
+      "remote": true,
       "migrations_dir":"../database"
     }
   ],
