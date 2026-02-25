@@ -251,17 +251,29 @@ export const LandingPage = () => {
                 <ArrowUpLeft className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-[-4px] group-hover:translate-y-[-4px]" />
               </a>
             </div>
-            <div className="js-hero-reveal rounded-2xl bg-white/15 p-6 backdrop-blur transition-all duration-300 hover:bg-white/20 hover:shadow-2xl">
-              <h3 className="mb-3 inline-flex items-center gap-2 text-lg font-bold">
+            <div className="js-hero-reveal group relative overflow-hidden rounded-2xl border border-white/30 bg-white/10 p-6 backdrop-blur-xl transition-all duration-500 hover:-translate-y-1 hover:bg-white/15 hover:shadow-[0_20px_45px_rgba(15,23,42,0.35)] hover:ring-1 hover:ring-white/40">
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/35 via-white/10 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-100"
+              />
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute -right-10 -top-12 h-36 w-36 rounded-full bg-white/30 blur-2xl transition-transform duration-700 group-hover:translate-x-2 group-hover:-translate-y-1"
+              />
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute -bottom-16 left-8 h-28 w-28 rounded-full bg-accent/20 blur-2xl transition-transform duration-700 group-hover:-translate-x-1 group-hover:translate-y-1"
+              />
+              <h3 className="relative z-10 mb-3 inline-flex items-center gap-2 text-lg font-bold">
                 <Target className="h-5 w-5" />
                 رؤيتنا
               </h3>
-              <p className="mb-5 leading-8">{content.vision}</p>
-              <h3 className="mb-3 inline-flex items-center gap-2 text-lg font-bold">
+              <p className="relative z-10 mb-5 leading-8">{content.vision}</p>
+              <h3 className="relative z-10 mb-3 inline-flex items-center gap-2 text-lg font-bold">
                 <Send className="h-5 w-5" />
                 رسالتنا
               </h3>
-              <p className="leading-8">{content.mission}</p>
+              <p className="relative z-10 leading-8">{content.mission}</p>
             </div>
           </div>
         </section>
