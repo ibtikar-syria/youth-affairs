@@ -97,6 +97,7 @@ export const SuperAdminPage = () => {
     branchId: string
     password: string
   } | null>(null)
+  const [showAdminPasswordEditorForId, setShowAdminPasswordEditorForId] = useState<number | null>(null)
   const [adminConfirmState, setAdminConfirmState] = useState<{
     open: boolean
     action: AdminConfirmAction | null
@@ -488,6 +489,7 @@ export const SuperAdminPage = () => {
     setEditingAdminId(null)
     setEditingAdminForm(null)
     setEditingAdminInitialForm(null)
+    setShowAdminPasswordEditorForId(null)
   }
 
   const applyStartAdminEditing = (admin: AdminUser) => {
@@ -504,6 +506,17 @@ export const SuperAdminPage = () => {
       displayName: admin.display_name,
       branchId: branchIdValue,
       password: '',
+    })
+    setShowAdminPasswordEditorForId(null)
+  }
+
+  const toggleAdminPasswordEditor = (adminId: number) => {
+    setShowAdminPasswordEditorForId((prev) => {
+      const next = prev === adminId ? null : adminId
+      if (next === null) {
+        setEditingAdminForm((current) => (current ? { ...current, password: '' } : current))
+      }
+      return next
     })
   }
 
@@ -1009,20 +1022,32 @@ export const SuperAdminPage = () => {
                         }
                       />
                     </div>
-                    <div className="md:col-span-2">
-                      <p className="mb-1 text-xs font-semibold text-slate-600">كلمة المرور</p>
+                  </div>
+                  {editingAdminId === admin.id && (
+                    <div className="mt-2">
+                      <button
+                        type="button"
+                        onClick={() => toggleAdminPasswordEditor(admin.id)}
+                        className="rounded-lg border border-gray bg-white px-3 py-1 text-sm font-semibold text-gray transition hover:bg-black hover:text-white"
+                      >
+                        {showAdminPasswordEditorForId === admin.id ? 'إخفاء تحديث كلمة المرور' : 'تحديث كلمة المرور'}
+                      </button>
+                    </div>
+                  )}
+                  {editingAdminId === admin.id && showAdminPasswordEditorForId === admin.id && (
+                    <div className="mt-2">
+                      <p className="mb-1 text-xs font-semibold text-slate-600">كلمة المرور الجديدة</p>
                       <input
                         type="password"
-                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
-                        value={editingAdminId === admin.id ? editingAdminForm?.password ?? '' : '********'}
-                        disabled={editingAdminId !== admin.id}
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                        value={editingAdminForm?.password ?? ''}
                         placeholder="اتركه فارغاً لعدم التغيير"
                         onChange={(event) =>
                           setEditingAdminForm((prev) => (prev ? { ...prev, password: event.target.value } : prev))
                         }
                       />
                     </div>
-                  </div>
+                  )}
                   <div className="mt-2 flex flex-wrap items-end gap-2">
                     <div className="min-w-[220px] flex-1">
                       <p className="mb-1 text-xs font-semibold text-slate-600">المحافظة</p>
