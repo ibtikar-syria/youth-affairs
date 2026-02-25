@@ -65,15 +65,16 @@ export const BranchesExplorer = ({ branches, loadingBranches, variant }: Branche
             </span>
           </div>
 
-          <p className="mb-2 inline-flex items-start gap-2 text-sm text-slate-600">
-            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary/80" />
-            <span>{branch.address || 'لا يوجد عنوان مضاف بعد.'}</span>
-          </p>
-
-          <p className="mb-4 inline-flex items-start gap-2 text-sm text-slate-600">
-            <Phone className="mt-0.5 h-4 w-4 shrink-0 text-primary/80" />
-            <span>{branch.phone || 'غير متوفر'}</span>
-          </p>
+          <div className="mb-4 flex flex-wrap gap-2">
+            <p className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700">
+              <MapPin className="h-3.5 w-3.5" />
+              {branch.address || 'لا يوجد عنوان مضاف بعد.'}
+            </p>
+            <p className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700">
+              <Phone className="h-3.5 w-3.5" />
+              {branch.phone || 'غير متوفر'}
+            </p>
+          </div>
 
           <div className="mt-4 flex flex-wrap gap-2 text-sm">
             {branch.facebook && (
