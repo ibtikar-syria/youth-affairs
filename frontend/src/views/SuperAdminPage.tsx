@@ -6,6 +6,8 @@ import type { AdminUser, AuthUser, Branch } from '../lib/types'
 
 const TOKEN_KEY = 'ya_superadmin_token'
 
+type BranchConfirmAction = 'save' | 'discard' | 'switch'
+
 export const SuperAdminPage = () => {
   const [token, setToken] = useState<string>(localStorage.getItem(TOKEN_KEY) ?? '')
   const [loading, setLoading] = useState(false)
@@ -51,6 +53,21 @@ export const SuperAdminPage = () => {
     phone: string
     whatsapp: string
   } | null>(null)
+  const [branchConfirmState, setBranchConfirmState] = useState<{
+    open: boolean
+    action: BranchConfirmAction | null
+    title: string
+    message: string
+    confirmText: string
+    targetBranch: Branch | null
+  }>({
+    open: false,
+    action: null,
+    title: '',
+    message: '',
+    confirmText: '',
+    targetBranch: null,
+  })
 
   const refreshData = async (activeToken: string) => {
     const [me, branchesResult, adminsResult] = await Promise.all([
@@ -173,14 +190,13 @@ export const SuperAdminPage = () => {
     )
   }
 
-  const startBranchEditing = (branch: Branch) => {
-    if (editingBranchId && editingBranchId !== branch.id && isBranchEditDirty()) {
-      const shouldDiscard = window.confirm('يوجد تعديل غير محفوظ. هل تريد تجاهل التعديلات وفتح فرع آخر؟')
-      if (!shouldDiscard) {
-        return
-      }
-    }
+  const clearBranchEditing = () => {
+    setEditingBranchId(null)
+    setEditingBranchForm(null)
+    setEditingBranchInitialForm(null)
+  }
 
+  const applyStartBranchEditing = (branch: Branch) => {
     setEditingBranchId(branch.id)
     setEditingBranchForm({
       name: branch.name,
@@ -198,17 +214,56 @@ export const SuperAdminPage = () => {
     })
   }
 
-  const discardBranchEditing = () => {
-    if (isBranchEditDirty()) {
-      const shouldDiscard = window.confirm('هل تريد تجاهل التعديلات؟')
-      if (!shouldDiscard) {
-        return
-      }
+  const openBranchConfirm = (
+    action: BranchConfirmAction,
+    title: string,
+    message: string,
+    confirmText: string,
+    targetBranch: Branch | null = null,
+  ) => {
+    setBranchConfirmState({
+      open: true,
+      action,
+      title,
+      message,
+      confirmText,
+      targetBranch,
+    })
+  }
+
+  const closeBranchConfirm = () => {
+    setBranchConfirmState({
+      open: false,
+      action: null,
+      title: '',
+      message: '',
+      confirmText: '',
+      targetBranch: null,
+    })
+  }
+
+  const startBranchEditing = (branch: Branch) => {
+    if (editingBranchId && editingBranchId !== branch.id && isBranchEditDirty()) {
+      openBranchConfirm(
+        'switch',
+        'تأكيد تجاهل التعديلات',
+        'يوجد تعديل غير محفوظ. هل تريد تجاهل التعديلات وفتح فرع آخر؟',
+        'تجاهل وفتح الفرع',
+        branch,
+      )
+      return
     }
 
-    setEditingBranchId(null)
-    setEditingBranchForm(null)
-    setEditingBranchInitialForm(null)
+    applyStartBranchEditing(branch)
+  }
+
+  const discardBranchEditing = () => {
+    if (isBranchEditDirty()) {
+      openBranchConfirm('discard', 'تأكيد الإلغاء', 'هل تريد تجاهل التعديلات؟', 'تجاهل التعديلات')
+      return
+    }
+
+    clearBranchEditing()
   }
 
   const saveBranchEditing = async (branch: Branch) => {
@@ -216,25 +271,48 @@ export const SuperAdminPage = () => {
       return
     }
 
-    const shouldSave = window.confirm('هل أنت متأكد من حفظ التعديلات على هذا الفرع؟')
-    if (!shouldSave) {
+    openBranchConfirm('save', 'تأكيد الحفظ', 'هل أنت متأكد من حفظ التعديلات على هذا الفرع؟', 'حفظ التعديلات', branch)
+  }
+
+  const handleBranchConfirm = async () => {
+    if (!branchConfirmState.action) {
       return
     }
 
-    const updatedBranch: Branch = {
-      ...branch,
-      name: editingBranchForm.name,
-      governorate: editingBranchForm.governorate,
-      address: editingBranchForm.address,
-      phone: editingBranchForm.phone,
-      whatsapp: editingBranchForm.whatsapp,
+    if (branchConfirmState.action === 'discard') {
+      clearBranchEditing()
+      closeBranchConfirm()
+      return
     }
 
-    const success = await handleUpdateBranch(updatedBranch)
-    if (success) {
-      setEditingBranchId(null)
-      setEditingBranchForm(null)
-      setEditingBranchInitialForm(null)
+    if (branchConfirmState.action === 'switch') {
+      if (branchConfirmState.targetBranch) {
+        applyStartBranchEditing(branchConfirmState.targetBranch)
+      }
+      closeBranchConfirm()
+      return
+    }
+
+    if (branchConfirmState.action === 'save') {
+      if (!editingBranchForm || !branchConfirmState.targetBranch) {
+        closeBranchConfirm()
+        return
+      }
+
+      const updatedBranch: Branch = {
+        ...branchConfirmState.targetBranch,
+        name: editingBranchForm.name,
+        governorate: editingBranchForm.governorate,
+        address: editingBranchForm.address,
+        phone: editingBranchForm.phone,
+        whatsapp: editingBranchForm.whatsapp,
+      }
+
+      const success = await handleUpdateBranch(updatedBranch)
+      if (success) {
+        clearBranchEditing()
+      }
+      closeBranchConfirm()
     }
   }
 
@@ -628,6 +706,32 @@ export const SuperAdminPage = () => {
             )}
           </div>
         </section>
+
+        {branchConfirmState.open && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4">
+            <div className="w-full max-w-md rounded-2xl border border-blue-100 bg-white p-5 shadow-xl">
+              <h3 className="mb-2 text-lg font-bold text-slate-900">{branchConfirmState.title}</h3>
+              <p className="mb-5 text-sm text-slate-600">{branchConfirmState.message}</p>
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={closeBranchConfirm}
+                  className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+                >
+                  إلغاء
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void handleBranchConfirm()}
+                  className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+                  disabled={loading}
+                >
+                  {branchConfirmState.confirmText}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
       </div>
   )
