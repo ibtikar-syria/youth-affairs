@@ -1,4 +1,4 @@
-import { MapPin, MessageCircle, Phone } from 'lucide-react'
+import { ArrowUpLeft, CalendarDays, MapPin, MessageCircle, Phone } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { Branch } from '../lib/types'
 
@@ -103,9 +103,11 @@ export const BranchesExplorer = ({ branches, loadingBranches, variant }: Branche
 
           <Link
             to={`/events?branchId=${branch.id}`}
-            className="mt-4 inline-flex w-fit items-center rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white transition-all duration-200 hover:bg-primary/90 hover:shadow-md"
+            className="mt-4 inline-flex w-fit items-center gap-2 rounded-xl border border-primary/25 bg-primary/10 px-3.5 py-2 text-sm font-semibold text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
           >
+            <CalendarDays className="h-4 w-4" />
             فعاليات هذا الفرع
+            <ArrowUpLeft className="h-4 w-4" />
           </Link>
         </article>
       ))}
