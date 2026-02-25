@@ -1,0 +1,47 @@
+name: (main) [backend] Deploy Main Backend via Cloudflare Workers
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'be-main-hono/**'
+      - .github/workflows/be-hono.yml
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy Main Backend Microservice
+    runs-on: ubuntu-latest
+    environment: main
+    defaults:
+      run:
+        working-directory: ./be-main-hono
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install Wrangler
+        run: npm install -g wrangler
+
+      - name: install project dependencies
+        run: |
+          npm install
+          npm run cf-typegen
+
+      - name: Update wrangler config with environment variables
+        run: |
+          # Update wrangler.jsonc with environment variables using sed
+          sed -i "s|\"database_id\":[[:space:]]*\"[^\"]*\"|\"database_id\": \"${{ vars.CLOUDFLARE_D1_DATABASE_ID }}\"|g" wrangler.jsonc
+          sed -i "s|\"bucket_name\":[[:space:]]*\"[^\"]*\"|\"bucket_name\": \"${{ vars.CLOUDFLARE_R2_BUCKET_NAME }}\"|g" wrangler.jsonc
+
+      - name: Deploy with wrangler
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: wrangler deploy
