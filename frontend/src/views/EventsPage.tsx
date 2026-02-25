@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { ChevronRight } from 'lucide-react'
+import { CalendarDays, ChevronRight } from 'lucide-react'
 import { api } from '../lib/api'
 import { EventsExplorer } from '../components/EventsExplorer'
 import { SiteHeader } from '../components/SiteHeader'
@@ -79,11 +79,14 @@ export const EventsPage = () => {
     <div dir="rtl" className="min-h-screen bg-slate-50">
       <SiteHeader />
 
-      <section className="border-b border-blue-100 bg-white shadow-sm">
-        <div className="mx-auto max-w-7xl px-4 py-6">
-          <div className="flex items-center justify-between">
+      <main className="mx-auto max-w-7xl px-4 py-8">
+        <section className="mb-6 rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-primary">الفعاليات</h1>
+              <h1 className="inline-flex items-center gap-2 text-3xl font-bold text-primary">
+                <CalendarDays className="h-7 w-7" />
+                الفعاليات
+              </h1>
               <p className="mt-1 text-sm text-slate-600">تصفح جميع الفعاليات والأنشطة</p>
             </div>
             <Link
@@ -94,10 +97,8 @@ export const EventsPage = () => {
               العودة للرئيسية
             </Link>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <main className="mx-auto max-w-7xl px-4 py-8">
         <EventsExplorer
           variant="events-page"
           branches={branches}

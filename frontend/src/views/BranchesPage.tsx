@@ -22,9 +22,9 @@ export const BranchesPage = () => {
     <div dir="rtl" className="min-h-screen bg-slate-50">
       <SiteHeader />
 
-      <section className="border-b border-blue-100 bg-white shadow-sm">
-        <div className="mx-auto max-w-7xl px-4 py-6">
-          <div className="flex items-center justify-between">
+      <main className="mx-auto max-w-7xl px-4 py-8">
+        <section className="mb-6 rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <h1 className="inline-flex items-center gap-2 text-3xl font-bold text-primary">
                 <MapPin className="h-7 w-7" />
@@ -40,10 +40,8 @@ export const BranchesPage = () => {
               العودة للرئيسية
             </Link>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <main className="mx-auto max-w-7xl px-4 py-8">
         <div className="mb-4 text-sm text-slate-600">
           عدد الأفرع: <span className="font-semibold text-primary">{branches.length}</span>
         </div>
