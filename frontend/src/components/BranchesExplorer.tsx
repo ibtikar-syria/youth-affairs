@@ -171,14 +171,19 @@ export const BranchesExplorer = ({ branches, loadingBranches, variant }: Branche
             )}
           </div>
 
-          <Link
-            to={`/events?branchId=${branch.id}`}
-            className="mt-4 inline-flex w-fit items-center gap-2 rounded-xl border border-primary/25 bg-primary/10 px-3.5 py-2 text-sm font-semibold text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
-          >
-            <CalendarDays className="h-4 w-4" />
-            فعاليات هذا الفرع
-            <ArrowUpLeft className="h-4 w-4" />
-          </Link>
+          <div className="mt-auto flex items-end justify-between gap-3 pt-4">
+            <Link
+              to={`/events?branchId=${branch.id}`}
+              className="inline-flex w-fit items-center gap-2 rounded-xl border border-primary/25 bg-primary/10 px-3.5 py-2 text-sm font-semibold text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+            >
+              <CalendarDays className="h-4 w-4" />
+              فعاليات هذا الفرع
+              <ArrowUpLeft className="h-4 w-4" />
+            </Link>
+            <div className="inline-flex min-w-10 items-center justify-center rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm font-bold text-primary">
+              {branch.events_count ?? 0}
+            </div>
+          </div>
         </article>
       ))}
       </div>
