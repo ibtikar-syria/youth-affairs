@@ -351,7 +351,7 @@ export const LandingPage = () => {
             data-move-x="36"
             data-rotate-to="-12"
           >
-            <Globe2 className="h-56 w-56 rotate-[-14deg]" strokeWidth={1.2} />
+            <MapPin className="h-56 w-56 rotate-[-14deg]" strokeWidth={1.2} />
           </span>
           <span
             aria-hidden="true"
@@ -360,7 +360,7 @@ export const LandingPage = () => {
             data-move-x="-32"
             data-rotate-to="30"
           >
-            <Globe2 className="h-32 w-32 rotate-[12deg]" strokeWidth={1.2} />
+            <Handshake className="h-32 w-32 rotate-[12deg]" strokeWidth={1.2} />
           </span>
           <div className="relative mx-auto grid max-w-6xl gap-6 px-4 md:grid-cols-5 md:items-stretch">
             <article className="js-card group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl md:col-span-3 md:p-8">
