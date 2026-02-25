@@ -180,8 +180,17 @@ export const BranchesExplorer = ({ branches, loadingBranches, variant }: Branche
               فعاليات هذا الفرع
               <ArrowUpLeft className="h-4 w-4" />
             </Link>
-            <div className="inline-flex min-w-10 items-center justify-center rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm font-bold text-primary">
-              {branch.events_count ?? 0}
+            <div className="group/tooltip relative inline-flex">
+              <div
+                className="inline-flex min-w-10 items-center justify-center rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm font-bold text-primary"
+                aria-label="عدد الفعاليات في هذا الفرع"
+                tabIndex={0}
+              >
+                {branch.events_count ?? 0}
+              </div>
+              <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900 px-2 py-1 text-xs text-white opacity-0 shadow-sm transition-opacity duration-200 group-hover/tooltip:opacity-100 group-focus-within/tooltip:opacity-100">
+                عدد الفعاليات في هذا الفرع
+              </div>
             </div>
           </div>
         </article>
