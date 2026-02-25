@@ -340,6 +340,12 @@ export const LandingPage = () => {
             aria-hidden="true"
             className="pointer-events-none absolute inset-x-0 top-0 h-full bg-gradient-to-l from-primary/[0.08] via-white to-accent/[0.08]"
           />
+          <img
+            src="/ya_full_logo.svg"
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute left-8 top-6 h-20 opacity-12 md:h-24"
+          />
           <span
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(148,163,184,0.14)_1px,transparent_0)] [background-size:14px_14px] opacity-35"
