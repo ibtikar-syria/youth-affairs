@@ -340,12 +340,6 @@ export const LandingPage = () => {
             aria-hidden="true"
             className="pointer-events-none absolute inset-x-0 top-0 h-full bg-gradient-to-l from-primary/[0.08] via-white to-accent/[0.08]"
           />
-          <img
-            src="/ya_full_logo.svg"
-            alt=""
-            aria-hidden="true"
-            className="pointer-events-none absolute left-8 top-6 h-20 opacity-12 md:h-24"
-          />
           <span
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(148,163,184,0.14)_1px,transparent_0)] [background-size:14px_14px] opacity-35"
@@ -395,20 +389,18 @@ export const LandingPage = () => {
               <p className="relative z-10 leading-8 text-slate-700 md:text-[1.04rem]">{content.workScope}</p>
             </article>
 
-            <aside className="js-card grid gap-4 md:col-span-2">
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <h4 className="mb-3 inline-flex items-center gap-2 text-base font-bold text-slate-900">
-                  <MapPin className="h-4 w-4 text-primary" />
-                  تغطية العمل
-                </h4>
-                <p className="text-sm leading-7 text-slate-600">شباب سوريا على امتداد المحافظات ضمن برامج ومسارات وطنية متكاملة.</p>
-              </div>
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <h4 className="mb-3 inline-flex items-center gap-2 text-base font-bold text-slate-900">
-                  <Handshake className="h-4 w-4 text-primary" />
-                  إطار التعاون
-                </h4>
-                <p className="text-sm leading-7 text-slate-600">شراكات إقليمية ودولية ممكنة عندما تنسجم مع القانون والسيادة الوطنية.</p>
+            <aside className="js-card group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:bg-white/70 md:col-span-2 md:p-8">
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(148,163,184,0.12)_1px,transparent_0)] [background-size:12px_12px] opacity-35"
+              />
+              <div className="relative z-10 flex h-full items-center justify-center transition-transform duration-300 group-hover:scale-105">
+                <img
+                  src="/ya_full_logo.svg"
+                  alt=""
+                  aria-hidden="true"
+                  className="h-24 opacity-80 transition-opacity duration-300 md:h-28"
+                />
               </div>
             </aside>
           </div>
