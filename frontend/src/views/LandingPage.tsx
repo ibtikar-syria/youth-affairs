@@ -312,35 +312,65 @@ export const LandingPage = () => {
           </div>
         </section>
 
-        <section className="animate-in js-reveal mx-auto max-w-6xl px-4 py-14">
-          <div className="mb-8 space-y-3">
-            <h3 className="inline-flex items-center gap-2 text-2xl font-bold text-primary">
-              <Globe2 className="h-6 w-6" />
-              فضاء العمل
-            </h3>
-            <p className="max-w-3xl text-sm leading-7 text-slate-600 md:text-base">
-              امتداد وطني واسع مع انفتاح منضبط على الشراكات الإقليمية والدولية ضمن الأطر القانونية.
-            </p>
+        <section className="animate-in js-reveal relative overflow-hidden py-16">
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-full bg-gradient-to-l from-primary/[0.08] via-white to-accent/[0.08]"
+          />
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(148,163,184,0.14)_1px,transparent_0)] [background-size:14px_14px] opacity-35"
+          />
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -bottom-16 -left-10 text-slate-300/40"
+          >
+            <Globe2 className="h-56 w-56 rotate-[-14deg]" strokeWidth={1.2} />
+          </span>
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-10 right-8 text-slate-300/30"
+          >
+            <Globe2 className="h-32 w-32 rotate-[12deg]" strokeWidth={1.2} />
+          </span>
+          <div className="relative mx-auto grid max-w-6xl gap-6 px-4 md:grid-cols-5 md:items-stretch">
+            <article className="js-card group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl md:col-span-3 md:p-8">
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(148,163,184,0.14)_1px,transparent_0)] [background-size:12px_12px] opacity-40"
+              />
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-primary/70 to-accent/70"
+              />
+              <span aria-hidden="true" className="pointer-events-none absolute -bottom-7 -left-6 text-slate-300/70">
+                <Globe2 className="h-24 w-24 rotate-[-16deg]" strokeWidth={1.5} />
+              </span>
+
+              <div className="relative z-10 mb-5 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary">
+                <Globe2 className="h-4 w-4" />
+                فضاء العمل
+              </div>
+              <p className="relative z-10 leading-8 text-slate-700 md:text-[1.04rem]">{content.workScope}</p>
+            </article>
+
+            <aside className="js-card grid gap-4 md:col-span-2">
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <h4 className="mb-3 inline-flex items-center gap-2 text-base font-bold text-slate-900">
+                  <MapPin className="h-4 w-4 text-primary" />
+                  تغطية العمل
+                </h4>
+                <p className="text-sm leading-7 text-slate-600">شباب سوريا على امتداد المحافظات ضمن برامج ومسارات وطنية متكاملة.</p>
+              </div>
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <h4 className="mb-3 inline-flex items-center gap-2 text-base font-bold text-slate-900">
+                  <Handshake className="h-4 w-4 text-primary" />
+                  إطار التعاون
+                </h4>
+                <p className="text-sm leading-7 text-slate-600">شراكات إقليمية ودولية ممكنة عندما تنسجم مع القانون والسيادة الوطنية.</p>
+              </div>
+            </aside>
           </div>
-          <article className="js-card group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:border-primary/30 md:p-8">
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(148,163,184,0.14)_1px,transparent_0)] [background-size:12px_12px] opacity-40"
-            />
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute -left-8 -top-8 rounded-full bg-primary/10 blur-2xl transition-all duration-300 h-28 w-28 group-hover:bg-primary/15"
-            />
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute -bottom-6 -left-4 text-slate-300/80"
-            >
-              <Globe2 className="h-20 w-20 rotate-[-16deg]" strokeWidth={1.6} />
-            </span>
-            <div className="relative z-10 flex items-start gap-3">
-              <p className="leading-8 text-slate-700 md:text-[1.02rem]">{content.workScope}</p>
-            </div>
-          </article>
         </section>
 
         <section id="branches" className="animate-in js-reveal mx-auto max-w-6xl px-4 py-14">
