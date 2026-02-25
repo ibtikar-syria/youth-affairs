@@ -7,6 +7,7 @@ import type { AdminUser, AuthUser, Branch } from '../lib/types'
 const TOKEN_KEY = 'ya_superadmin_token'
 
 type BranchConfirmAction = 'save' | 'discard' | 'switch'
+type AdminConfirmAction = 'save' | 'discard' | 'switch'
 
 export const SuperAdminPage = () => {
   const [token, setToken] = useState<string>(localStorage.getItem(TOKEN_KEY) ?? '')
@@ -67,6 +68,24 @@ export const SuperAdminPage = () => {
     message: '',
     confirmText: '',
     targetBranch: null,
+  })
+  const [editingAdminId, setEditingAdminId] = useState<number | null>(null)
+  const [editingAdminForm, setEditingAdminForm] = useState<{ branchId: string } | null>(null)
+  const [editingAdminInitialForm, setEditingAdminInitialForm] = useState<{ branchId: string } | null>(null)
+  const [adminConfirmState, setAdminConfirmState] = useState<{
+    open: boolean
+    action: AdminConfirmAction | null
+    title: string
+    message: string
+    confirmText: string
+    targetAdmin: AdminUser | null
+  }>({
+    open: false,
+    action: null,
+    title: '',
+    message: '',
+    confirmText: '',
+    targetAdmin: null,
   })
 
   const refreshData = async (activeToken: string) => {
@@ -380,6 +399,124 @@ export const SuperAdminPage = () => {
     }
   }
 
+  const isAdminEditDirty = () => {
+    if (!editingAdminForm || !editingAdminInitialForm) {
+      return false
+    }
+
+    return editingAdminForm.branchId !== editingAdminInitialForm.branchId
+  }
+
+  const clearAdminEditing = () => {
+    setEditingAdminId(null)
+    setEditingAdminForm(null)
+    setEditingAdminInitialForm(null)
+  }
+
+  const applyStartAdminEditing = (admin: AdminUser) => {
+    const branchIdValue = String(admin.branch_id ?? '')
+    setEditingAdminId(admin.id)
+    setEditingAdminForm({ branchId: branchIdValue })
+    setEditingAdminInitialForm({ branchId: branchIdValue })
+  }
+
+  const openAdminConfirm = (
+    action: AdminConfirmAction,
+    title: string,
+    message: string,
+    confirmText: string,
+    targetAdmin: AdminUser | null = null,
+  ) => {
+    setAdminConfirmState({
+      open: true,
+      action,
+      title,
+      message,
+      confirmText,
+      targetAdmin,
+    })
+  }
+
+  const closeAdminConfirm = () => {
+    setAdminConfirmState({
+      open: false,
+      action: null,
+      title: '',
+      message: '',
+      confirmText: '',
+      targetAdmin: null,
+    })
+  }
+
+  const startAdminEditing = (admin: AdminUser) => {
+    if (editingAdminId && editingAdminId !== admin.id && isAdminEditDirty()) {
+      openAdminConfirm(
+        'switch',
+        'تأكيد تجاهل التعديلات',
+        'يوجد تعديل غير محفوظ. هل تريد تجاهل التعديلات وفتح مشرف آخر؟',
+        'تجاهل وفتح المشرف',
+        admin,
+      )
+      return
+    }
+
+    applyStartAdminEditing(admin)
+  }
+
+  const discardAdminEditing = () => {
+    if (isAdminEditDirty()) {
+      openAdminConfirm('discard', 'تأكيد الإلغاء', 'هل تريد تجاهل التعديلات؟', 'تجاهل التعديلات')
+      return
+    }
+
+    clearAdminEditing()
+  }
+
+  const saveAdminEditing = async (admin: AdminUser) => {
+    if (!editingAdminForm) {
+      return
+    }
+
+    openAdminConfirm('save', 'تأكيد الحفظ', 'هل أنت متأكد من حفظ التعديلات على هذا المشرف؟', 'حفظ التعديلات', admin)
+  }
+
+  const handleAdminConfirm = async () => {
+    if (!adminConfirmState.action) {
+      return
+    }
+
+    if (adminConfirmState.action === 'discard') {
+      clearAdminEditing()
+      closeAdminConfirm()
+      return
+    }
+
+    if (adminConfirmState.action === 'switch') {
+      if (adminConfirmState.targetAdmin) {
+        applyStartAdminEditing(adminConfirmState.targetAdmin)
+      }
+      closeAdminConfirm()
+      return
+    }
+
+    if (adminConfirmState.action === 'save') {
+      if (!editingAdminForm || !adminConfirmState.targetAdmin) {
+        closeAdminConfirm()
+        return
+      }
+
+      if (!editingAdminForm.branchId) {
+        setError('يرجى اختيار محافظة للمشرف')
+        closeAdminConfirm()
+        return
+      }
+
+      await handleChangeAdminBranch(adminConfirmState.targetAdmin.id, Number(editingAdminForm.branchId))
+      clearAdminEditing()
+      closeAdminConfirm()
+    }
+  }
+
   const logout = () => {
     localStorage.removeItem(TOKEN_KEY)
     setToken('')
@@ -677,14 +814,49 @@ export const SuperAdminPage = () => {
               .filter((admin) => admin.role === 'admin')
               .map((admin) => (
                 <article key={admin.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  {editingAdminId === admin.id ? (
+                    <div className="mb-2 flex flex-wrap justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => void saveAdminEditing(admin)}
+                        className="inline-flex items-center gap-1 rounded-lg bg-primary px-3 py-1 text-sm font-semibold text-white transition hover:opacity-90"
+                      >
+                        <Check className="h-4 w-4" />
+                        حفظ
+                      </button>
+                      <button
+                        type="button"
+                        onClick={discardAdminEditing}
+                        className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-3 py-1 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+                      >
+                        <X className="h-4 w-4" />
+                        إلغاء
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="mb-2 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => startAdminEditing(admin)}
+                        className="inline-flex items-center gap-1 rounded-lg border border-primary bg-white px-3 py-1 text-sm font-semibold text-primary transition hover:bg-primary hover:text-white"
+                      >
+                        <Pencil className="h-4 w-4" />
+                        تعديل
+                      </button>
+                    </div>
+                  )}
+
                   <p className="font-semibold text-slate-900">
                     {admin.display_name} <span className="font-normal text-slate-500">({admin.username})</span>
                   </p>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     <select
-                      className="rounded-lg border border-slate-300 bg-white px-3 py-1 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                      value={admin.branch_id ?? ''}
-                      onChange={(event) => void handleChangeAdminBranch(admin.id, Number(event.target.value))}
+                      className="rounded-lg border border-slate-300 bg-white px-3 py-1 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                      value={editingAdminId === admin.id ? editingAdminForm?.branchId ?? '' : String(admin.branch_id ?? '')}
+                      disabled={editingAdminId !== admin.id}
+                      onChange={(event) =>
+                        setEditingAdminForm((prev) => (prev ? { ...prev, branchId: event.target.value } : prev))
+                      }
                     >
                       {branches.map((branch) => (
                         <option key={branch.id} value={branch.id}>
@@ -727,6 +899,32 @@ export const SuperAdminPage = () => {
                   disabled={loading}
                 >
                   {branchConfirmState.confirmText}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {adminConfirmState.open && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4">
+            <div className="w-full max-w-md rounded-2xl border border-blue-100 bg-white p-5 shadow-xl">
+              <h3 className="mb-2 text-lg font-bold text-slate-900">{adminConfirmState.title}</h3>
+              <p className="mb-5 text-sm text-slate-600">{adminConfirmState.message}</p>
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={closeAdminConfirm}
+                  className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+                >
+                  إلغاء
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void handleAdminConfirm()}
+                  className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+                  disabled={loading}
+                >
+                  {adminConfirmState.confirmText}
                 </button>
               </div>
             </div>
