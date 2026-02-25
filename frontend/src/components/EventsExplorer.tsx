@@ -1,4 +1,4 @@
-import { CalendarDays, Filter, MapPin } from 'lucide-react'
+import { CalendarDays, Filter, Link2, MapPin } from 'lucide-react'
 import type { Branch, EventItem } from '../lib/types'
 
 type EventsFilters = {
@@ -171,6 +171,12 @@ export const EventsExplorer = ({
                       <CalendarDays className="h-3.5 w-3.5" />
                       {eventItem.event_date}
                     </p>
+                    {eventItem.urls.length > 0 && (
+                      <p className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700">
+                        <Link2 className="h-3.5 w-3.5" />
+                        {eventItem.urls.length}
+                      </p>
+                    )}
                   </div>
                   <p className="mt-3 text-xs font-semibold text-primary">
                     {eventItem.branch_name ?? eventItem.branch_governorate}
