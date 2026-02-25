@@ -1,4 +1,4 @@
-import { ArrowUpLeft, CalendarDays, Facebook, Instagram, MapPin, MessageCircle, Phone, Send } from 'lucide-react'
+import { ArrowUpLeft, CalendarDays, Facebook, Instagram, MapPin, Phone, Send } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { Branch } from '../lib/types'
 
