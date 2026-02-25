@@ -30,6 +30,8 @@ export const AdminPage = () => {
   const [loginForm, setLoginForm] = useState({ username: '', password: '' })
   const [user, setUser] = useState<AuthUser | null>(null)
   const [branch, setBranch] = useState<Branch | null>(null)
+  const [branchDraft, setBranchDraft] = useState<Branch | null>(null)
+  const [isEditingBranch, setIsEditingBranch] = useState(false)
   const [events, setEvents] = useState<EventItem[]>([])
   const [eventForm, setEventForm] = useState<EventFormState>(emptyEvent)
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -88,7 +90,7 @@ export const AdminPage = () => {
 
   const handleUpdateBranch = async (event: React.FormEvent) => {
     event.preventDefault()
-    if (!token || !branch) {
+    if (!token || !branchDraft) {
       return
     }
 
@@ -96,18 +98,33 @@ export const AdminPage = () => {
     setError('')
     try {
       await api.updateAdminBranch(token, {
-        address: branch.address,
-        phone: branch.phone,
-        whatsapp: branch.whatsapp,
-        facebook: branch.facebook ?? '',
-        telegram: branch.telegram ?? '',
-        instagram: branch.instagram ?? '',
+        address: branchDraft.address,
+        phone: branchDraft.phone,
+        whatsapp: branchDraft.whatsapp,
+        facebook: branchDraft.facebook ?? '',
+        telegram: branchDraft.telegram ?? '',
+        instagram: branchDraft.instagram ?? '',
       })
+      setBranch(branchDraft)
+      setIsEditingBranch(false)
     } catch (updateError) {
       setError(updateError instanceof Error ? updateError.message : 'فشل تحديث بيانات الفرع')
     } finally {
       setLoading(false)
     }
+  }
+
+  const startBranchEditing = () => {
+    if (!branch) {
+      return
+    }
+    setBranchDraft({ ...branch })
+    setIsEditingBranch(true)
+  }
+
+  const cancelBranchEditing = () => {
+    setBranchDraft(branch ? { ...branch } : null)
+    setIsEditingBranch(false)
   }
 
   const handleSaveEvent = async (event: React.FormEvent) => {
@@ -283,77 +300,127 @@ export const AdminPage = () => {
         {error && <p className="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
 
         {branch && (
-          <form onSubmit={handleUpdateBranch} className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
+          <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h2 className="text-lg font-bold">بيانات الفرع</h2>
-                <p className="text-sm text-slate-500">تحديث بيانات التواصل الخاصة بالفرع</p>
+                <p className="text-sm text-slate-500">عرض بيانات التواصل الخاصة بالفرع</p>
               </div>
-              <span className="rounded-lg bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700">{branch.name}</span>
+              <div className="flex items-center gap-2">
+                <span className="rounded-lg bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700">{branch.name}</span>
+                {!isEditingBranch && (
+                  <button
+                    type="button"
+                    onClick={startBranchEditing}
+                    className="rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary hover:text-white"
+                  >
+                    تعديل
+                  </button>
+                )}
+              </div>
             </div>
-            <div className="grid gap-3 md:grid-cols-2">
-              <label className="space-y-1 text-sm text-slate-600">
-                <span className="font-semibold">العنوان</span>
-                <input
-                  dir="auto"
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  value={branch.address}
-                  onChange={(event) => setBranch((prev) => (prev ? { ...prev, address: event.target.value } : prev))}
-                />
-              </label>
-              <label className="space-y-1 text-sm text-slate-600">
-                <span className="font-semibold">الهاتف</span>
-                <input
-                  dir="ltr"
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  value={branch.phone}
-                  onChange={(event) => setBranch((prev) => (prev ? { ...prev, phone: event.target.value } : prev))}
-                />
-              </label>
-              <label className="space-y-1 text-sm text-slate-600">
-                <span className="font-semibold">واتساب</span>
-                <input
-                  dir="ltr"
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  value={branch.whatsapp}
-                  onChange={(event) => setBranch((prev) => (prev ? { ...prev, whatsapp: event.target.value } : prev))}
-                />
-              </label>
-              <label className="space-y-1 text-sm text-slate-600">
-                <span className="font-semibold">Facebook</span>
-                <input
-                  dir="ltr"
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  value={branch.facebook ?? ''}
-                  onChange={(event) => setBranch((prev) => (prev ? { ...prev, facebook: event.target.value } : prev))}
-                />
-              </label>
-              <label className="space-y-1 text-sm text-slate-600">
-                <span className="font-semibold">Telegram</span>
-                <input
-                  dir="ltr"
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  value={branch.telegram ?? ''}
-                  onChange={(event) => setBranch((prev) => (prev ? { ...prev, telegram: event.target.value } : prev))}
-                />
-              </label>
-              <label className="space-y-1 text-sm text-slate-600">
-                <span className="font-semibold">Instagram</span>
-                <input
-                  dir="ltr"
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  value={branch.instagram ?? ''}
-                  onChange={(event) => setBranch((prev) => (prev ? { ...prev, instagram: event.target.value } : prev))}
-                />
-              </label>
-            </div>
-            <button
-              className="mt-4 rounded-lg bg-accent px-4 py-2 font-bold text-slate-900 transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
-              disabled={loading}
-            >
-              حفظ بيانات الفرع
-            </button>
-          </form>
+
+            {isEditingBranch && branchDraft ? (
+              <form onSubmit={handleUpdateBranch} className="grid gap-3 md:grid-cols-2">
+                <label className="space-y-1 text-sm text-slate-600 md:col-span-2">
+                  <span className="font-semibold">العنوان</span>
+                  <input
+                    dir="auto"
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    value={branchDraft.address}
+                    onChange={(event) => setBranchDraft((prev) => (prev ? { ...prev, address: event.target.value } : prev))}
+                  />
+                </label>
+                <label className="space-y-1 text-sm text-slate-600">
+                  <span className="font-semibold">الهاتف</span>
+                  <input
+                    dir="ltr"
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    value={branchDraft.phone}
+                    onChange={(event) => setBranchDraft((prev) => (prev ? { ...prev, phone: event.target.value } : prev))}
+                  />
+                </label>
+                <label className="space-y-1 text-sm text-slate-600">
+                  <span className="font-semibold">واتساب</span>
+                  <input
+                    dir="ltr"
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    value={branchDraft.whatsapp}
+                    onChange={(event) => setBranchDraft((prev) => (prev ? { ...prev, whatsapp: event.target.value } : prev))}
+                  />
+                </label>
+                <label className="space-y-1 text-sm text-slate-600">
+                  <span className="font-semibold">Facebook</span>
+                  <input
+                    dir="ltr"
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    value={branchDraft.facebook ?? ''}
+                    onChange={(event) => setBranchDraft((prev) => (prev ? { ...prev, facebook: event.target.value } : prev))}
+                  />
+                </label>
+                <label className="space-y-1 text-sm text-slate-600">
+                  <span className="font-semibold">Telegram</span>
+                  <input
+                    dir="ltr"
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    value={branchDraft.telegram ?? ''}
+                    onChange={(event) => setBranchDraft((prev) => (prev ? { ...prev, telegram: event.target.value } : prev))}
+                  />
+                </label>
+                <label className="space-y-1 text-sm text-slate-600">
+                  <span className="font-semibold">Instagram</span>
+                  <input
+                    dir="ltr"
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    value={branchDraft.instagram ?? ''}
+                    onChange={(event) => setBranchDraft((prev) => (prev ? { ...prev, instagram: event.target.value } : prev))}
+                  />
+                </label>
+                <div className="md:col-span-2 flex flex-wrap gap-2">
+                  <button
+                    className="rounded-lg bg-accent px-4 py-2 font-bold text-slate-900 transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={loading}
+                  >
+                    حفظ بيانات الفرع
+                  </button>
+                  <button
+                    type="button"
+                    onClick={cancelBranchEditing}
+                    className="rounded-lg border border-slate-300 px-4 py-2 text-slate-700 transition hover:bg-slate-100"
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  <p className="text-xs font-semibold text-slate-600">العنوان</p>
+                  <p className="mt-1 text-sm text-slate-900">{branch.address}</p>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  <p className="text-xs font-semibold text-slate-600">الهاتف</p>
+                  <p className="mt-1 text-sm text-slate-900">{branch.phone}</p>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  <p className="text-xs font-semibold text-slate-600">واتساب</p>
+                  <p className="mt-1 text-sm text-slate-900">{branch.whatsapp}</p>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  <p className="text-xs font-semibold text-slate-600">Facebook</p>
+                  <p className="mt-1 text-sm text-slate-900">{branch.facebook ?? '—'}</p>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  <p className="text-xs font-semibold text-slate-600">Telegram</p>
+                  <p className="mt-1 text-sm text-slate-900">{branch.telegram ?? '—'}</p>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  <p className="text-xs font-semibold text-slate-600">Instagram</p>
+                  <p className="mt-1 text-sm text-slate-900">{branch.instagram ?? '—'}</p>
+                </div>
+              </div>
+            )}
+          </section>
         )}
 
         <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
