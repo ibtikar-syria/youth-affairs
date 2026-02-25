@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Building2, LogOut, ShieldCheck, UserCog, Users } from 'lucide-react'
+import { Building2, Check, LogOut, Pencil, ShieldCheck, UserCog, Users, X } from 'lucide-react'
 import { api } from '../lib/api'
 import type { AdminUser, AuthUser, Branch } from '../lib/types'
 
@@ -36,6 +36,14 @@ export const SuperAdminPage = () => {
   })
   const [showAddBranchForm, setShowAddBranchForm] = useState(false)
   const [showAddAdminForm, setShowAddAdminForm] = useState(false)
+  const [editingBranchId, setEditingBranchId] = useState<number | null>(null)
+  const [editingBranchForm, setEditingBranchForm] = useState<{
+    name: string
+    governorate: string
+    address: string
+    phone: string
+    whatsapp: string
+  } | null>(null)
 
   const refreshData = async (activeToken: string) => {
     const [me, branchesResult, adminsResult] = await Promise.all([
@@ -118,7 +126,7 @@ export const SuperAdminPage = () => {
 
   const handleUpdateBranch = async (branch: Branch) => {
     if (!token) {
-      return
+      return false
     }
 
     setLoading(true)
@@ -134,10 +142,67 @@ export const SuperAdminPage = () => {
         telegram: branch.telegram ?? '',
         instagram: branch.instagram ?? '',
       })
+      setBranches((prev) => prev.map((item) => (item.id === branch.id ? branch : item)))
+      return true
     } catch (updateError) {
       setError(updateError instanceof Error ? updateError.message : 'فشل تحديث الفرع')
+      return false
     } finally {
       setLoading(false)
+    }
+  }
+
+  const startBranchEditing = (branch: Branch) => {
+    if (editingBranchId && editingBranchId !== branch.id && editingBranchForm) {
+      const shouldDiscard = window.confirm('يوجد تعديل غير محفوظ. هل تريد تجاهل التعديلات وفتح فرع آخر؟')
+      if (!shouldDiscard) {
+        return
+      }
+    }
+
+    setEditingBranchId(branch.id)
+    setEditingBranchForm({
+      name: branch.name,
+      governorate: branch.governorate,
+      address: branch.address,
+      phone: branch.phone,
+      whatsapp: branch.whatsapp,
+    })
+  }
+
+  const discardBranchEditing = () => {
+    const shouldDiscard = window.confirm('هل تريد تجاهل التعديلات؟')
+    if (!shouldDiscard) {
+      return
+    }
+
+    setEditingBranchId(null)
+    setEditingBranchForm(null)
+  }
+
+  const saveBranchEditing = async (branch: Branch) => {
+    if (!editingBranchForm) {
+      return
+    }
+
+    const shouldSave = window.confirm('هل أنت متأكد من حفظ التعديلات على هذا الفرع؟')
+    if (!shouldSave) {
+      return
+    }
+
+    const updatedBranch: Branch = {
+      ...branch,
+      name: editingBranchForm.name,
+      governorate: editingBranchForm.governorate,
+      address: editingBranchForm.address,
+      phone: editingBranchForm.phone,
+      whatsapp: editingBranchForm.whatsapp,
+    }
+
+    const success = await handleUpdateBranch(updatedBranch)
+    if (success) {
+      setEditingBranchId(null)
+      setEditingBranchForm(null)
     }
   }
 
@@ -360,71 +425,78 @@ export const SuperAdminPage = () => {
           )}
 
           <div className="max-h-[620px] space-y-3 overflow-auto pr-1">
-            {branches.map((branch, index) => (
+            {branches.map((branch) => (
               <div key={branch.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                {editingBranchId === branch.id ? (
+                  <div className="mb-2 flex flex-wrap justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => void saveBranchEditing(branch)}
+                      className="inline-flex items-center gap-1 rounded-lg bg-primary px-3 py-1 text-sm font-semibold text-white transition hover:opacity-90"
+                    >
+                      <Check className="h-4 w-4" />
+                      حفظ
+                    </button>
+                    <button
+                      type="button"
+                      onClick={discardBranchEditing}
+                      className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-3 py-1 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+                    >
+                      <X className="h-4 w-4" />
+                      إلغاء
+                    </button>
+                  </div>
+                ) : (
+                  <div className="mb-2 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => startBranchEditing(branch)}
+                      className="inline-flex items-center gap-1 rounded-lg border border-primary bg-white px-3 py-1 text-sm font-semibold text-primary transition hover:bg-primary hover:text-white"
+                    >
+                      <Pencil className="h-4 w-4" />
+                      تعديل
+                    </button>
+                  </div>
+                )}
+
                 <input
-                  className="mb-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  value={branch.name}
-                  onChange={(event) =>
-                    setBranches((prev) =>
-                      prev.map((item, currentIndex) =>
-                        currentIndex === index ? { ...item, name: event.target.value } : item,
-                      ),
-                    )
-                  }
+                  className="mb-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                  value={editingBranchId === branch.id ? editingBranchForm?.name ?? '' : branch.name}
+                  disabled={editingBranchId !== branch.id}
+                  onChange={(event) => setEditingBranchForm((prev) => (prev ? { ...prev, name: event.target.value } : prev))}
                 />
                 <div className="grid gap-2 md:grid-cols-2">
                   <input
-                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    value={branch.governorate}
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                    value={editingBranchId === branch.id ? editingBranchForm?.governorate ?? '' : branch.governorate}
+                    disabled={editingBranchId !== branch.id}
                     onChange={(event) =>
-                      setBranches((prev) =>
-                        prev.map((item, currentIndex) =>
-                          currentIndex === index ? { ...item, governorate: event.target.value } : item,
-                        ),
-                      )
+                      setEditingBranchForm((prev) => (prev ? { ...prev, governorate: event.target.value } : prev))
                     }
                   />
                   <input
-                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    value={branch.address}
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                    value={editingBranchId === branch.id ? editingBranchForm?.address ?? '' : branch.address}
+                    disabled={editingBranchId !== branch.id}
                     onChange={(event) =>
-                      setBranches((prev) =>
-                        prev.map((item, currentIndex) =>
-                          currentIndex === index ? { ...item, address: event.target.value } : item,
-                        ),
-                      )
+                      setEditingBranchForm((prev) => (prev ? { ...prev, address: event.target.value } : prev))
                     }
                   />
                   <input
-                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    value={branch.phone}
-                    onChange={(event) =>
-                      setBranches((prev) =>
-                        prev.map((item, currentIndex) =>
-                          currentIndex === index ? { ...item, phone: event.target.value } : item,
-                        ),
-                      )
-                    }
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                    value={editingBranchId === branch.id ? editingBranchForm?.phone ?? '' : branch.phone}
+                    disabled={editingBranchId !== branch.id}
+                    onChange={(event) => setEditingBranchForm((prev) => (prev ? { ...prev, phone: event.target.value } : prev))}
                   />
                   <input
-                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    value={branch.whatsapp}
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                    value={editingBranchId === branch.id ? editingBranchForm?.whatsapp ?? '' : branch.whatsapp}
+                    disabled={editingBranchId !== branch.id}
                     onChange={(event) =>
-                      setBranches((prev) =>
-                        prev.map((item, currentIndex) =>
-                          currentIndex === index ? { ...item, whatsapp: event.target.value } : item,
-                        ),
-                      )
+                      setEditingBranchForm((prev) => (prev ? { ...prev, whatsapp: event.target.value } : prev))
                     }
                   />
                 </div>
-                <button
-                  onClick={() => void handleUpdateBranch(branch)}
-                  className="mt-2 rounded-lg border border-primary px-3 py-1 text-sm font-semibold text-primary transition hover:bg-primary hover:text-white"
-                >
-                  حفظ الفرع
-                </button>
               </div>
             ))}
             {branches.length === 0 && (
