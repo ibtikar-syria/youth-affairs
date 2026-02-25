@@ -44,6 +44,13 @@ export const SuperAdminPage = () => {
     phone: string
     whatsapp: string
   } | null>(null)
+  const [editingBranchInitialForm, setEditingBranchInitialForm] = useState<{
+    name: string
+    governorate: string
+    address: string
+    phone: string
+    whatsapp: string
+  } | null>(null)
 
   const refreshData = async (activeToken: string) => {
     const [me, branchesResult, adminsResult] = await Promise.all([
@@ -152,8 +159,22 @@ export const SuperAdminPage = () => {
     }
   }
 
+  const isBranchEditDirty = () => {
+    if (!editingBranchForm || !editingBranchInitialForm) {
+      return false
+    }
+
+    return (
+      editingBranchForm.name !== editingBranchInitialForm.name ||
+      editingBranchForm.governorate !== editingBranchInitialForm.governorate ||
+      editingBranchForm.address !== editingBranchInitialForm.address ||
+      editingBranchForm.phone !== editingBranchInitialForm.phone ||
+      editingBranchForm.whatsapp !== editingBranchInitialForm.whatsapp
+    )
+  }
+
   const startBranchEditing = (branch: Branch) => {
-    if (editingBranchId && editingBranchId !== branch.id && editingBranchForm) {
+    if (editingBranchId && editingBranchId !== branch.id && isBranchEditDirty()) {
       const shouldDiscard = window.confirm('يوجد تعديل غير محفوظ. هل تريد تجاهل التعديلات وفتح فرع آخر؟')
       if (!shouldDiscard) {
         return
@@ -168,16 +189,26 @@ export const SuperAdminPage = () => {
       phone: branch.phone,
       whatsapp: branch.whatsapp,
     })
+    setEditingBranchInitialForm({
+      name: branch.name,
+      governorate: branch.governorate,
+      address: branch.address,
+      phone: branch.phone,
+      whatsapp: branch.whatsapp,
+    })
   }
 
   const discardBranchEditing = () => {
-    const shouldDiscard = window.confirm('هل تريد تجاهل التعديلات؟')
-    if (!shouldDiscard) {
-      return
+    if (isBranchEditDirty()) {
+      const shouldDiscard = window.confirm('هل تريد تجاهل التعديلات؟')
+      if (!shouldDiscard) {
+        return
+      }
     }
 
     setEditingBranchId(null)
     setEditingBranchForm(null)
+    setEditingBranchInitialForm(null)
   }
 
   const saveBranchEditing = async (branch: Branch) => {
@@ -203,6 +234,7 @@ export const SuperAdminPage = () => {
     if (success) {
       setEditingBranchId(null)
       setEditingBranchForm(null)
+      setEditingBranchInitialForm(null)
     }
   }
 
