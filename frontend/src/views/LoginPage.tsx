@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { ShieldCheck, UserCircle } from 'lucide-react'
 import { api } from '../lib/api'
+import { SiteHeader } from '../components/SiteHeader'
 
 const ADMIN_TOKEN_KEY = 'ya_admin_token'
 const SUPERADMIN_TOKEN_KEY = 'ya_superadmin_token'
@@ -92,12 +93,11 @@ export const LoginPage = () => {
   }
 
   return (
-    <div dir="rtl" className="min-h-screen bg-slate-50 px-4 py-10">
-      <div className="mx-auto max-w-lg">
-        <Link to="/" className="mb-6 inline-flex items-center text-sm font-medium text-primary transition hover:opacity-90">
-          العودة إلى الصفحة الرئيسية
-        </Link>
+    <div dir="rtl" className="min-h-screen bg-slate-50">
+      <SiteHeader />
 
+      <div className="px-4 py-10">
+      <div className="mx-auto max-w-lg">
         <div className="rounded-2xl border border-blue-100 bg-white p-6 shadow-sm">
           <div className="mb-6 flex items-center gap-3">
             <div className="rounded-xl bg-primary/10 p-3 text-primary">
@@ -137,6 +137,7 @@ export const LoginPage = () => {
             {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
           </form>
         </div>
+      </div>
       </div>
     </div>
   )

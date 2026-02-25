@@ -24,6 +24,7 @@ import {
 import { api } from '../lib/api'
 import { BranchesExplorer } from '../components/BranchesExplorer'
 import { EventsExplorer } from '../components/EventsExplorer'
+import { SiteHeader } from '../components/SiteHeader'
 import type { Branch, EventItem } from '../lib/types'
 
 const values = [
@@ -207,35 +208,7 @@ export const LandingPage = () => {
 
   return (
     <div ref={pageRef} dir="rtl" className="min-h-screen bg-slate-50 text-slate-800">
-      <header className="sticky top-0 z-30 border-b border-blue-100 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <button
-            type="button"
-            onClick={scrollToTop}
-            className="flex items-center gap-3 rounded-lg transition-transform duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-            aria-label="العودة إلى أعلى الصفحة"
-          >
-            <img src="/ya_logo_color.svg" alt="شعار شؤون الشباب" className="h-12 w-12 transition-transform duration-300 hover:rotate-6" />
-            <div>
-              <h1 className="text-xl font-bold text-primary">{content.organizationName}</h1>
-              <p className="text-sm text-slate-600">{content.slogan}</p>
-            </div>
-          </button>
-          <div className="flex items-center gap-3 text-sm">
-            <a href="#events" className="inline-flex items-center gap-1 text-slate-600 transition-all duration-200 hover:text-primary hover:translate-x-[-2px]">
-              <CalendarDays className="h-4 w-4" />
-              الفعاليات
-            </a>
-            <a href="#branches" className="inline-flex items-center gap-1 text-slate-600 transition-all duration-200 hover:text-primary hover:translate-x-[-2px]">
-              <MapPin className="h-4 w-4" />
-              الأفرع
-            </a>
-            <Link to="/login" className="rounded-lg bg-primary px-3 py-2 text-white transition-all duration-200 hover:bg-primary/90 hover:shadow-lg hover:scale-105">
-              تسجيل الدخول
-            </Link>
-          </div>
-        </div>
-      </header>
+      <SiteHeader isLanding onLogoClick={scrollToTop} />
 
       <main>
         <section className="relative overflow-hidden bg-gradient-to-l from-primary to-accent py-16 text-white">

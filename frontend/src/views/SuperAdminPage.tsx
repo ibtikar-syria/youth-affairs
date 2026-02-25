@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { Building2, Check, LogOut, Pencil, Trash2, UserCog, Users, X } from 'lucide-react'
 import { api } from '../lib/api'
+import { SiteHeader } from '../components/SiteHeader'
 import type { AdminUser, AuthUser, Branch } from '../lib/types'
 
 const TOKEN_KEY = 'ya_superadmin_token'
@@ -134,6 +135,7 @@ export const SuperAdminPage = () => {
     if (!token) {
       return
     }
+
     setLoading(true)
     void refreshData(token)
       .catch((loadError) => {
@@ -647,7 +649,9 @@ export const SuperAdminPage = () => {
 
   return (
     <div dir="rtl" className="min-h-screen bg-slate-50">
-      <header className="border-b border-blue-100 bg-white shadow-sm">
+      <SiteHeader />
+
+      <section className="border-b border-blue-100 bg-white shadow-sm">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-6">
           <div>
             <h1 className="text-2xl font-bold text-primary">لوحة المدير العام</h1>
@@ -661,7 +665,7 @@ export const SuperAdminPage = () => {
             تسجيل الخروج
           </button>
         </div>
-      </header>
+      </section>
 
       <main className="mx-auto max-w-7xl space-y-6 px-4 py-8">
         <section className="grid gap-4 md:grid-cols-3">

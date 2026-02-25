@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ChevronRight, MapPin } from 'lucide-react'
 import { api } from '../lib/api'
 import { BranchesExplorer } from '../components/BranchesExplorer'
+import { SiteHeader } from '../components/SiteHeader'
 import type { Branch } from '../lib/types'
 
 export const BranchesPage = () => {
@@ -19,7 +20,9 @@ export const BranchesPage = () => {
 
   return (
     <div dir="rtl" className="min-h-screen bg-slate-50">
-      <header className="border-b border-blue-100 bg-white shadow-sm">
+      <SiteHeader />
+
+      <section className="border-b border-blue-100 bg-white shadow-sm">
         <div className="mx-auto max-w-7xl px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
@@ -38,7 +41,7 @@ export const BranchesPage = () => {
             </Link>
           </div>
         </div>
-      </header>
+      </section>
 
       <main className="mx-auto max-w-7xl px-4 py-8">
         <div className="mb-4 text-sm text-slate-600">

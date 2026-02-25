@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { ArrowUpRight, Building2, CalendarDays, Image, LogOut, MapPin, UserCircle } from 'lucide-react'
 import { api } from '../lib/api'
+import { SiteHeader } from '../components/SiteHeader'
 import type { Branch, EventItem, AuthUser } from '../lib/types'
 
 const TOKEN_KEY = 'ya_admin_token'
@@ -199,7 +200,9 @@ export const AdminPage = () => {
 
   return (
     <div dir="rtl" className="min-h-screen bg-slate-50">
-      <header className="border-b border-blue-100 bg-white shadow-sm">
+      <SiteHeader />
+
+      <section className="border-b border-blue-100 bg-white shadow-sm">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-6">
           <div>
             <h1 className="text-2xl font-bold text-primary">لوحة مشرف الفرع</h1>
@@ -213,7 +216,7 @@ export const AdminPage = () => {
             تسجيل الخروج
           </button>
         </div>
-      </header>
+      </section>
 
       <main className="mx-auto max-w-7xl space-y-6 px-4 py-8">
         <section className="grid gap-4 md:grid-cols-3">
