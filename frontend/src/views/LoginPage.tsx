@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ShieldCheck, UserCircle } from 'lucide-react'
 import { api } from '../lib/api'
-import { SiteHeader } from '../components/SiteHeader'
 
 const ADMIN_TOKEN_KEY = 'ya_admin_token'
 const SUPERADMIN_TOKEN_KEY = 'ya_superadmin_token'
@@ -94,8 +93,6 @@ export const LoginPage = () => {
 
   return (
     <div dir="rtl" className="bg-slate-50">
-      <SiteHeader />
-
       <div className="px-4 py-10">
       <div className="mx-auto max-w-lg">
         <div className="rounded-2xl border border-blue-100 bg-white p-6 shadow-sm">

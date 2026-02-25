@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { CalendarDays } from 'lucide-react'
 import { api } from '../lib/api'
 import { EventsExplorer } from '../components/EventsExplorer'
-import { SiteHeader } from '../components/SiteHeader'
 import type { Branch, EventItem } from '../lib/types'
 
 export const EventsPage = () => {
@@ -77,8 +76,6 @@ export const EventsPage = () => {
 
   return (
     <div dir="rtl" className="bg-slate-50">
-      <SiteHeader />
-
       <main className="mx-auto max-w-7xl px-4 py-8">
         <section className="mb-6 rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
           <div>

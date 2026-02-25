@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { SiteFooter } from '../components/SiteFooter'
+import { SiteHeader } from '../components/SiteHeader'
 import { AdminPage } from '../views/AdminPage'
 import { BranchesPage } from '../views/BranchesPage'
 import { EventDetailPage } from '../views/EventDetailPage'
@@ -11,6 +12,7 @@ import { SuperAdminPage } from '../views/SuperAdminPage'
 export const AppRouter = () => (
   <BrowserRouter>
     <div className="flex min-h-screen flex-col">
+      <SiteHeader />
       <div className="flex-1">
         <Routes>
           <Route path="/" element={<LandingPage />} />

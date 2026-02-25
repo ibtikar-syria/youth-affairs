@@ -1,5 +1,5 @@
 import { CalendarDays, MapPin, UserCircle2 } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 type SiteHeaderProps = {
   isLanding?: boolean
@@ -7,6 +7,19 @@ type SiteHeaderProps = {
 }
 
 export const SiteHeader = ({ isLanding = false, onLogoClick }: SiteHeaderProps) => {
+  const location = useLocation()
+  const isLandingRoute = location.pathname === '/'
+  const useLandingMode = isLanding || isLandingRoute
+
+  const handleLandingLogoClick = () => {
+    if (onLogoClick) {
+      onLogoClick()
+      return
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   const LogoContent = (
     <>
       <img
@@ -24,10 +37,10 @@ export const SiteHeader = ({ isLanding = false, onLogoClick }: SiteHeaderProps) 
   return (
     <header className="sticky top-0 z-30 border-b border-blue-100 bg-white/95 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
-        {isLanding ? (
+        {useLandingMode ? (
           <button
             type="button"
-            onClick={onLogoClick}
+            onClick={handleLandingLogoClick}
             className="group flex items-center gap-3 rounded-lg text-right transition-transform duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
             aria-label="العودة إلى أعلى الصفحة"
           >

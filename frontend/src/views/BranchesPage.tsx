@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { MapPin } from 'lucide-react'
 import { api } from '../lib/api'
 import { BranchesExplorer } from '../components/BranchesExplorer'
-import { SiteHeader } from '../components/SiteHeader'
 import type { Branch } from '../lib/types'
 
 export const BranchesPage = () => {
@@ -19,8 +18,6 @@ export const BranchesPage = () => {
 
   return (
     <div dir="rtl" className="bg-slate-50">
-      <SiteHeader />
-
       <main className="mx-auto max-w-7xl px-4 py-8">
         <section className="mb-6 rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
           <div>

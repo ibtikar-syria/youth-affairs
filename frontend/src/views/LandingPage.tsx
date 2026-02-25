@@ -24,7 +24,6 @@ import {
 import { api } from '../lib/api'
 import { BranchesExplorer } from '../components/BranchesExplorer'
 import { EventsExplorer } from '../components/EventsExplorer'
-import { SiteHeader } from '../components/SiteHeader'
 import type { Branch, EventItem } from '../lib/types'
 
 const values = [
@@ -207,8 +206,6 @@ export const LandingPage = () => {
 
   return (
     <div ref={pageRef} dir="rtl" className="bg-slate-50 text-slate-800">
-      <SiteHeader isLanding onLogoClick={scrollToTop} />
-
       <main>
         <section className="relative overflow-hidden bg-gradient-to-l from-primary to-accent py-16 text-white">
           <img
