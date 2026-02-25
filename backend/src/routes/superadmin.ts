@@ -26,6 +26,7 @@ type UpdateAdminInput = {
   username: string
   displayName: string
   branchId: number
+  password?: string
 }
 
 type BranchRelationCounts = {
@@ -243,14 +244,26 @@ superadminRoutes.put('/admins/:id', async (c) => {
     return c.json({ error: 'Username already exists' }, 409)
   }
 
-  await c.env.DB
-    .prepare(
-      `UPDATE users
-       SET username = ?, display_name = ?, branch_id = ?, updated_at = CURRENT_TIMESTAMP
-       WHERE id = ? AND role = 'admin'`
-    )
-    .bind(input.username.trim(), input.displayName.trim(), input.branchId, userId)
-    .run()
+  if (input.password && input.password.trim()) {
+    const passwordHash = await hashPassword(input.password.trim())
+    await c.env.DB
+      .prepare(
+        `UPDATE users
+         SET username = ?, display_name = ?, branch_id = ?, password_hash = ?, updated_at = CURRENT_TIMESTAMP
+         WHERE id = ? AND role = 'admin'`
+      )
+      .bind(input.username.trim(), input.displayName.trim(), input.branchId, passwordHash, userId)
+      .run()
+  } else {
+    await c.env.DB
+      .prepare(
+        `UPDATE users
+         SET username = ?, display_name = ?, branch_id = ?, updated_at = CURRENT_TIMESTAMP
+         WHERE id = ? AND role = 'admin'`
+      )
+      .bind(input.username.trim(), input.displayName.trim(), input.branchId, userId)
+      .run()
+  }
 
   return c.json({ ok: true })
 })
