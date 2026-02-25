@@ -9,7 +9,11 @@ type SiteHeaderProps = {
 export const SiteHeader = ({ isLanding = false, onLogoClick }: SiteHeaderProps) => {
   const LogoContent = (
     <>
-      <img src="/ya_logo_color.svg" alt="شعار شؤون الشباب" className="h-12 w-12 transition-transform duration-300 hover:rotate-6" />
+      <img
+        src="/ya_logo_color.svg"
+        alt="شعار شؤون الشباب"
+        className="h-12 w-12 transition-transform duration-[3600ms] ease-linear group-hover:rotate-[360deg]"
+      />
       <div className="text-right">
         <h1 className="text-xl font-bold text-primary">شؤون الشباب</h1>
         <p className="text-sm text-slate-600">جيل شبابي متمكّن وواعٍ</p>
@@ -24,7 +28,7 @@ export const SiteHeader = ({ isLanding = false, onLogoClick }: SiteHeaderProps) 
           <button
             type="button"
             onClick={onLogoClick}
-            className="flex items-center gap-3 rounded-lg text-right transition-transform duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+            className="group flex items-center gap-3 rounded-lg text-right transition-transform duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
             aria-label="العودة إلى أعلى الصفحة"
           >
             {LogoContent}
@@ -32,7 +36,7 @@ export const SiteHeader = ({ isLanding = false, onLogoClick }: SiteHeaderProps) 
         ) : (
           <Link
             to="/"
-            className="flex items-center gap-3 rounded-lg text-right transition-transform duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+            className="group flex items-center gap-3 rounded-lg text-right transition-transform duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
             aria-label="العودة إلى الصفحة الرئيسية"
           >
             {LogoContent}
