@@ -3,7 +3,6 @@ export type UserRole = 'superadmin' | 'admin'
 export type AuthUser = {
   id: number
   username: string
-  displayName: string
   role: UserRole
   branchId: number | null
 }

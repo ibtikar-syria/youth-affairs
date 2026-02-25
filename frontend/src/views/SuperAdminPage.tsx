@@ -126,6 +126,7 @@ export const SuperAdminPage = () => {
     }
 
     setUser(me.user)
+    console.log('Loaded superadmin data:', { user: me.user, branches: branchesResult.items, admins: adminsResult.items })
     setBranches(branchesResult.items)
     setAdmins(adminsResult.items)
   }
@@ -707,7 +708,7 @@ export const SuperAdminPage = () => {
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-6">
           <div>
             <h1 className="text-2xl font-bold text-primary">لوحة المدير العام</h1>
-            <p className="text-sm text-slate-600">مرحباً {user.displayName}</p>
+            <p className="text-sm text-slate-600 text-right" dir='rtl'>{user.username}</p>
           </div>
           <button
             onClick={logout}
@@ -740,7 +741,7 @@ export const SuperAdminPage = () => {
               <UserCog className="h-4 w-4" />
             </div>
             <p className="text-sm text-slate-500">الحساب الحالي</p>
-            <p className="text-lg font-bold text-slate-900">{user.displayName}</p>
+            <p className="text-lg font-bold text-slate-900 text-right" dir='rtl'>{user.username}</p>
           </article>
         </section>
 

@@ -260,7 +260,7 @@ export const AdminPage = () => {
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-6">
           <div>
             <h1 className="text-2xl font-bold text-primary">لوحة مشرف الفرع</h1>
-            <p className="text-sm text-slate-600">مرحباً {user.displayName}</p>
+            <p className="text-sm text-slate-600 text-right" dir='ltr'>{user.username}</p>
           </div>
           <button
             onClick={logout}
@@ -293,7 +293,7 @@ export const AdminPage = () => {
               <UserCircle className="h-4 w-4" />
             </div>
             <p className="text-sm text-slate-500">الحساب الحالي</p>
-            <p className="text-lg font-bold text-slate-900">{user.displayName}</p>
+            <p className="text-lg font-bold text-slate-900 text-right" dir='ltr'>{user.username}</p>
           </article>
         </section>
 
