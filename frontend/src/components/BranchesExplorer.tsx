@@ -1,4 +1,4 @@
-import { ArrowUpLeft, CalendarDays, MapPin, MessageCircle, Phone } from 'lucide-react'
+import { ArrowUpLeft, CalendarDays, Facebook, Instagram, MapPin, MessageCircle, Phone, Send } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { Branch } from '../lib/types'
 
@@ -71,32 +71,38 @@ export const BranchesExplorer = ({ branches, loadingBranches, variant }: Branche
           <div className="mt-4 flex flex-wrap gap-2 text-sm">
             {branch.facebook && (
               <a
-                className="rounded-lg bg-blue-50 px-3 py-1 text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md"
                 href={branch.facebook}
                 target="_blank"
                 rel="noreferrer"
+                aria-label="Facebook"
+                title="Facebook"
               >
-                Facebook
+                <Facebook className="h-4 w-4" />
               </a>
             )}
             {branch.telegram && (
               <a
-                className="rounded-lg bg-blue-50 px-3 py-1 text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md"
                 href={branch.telegram}
                 target="_blank"
                 rel="noreferrer"
+                aria-label="Telegram"
+                title="Telegram"
               >
-                Telegram
+                <Send className="h-4 w-4" />
               </a>
             )}
             {branch.instagram && (
               <a
-                className="rounded-lg bg-blue-50 px-3 py-1 text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md"
                 href={branch.instagram}
                 target="_blank"
                 rel="noreferrer"
+                aria-label="Instagram"
+                title="Instagram"
               >
-                Instagram
+                <Instagram className="h-4 w-4" />
               </a>
             )}
           </div>
