@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { Building2, Check, LogOut, Pencil, Trash2, UserCog, Users, X } from 'lucide-react'
 import { api } from '../lib/api'
-import { SiteFooter } from '../components/SiteFooter'
 import { SiteHeader } from '../components/SiteHeader'
 import type { AdminUser, AuthUser, Branch } from '../lib/types'
 
@@ -649,7 +648,7 @@ export const SuperAdminPage = () => {
   }
 
   return (
-    <div dir="rtl" className="min-h-screen bg-slate-50">
+    <div dir="rtl" className="bg-slate-50">
       <SiteHeader />
 
       <section className="border-b border-blue-100 bg-white shadow-sm">
@@ -1170,7 +1169,6 @@ export const SuperAdminPage = () => {
         )}
       </main>
 
-      <SiteFooter />
       </div>
   )
 }

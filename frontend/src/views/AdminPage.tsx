@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { ArrowUpRight, Building2, CalendarDays, Image, LogOut, MapPin, UserCircle } from 'lucide-react'
 import { api } from '../lib/api'
-import { SiteFooter } from '../components/SiteFooter'
 import { SiteHeader } from '../components/SiteHeader'
 import type { Branch, EventItem, AuthUser } from '../lib/types'
 
@@ -200,7 +199,7 @@ export const AdminPage = () => {
   }
 
   return (
-    <div dir="rtl" className="min-h-screen bg-slate-50">
+    <div dir="rtl" className="bg-slate-50">
       <SiteHeader />
 
       <section className="border-b border-blue-100 bg-white shadow-sm">
@@ -588,7 +587,6 @@ export const AdminPage = () => {
         )}
       </main>
 
-      <SiteFooter />
     </div>
   )
 }

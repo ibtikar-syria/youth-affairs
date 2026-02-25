@@ -24,7 +24,6 @@ import {
 import { api } from '../lib/api'
 import { BranchesExplorer } from '../components/BranchesExplorer'
 import { EventsExplorer } from '../components/EventsExplorer'
-import { SiteFooter } from '../components/SiteFooter'
 import { SiteHeader } from '../components/SiteHeader'
 import type { Branch, EventItem } from '../lib/types'
 
@@ -93,7 +92,6 @@ const goals = [
 ]
 
 const content = {
-  organizationName: 'شؤون الشباب',
   slogan: 'جيل شبابي متمكّن وواعٍ',
   definition:
     'مؤسسة رسمية وطنية تُعنى بتمكين الشباب فكرياً وسياسياً واجتماعياً، بهدف صناعة جيل واعٍ يسهم في بناء وطنه وتمثيله وخدمة قيمه ومبادئه.',
@@ -208,7 +206,7 @@ export const LandingPage = () => {
   }, [])
 
   return (
-    <div ref={pageRef} dir="rtl" className="min-h-screen bg-slate-50 text-slate-800">
+    <div ref={pageRef} dir="rtl" className="bg-slate-50 text-slate-800">
       <SiteHeader isLanding onLogoClick={scrollToTop} />
 
       <main>
@@ -358,8 +356,6 @@ export const LandingPage = () => {
           />
         </section>
       </main>
-
-      <SiteFooter organizationName={content.organizationName} slogan={content.slogan} />
 
       <button
         type="button"

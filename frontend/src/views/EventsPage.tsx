@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { CalendarDays } from 'lucide-react'
 import { api } from '../lib/api'
 import { EventsExplorer } from '../components/EventsExplorer'
-import { SiteFooter } from '../components/SiteFooter'
 import { SiteHeader } from '../components/SiteHeader'
 import type { Branch, EventItem } from '../lib/types'
 
@@ -77,7 +76,7 @@ export const EventsPage = () => {
   }, [filters])
 
   return (
-    <div dir="rtl" className="min-h-screen bg-slate-50">
+    <div dir="rtl" className="bg-slate-50">
       <SiteHeader />
 
       <main className="mx-auto max-w-7xl px-4 py-8">
@@ -105,7 +104,6 @@ export const EventsPage = () => {
         />
       </main>
 
-      <SiteFooter />
     </div>
   )
 }

@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ShieldCheck, UserCircle } from 'lucide-react'
 import { api } from '../lib/api'
-import { SiteFooter } from '../components/SiteFooter'
 import { SiteHeader } from '../components/SiteHeader'
 
 const ADMIN_TOKEN_KEY = 'ya_admin_token'
@@ -87,14 +86,14 @@ export const LoginPage = () => {
 
   if (checkingSession) {
     return (
-      <div dir="rtl" className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">
+      <div dir="rtl" className="flex min-h-[60vh] items-center justify-center bg-slate-50 px-4 py-10">
         <p className="text-sm font-medium text-slate-600">جارٍ التحقق من الجلسة...</p>
       </div>
     )
   }
 
   return (
-    <div dir="rtl" className="min-h-screen bg-slate-50">
+    <div dir="rtl" className="bg-slate-50">
       <SiteHeader />
 
       <div className="px-4 py-10">
@@ -141,7 +140,6 @@ export const LoginPage = () => {
       </div>
       </div>
 
-      <SiteFooter />
     </div>
   )
 }

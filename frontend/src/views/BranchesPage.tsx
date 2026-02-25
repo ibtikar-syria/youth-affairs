@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { MapPin } from 'lucide-react'
 import { api } from '../lib/api'
 import { BranchesExplorer } from '../components/BranchesExplorer'
-import { SiteFooter } from '../components/SiteFooter'
 import { SiteHeader } from '../components/SiteHeader'
 import type { Branch } from '../lib/types'
 
@@ -19,7 +18,7 @@ export const BranchesPage = () => {
   }, [])
 
   return (
-    <div dir="rtl" className="min-h-screen bg-slate-50">
+    <div dir="rtl" className="bg-slate-50">
       <SiteHeader />
 
       <main className="mx-auto max-w-7xl px-4 py-8">
@@ -45,7 +44,6 @@ export const BranchesPage = () => {
         />
       </main>
 
-      <SiteFooter />
     </div>
   )
 }

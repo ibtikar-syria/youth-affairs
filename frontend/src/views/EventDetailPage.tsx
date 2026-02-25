@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { CalendarDays, ChevronRight, MapPin, Calendar, Building2, ArrowRight } from 'lucide-react'
 import { api } from '../lib/api'
-import { SiteFooter } from '../components/SiteFooter'
 import { SiteHeader } from '../components/SiteHeader'
 import type { EventItem } from '../lib/types'
 
@@ -55,7 +54,7 @@ export const EventDetailPage = () => {
 
   if (error || !event) {
     return (
-      <div dir="rtl" className="min-h-screen bg-slate-50">
+      <div dir="rtl" className="bg-slate-50">
         <SiteHeader />
 
         <section className="border-b border-blue-100 bg-white shadow-sm">
@@ -92,13 +91,12 @@ export const EventDetailPage = () => {
           </div>
         </main>
 
-        <SiteFooter />
       </div>
     )
   }
 
   return (
-    <div dir="rtl" className="min-h-screen bg-slate-50">
+    <div dir="rtl" className="bg-slate-50">
       <SiteHeader />
 
       <section className="border-b border-blue-100 bg-white shadow-sm">
@@ -186,7 +184,6 @@ export const EventDetailPage = () => {
         </article>
       </main>
 
-      <SiteFooter />
     </div>
   )
 }
