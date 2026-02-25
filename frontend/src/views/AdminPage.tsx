@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Building2, CalendarDays, Image, LogOut, MapPin, UserCircle } from 'lucide-react'
 import { api } from '../lib/api'
 import type { Branch, EventItem, AuthUser } from '../lib/types'
 
@@ -173,207 +174,343 @@ export const AdminPage = () => {
 
   if (!token || !user) {
     return (
-      <div dir="rtl" className="mx-auto max-w-lg px-4 py-12">
-        <Link to="/" className="mb-6 inline-block text-sm text-primary">
-          العودة إلى الصفحة الرئيسية
-        </Link>
-        <h1 className="mb-4 text-2xl font-bold text-primary">دخول مشرف الفرع</h1>
-        <form onSubmit={handleLogin} className="space-y-3 rounded-2xl border border-blue-100 bg-white p-6 shadow-sm">
-          <input
-            className="w-full rounded-lg border border-slate-300 px-3 py-2"
-            placeholder="اسم المستخدم"
-            value={loginForm.username}
-            onChange={(event) => setLoginForm((prev) => ({ ...prev, username: event.target.value }))}
-          />
-          <input
-            type="password"
-            className="w-full rounded-lg border border-slate-300 px-3 py-2"
-            placeholder="كلمة المرور"
-            value={loginForm.password}
-            onChange={(event) => setLoginForm((prev) => ({ ...prev, password: event.target.value }))}
-          />
-          <button className="w-full rounded-lg bg-primary px-4 py-2 font-bold text-white" disabled={loading}>
-            تسجيل الدخول
-          </button>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-        </form>
+      <div dir="rtl" className="min-h-screen bg-slate-50 px-4 py-10">
+        <div className="mx-auto max-w-lg">
+          <Link to="/" className="mb-6 inline-flex items-center text-sm font-medium text-primary transition hover:opacity-90">
+            العودة إلى الصفحة الرئيسية
+          </Link>
+
+          <div className="rounded-2xl border border-blue-100 bg-white p-6 shadow-sm">
+            <div className="mb-6 flex items-center gap-3">
+              <div className="rounded-xl bg-primary/10 p-3 text-primary">
+                <UserCircle className="h-5 w-5" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-primary">دخول مشرف الفرع</h1>
+                <p className="text-sm text-slate-600">إدارة بيانات الفرع والفعاليات</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleLogin} className="space-y-3">
+              <input
+                dir="ltr"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                placeholder="اسم المستخدم"
+                value={loginForm.username}
+                onChange={(event) => setLoginForm((prev) => ({ ...prev, username: event.target.value }))}
+              />
+              <input
+                type="password"
+                dir="ltr"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                placeholder="كلمة المرور"
+                value={loginForm.password}
+                onChange={(event) => setLoginForm((prev) => ({ ...prev, password: event.target.value }))}
+              />
+              <button
+                className="w-full rounded-lg bg-primary px-4 py-2 font-bold text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={loading}
+              >
+                {loading ? 'جار تسجيل الدخول...' : 'تسجيل الدخول'}
+              </button>
+              {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+            </form>
+          </div>
+        </div>
       </div>
     )
   }
 
   return (
-    <div dir="rtl" className="mx-auto max-w-6xl space-y-6 px-4 py-8">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-primary">لوحة مشرف الفرع</h1>
-          <p className="text-sm text-slate-600">مرحباً {user.displayName}</p>
-        </div>
-        <button onClick={logout} className="rounded-lg border border-primary px-4 py-2 text-primary">
-          تسجيل الخروج
-        </button>
-      </div>
-
-      {error && <p className="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
-
-      {branch && (
-        <form onSubmit={handleUpdateBranch} className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
-          <h2 className="mb-4 text-lg font-bold">بيانات الفرع: {branch.name}</h2>
-          <div className="grid gap-3 md:grid-cols-2">
-            <input
-              className="rounded-lg border border-slate-300 px-3 py-2"
-              placeholder="العنوان"
-              value={branch.address}
-              onChange={(event) => setBranch((prev) => (prev ? { ...prev, address: event.target.value } : prev))}
-            />
-            <input
-              className="rounded-lg border border-slate-300 px-3 py-2"
-              placeholder="الهاتف"
-              value={branch.phone}
-              onChange={(event) => setBranch((prev) => (prev ? { ...prev, phone: event.target.value } : prev))}
-            />
-            <input
-              className="rounded-lg border border-slate-300 px-3 py-2"
-              placeholder="واتساب"
-              value={branch.whatsapp}
-              onChange={(event) => setBranch((prev) => (prev ? { ...prev, whatsapp: event.target.value } : prev))}
-            />
-            <input
-              className="rounded-lg border border-slate-300 px-3 py-2"
-              placeholder="Facebook"
-              value={branch.facebook ?? ''}
-              onChange={(event) => setBranch((prev) => (prev ? { ...prev, facebook: event.target.value } : prev))}
-            />
-            <input
-              className="rounded-lg border border-slate-300 px-3 py-2"
-              placeholder="Telegram"
-              value={branch.telegram ?? ''}
-              onChange={(event) => setBranch((prev) => (prev ? { ...prev, telegram: event.target.value } : prev))}
-            />
-            <input
-              className="rounded-lg border border-slate-300 px-3 py-2"
-              placeholder="Instagram"
-              value={branch.instagram ?? ''}
-              onChange={(event) => setBranch((prev) => (prev ? { ...prev, instagram: event.target.value } : prev))}
-            />
+    <div dir="rtl" className="min-h-screen bg-slate-50">
+      <header className="border-b border-blue-100 bg-white shadow-sm">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-6">
+          <div>
+            <h1 className="text-2xl font-bold text-primary">لوحة مشرف الفرع</h1>
+            <p className="text-sm text-slate-600">مرحباً {user.displayName}</p>
           </div>
-          <button className="mt-4 rounded-lg bg-accent px-4 py-2 font-bold text-slate-900" disabled={loading}>
-            حفظ بيانات الفرع
+          <button
+            onClick={logout}
+            className="inline-flex items-center gap-2 rounded-lg border border-primary px-4 py-2 text-primary transition hover:bg-primary hover:text-white"
+          >
+            <LogOut className="h-4 w-4" />
+            تسجيل الخروج
           </button>
-        </form>
-      )}
+        </div>
+      </header>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <form onSubmit={handleSaveEvent} className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
-          <h2 className="mb-4 text-lg font-bold">{editingId ? 'تعديل فعالية' : 'إضافة فعالية جديدة'}</h2>
-          <div className="space-y-3">
-            <input
-              className="w-full rounded-lg border border-slate-300 px-3 py-2"
-              placeholder="اسم الفعالية"
-              value={eventForm.title}
-              onChange={(event) => setEventForm((prev) => ({ ...prev, title: event.target.value }))}
-            />
-            <input
-              className="w-full rounded-lg border border-slate-300 px-3 py-2"
-              placeholder="رابط الصورة"
-              value={eventForm.imageUrl}
-              onChange={(event) => setEventForm((prev) => ({ ...prev, imageUrl: event.target.value }))}
-            />
-            <div className="space-y-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
-              <label className="block text-sm font-medium text-slate-700">أو ارفع صورة من جهازك</label>
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                onChange={(event) => {
-                  const file = event.target.files?.[0]
-                  if (file) {
-                    void handleUploadR2Image(file)
-                  }
-                  event.currentTarget.value = ''
-                }}
-                className="w-full text-sm"
-                disabled={loading || uploadingImage}
-              />
-              <p className="text-xs text-slate-500">الأنواع المسموحة: JPG, PNG, WEBP — الحد الأعلى 5MB</p>
-              {uploadingImage && <p className="text-sm text-primary">جار رفع الصورة...</p>}
+      <main className="mx-auto max-w-7xl space-y-6 px-4 py-8">
+        <section className="grid gap-4 md:grid-cols-3">
+          <article className="rounded-2xl border border-blue-100 bg-white p-4 shadow-sm">
+            <div className="mb-2 inline-flex rounded-lg bg-primary/10 p-2 text-primary">
+              <Building2 className="h-4 w-4" />
             </div>
-            {eventForm.imageUrl && (
-              <img src={eventForm.imageUrl} alt="معاينة صورة الفعالية" className="h-40 w-full rounded-lg object-cover" />
-            )}
-            <textarea
-              className="w-full rounded-lg border border-slate-300 px-3 py-2"
-              placeholder="نص الإعلان"
-              rows={4}
-              value={eventForm.announcement}
-              onChange={(event) => setEventForm((prev) => ({ ...prev, announcement: event.target.value }))}
-            />
-            <input
-              type="date"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2"
-              value={eventForm.eventDate}
-              onChange={(event) => setEventForm((prev) => ({ ...prev, eventDate: event.target.value }))}
-            />
-            <input
-              className="w-full rounded-lg border border-slate-300 px-3 py-2"
-              placeholder="المكان"
-              value={eventForm.location}
-              onChange={(event) => setEventForm((prev) => ({ ...prev, location: event.target.value }))}
-            />
-          </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button className="rounded-lg bg-primary px-4 py-2 font-bold text-white" disabled={loading}>
-              {editingId ? 'حفظ التعديلات' : 'إضافة الفعالية'}
-            </button>
-            {editingId && (
-              <button
-                type="button"
-                onClick={() => {
-                  setEditingId(null)
-                  setEventForm(emptyEvent)
-                }}
-                className="rounded-lg border border-slate-300 px-4 py-2"
-              >
-                إلغاء
-              </button>
-            )}
-          </div>
-        </form>
-
-        <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
-          <h2 className="mb-4 text-lg font-bold">فعاليات الفرع</h2>
-          <div className="space-y-3">
-            {events.map((eventItem) => (
-              <article key={eventItem.id} className="rounded-xl border border-slate-200 p-3">
-                <h3 className="font-semibold">{eventItem.title}</h3>
-                <p className="text-sm text-slate-600">{eventItem.event_date} — {eventItem.location}</p>
-                <div className="mt-2 flex gap-2 text-sm">
-                  <button
-                    onClick={() => {
-                      setEditingId(eventItem.id)
-                      setEventForm({
-                        title: eventItem.title,
-                        imageUrl: eventItem.image_url,
-                        announcement: eventItem.announcement,
-                        eventDate: eventItem.event_date,
-                        location: eventItem.location,
-                      })
-                    }}
-                    className="rounded-lg border border-primary px-3 py-1 text-primary"
-                  >
-                    تعديل
-                  </button>
-                  <button
-                    onClick={() => void handleDeleteEvent(eventItem.id)}
-                    className="rounded-lg border border-red-300 px-3 py-1 text-red-600"
-                  >
-                    حذف
-                  </button>
-                </div>
-              </article>
-            ))}
-            {events.length === 0 && <p className="text-sm text-slate-600">لا توجد فعاليات بعد.</p>}
-          </div>
+            <p className="text-sm text-slate-500">الفرع الحالي</p>
+            <p className="text-2xl font-bold text-slate-900">{branch?.name ?? '—'}</p>
+          </article>
+          <article className="rounded-2xl border border-blue-100 bg-white p-4 shadow-sm">
+            <div className="mb-2 inline-flex rounded-lg bg-primary/10 p-2 text-primary">
+              <CalendarDays className="h-4 w-4" />
+            </div>
+            <p className="text-sm text-slate-500">عدد الفعاليات</p>
+            <p className="text-2xl font-bold text-slate-900">{events.length}</p>
+          </article>
+          <article className="rounded-2xl border border-blue-100 bg-white p-4 shadow-sm">
+            <div className="mb-2 inline-flex rounded-lg bg-accent/20 p-2 text-slate-900">
+              <UserCircle className="h-4 w-4" />
+            </div>
+            <p className="text-sm text-slate-500">الحساب الحالي</p>
+            <p className="text-lg font-bold text-slate-900">{user.displayName}</p>
+          </article>
         </section>
-      </div>
+
+        {error && <p className="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
+
+        {branch && (
+          <form onSubmit={handleUpdateBranch} className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-bold">بيانات الفرع</h2>
+                <p className="text-sm text-slate-500">تحديث بيانات التواصل الخاصة بالفرع</p>
+              </div>
+              <span className="rounded-lg bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700">{branch.name}</span>
+            </div>
+            <div className="grid gap-3 md:grid-cols-2">
+              <label className="space-y-1 text-sm text-slate-600">
+                <span className="font-semibold">العنوان</span>
+                <input
+                  dir="auto"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  value={branch.address}
+                  onChange={(event) => setBranch((prev) => (prev ? { ...prev, address: event.target.value } : prev))}
+                />
+              </label>
+              <label className="space-y-1 text-sm text-slate-600">
+                <span className="font-semibold">الهاتف</span>
+                <input
+                  dir="ltr"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  value={branch.phone}
+                  onChange={(event) => setBranch((prev) => (prev ? { ...prev, phone: event.target.value } : prev))}
+                />
+              </label>
+              <label className="space-y-1 text-sm text-slate-600">
+                <span className="font-semibold">واتساب</span>
+                <input
+                  dir="ltr"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  value={branch.whatsapp}
+                  onChange={(event) => setBranch((prev) => (prev ? { ...prev, whatsapp: event.target.value } : prev))}
+                />
+              </label>
+              <label className="space-y-1 text-sm text-slate-600">
+                <span className="font-semibold">Facebook</span>
+                <input
+                  dir="ltr"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  value={branch.facebook ?? ''}
+                  onChange={(event) => setBranch((prev) => (prev ? { ...prev, facebook: event.target.value } : prev))}
+                />
+              </label>
+              <label className="space-y-1 text-sm text-slate-600">
+                <span className="font-semibold">Telegram</span>
+                <input
+                  dir="ltr"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  value={branch.telegram ?? ''}
+                  onChange={(event) => setBranch((prev) => (prev ? { ...prev, telegram: event.target.value } : prev))}
+                />
+              </label>
+              <label className="space-y-1 text-sm text-slate-600">
+                <span className="font-semibold">Instagram</span>
+                <input
+                  dir="ltr"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  value={branch.instagram ?? ''}
+                  onChange={(event) => setBranch((prev) => (prev ? { ...prev, instagram: event.target.value } : prev))}
+                />
+              </label>
+            </div>
+            <button
+              className="mt-4 rounded-lg bg-accent px-4 py-2 font-bold text-slate-900 transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={loading}
+            >
+              حفظ بيانات الفرع
+            </button>
+          </form>
+        )}
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <form onSubmit={handleSaveEvent} className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-bold">{editingId ? 'تعديل فعالية' : 'إضافة فعالية جديدة'}</h2>
+                <p className="text-sm text-slate-500">أدخل تفاصيل الفعالية وبياناتها الأساسية</p>
+              </div>
+              {editingId && <span className="rounded-lg bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">وضع التعديل</span>}
+            </div>
+            <div className="space-y-3">
+              <label className="space-y-1 text-sm text-slate-600">
+                <span className="font-semibold">اسم الفعالية</span>
+                <input
+                  dir="auto"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  value={eventForm.title}
+                  onChange={(event) => setEventForm((prev) => ({ ...prev, title: event.target.value }))}
+                />
+              </label>
+              <label className="space-y-1 text-sm text-slate-600">
+                <span className="font-semibold">رابط الصورة</span>
+                <input
+                  dir="ltr"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  value={eventForm.imageUrl}
+                  onChange={(event) => setEventForm((prev) => ({ ...prev, imageUrl: event.target.value }))}
+                />
+              </label>
+              <div className="space-y-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                  <Image className="h-4 w-4" />
+                  أو ارفع صورة من جهازك
+                </div>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0]
+                    if (file) {
+                      void handleUploadR2Image(file)
+                    }
+                    event.currentTarget.value = ''
+                  }}
+                  className="w-full text-sm"
+                  disabled={loading || uploadingImage}
+                />
+                <p className="text-xs text-slate-500">الأنواع المسموحة: JPG, PNG, WEBP — الحد الأعلى 5MB</p>
+                {uploadingImage && <p className="text-sm text-primary">جار رفع الصورة...</p>}
+              </div>
+              {eventForm.imageUrl && (
+                <img src={eventForm.imageUrl} alt="معاينة صورة الفعالية" className="h-40 w-full rounded-lg object-cover" />
+              )}
+              <label className="space-y-1 text-sm text-slate-600">
+                <span className="font-semibold">نص الإعلان</span>
+                <textarea
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  rows={4}
+                  value={eventForm.announcement}
+                  onChange={(event) => setEventForm((prev) => ({ ...prev, announcement: event.target.value }))}
+                />
+              </label>
+              <label className="space-y-1 text-sm text-slate-600">
+                <span className="font-semibold">تاريخ الفعالية</span>
+                <input
+                  type="date"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  value={eventForm.eventDate}
+                  onChange={(event) => setEventForm((prev) => ({ ...prev, eventDate: event.target.value }))}
+                />
+              </label>
+              <label className="space-y-1 text-sm text-slate-600">
+                <span className="font-semibold">المكان</span>
+                <input
+                  dir="auto"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  value={eventForm.location}
+                  onChange={(event) => setEventForm((prev) => ({ ...prev, location: event.target.value }))}
+                />
+              </label>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                className="rounded-lg bg-primary px-4 py-2 font-bold text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={loading}
+              >
+                {editingId ? 'حفظ التعديلات' : 'إضافة الفعالية'}
+              </button>
+              {editingId && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingId(null)
+                    setEventForm(emptyEvent)
+                  }}
+                  className="rounded-lg border border-slate-300 px-4 py-2 text-slate-700 transition hover:bg-slate-100"
+                >
+                  إلغاء
+                </button>
+              )}
+            </div>
+          </form>
+
+          <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-bold">فعاليات الفرع</h2>
+                <p className="text-sm text-slate-500">إدارة قائمة الفعاليات الحالية</p>
+              </div>
+              <span className="text-sm font-semibold text-slate-600">عدد الفعاليات: {events.length}</span>
+            </div>
+            {events.length === 0 ? (
+              <div className="rounded-xl border border-blue-100 bg-slate-50 p-6 text-center">
+                <p className="text-sm text-slate-600">لا توجد فعاليات بعد.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {events.map((eventItem) => (
+                  <article key={eventItem.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                    <div className="flex gap-3">
+                      {eventItem.image_url && (
+                        <img
+                          src={eventItem.image_url}
+                          alt={eventItem.title}
+                          className="h-20 w-20 rounded-lg object-cover"
+                        />
+                      )}
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-slate-900">{eventItem.title}</h3>
+                        <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-slate-600">
+                          <span className="inline-flex items-center gap-1">
+                            <CalendarDays className="h-3.5 w-3.5" />
+                            {eventItem.event_date}
+                          </span>
+                          <span className="inline-flex items-center gap-1">
+                            <MapPin className="h-3.5 w-3.5" />
+                            {eventItem.location}
+                          </span>
+                        </div>
+                        <p className="mt-2 text-sm text-slate-600">{eventItem.announcement}</p>
+                      </div>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2 text-sm">
+                      <button
+                        onClick={() => {
+                          setEditingId(eventItem.id)
+                          setEventForm({
+                            title: eventItem.title,
+                            imageUrl: eventItem.image_url,
+                            announcement: eventItem.announcement,
+                            eventDate: eventItem.event_date,
+                            location: eventItem.location,
+                          })
+                        }}
+                        className="rounded-lg border border-primary px-3 py-1 text-primary transition hover:bg-primary hover:text-white"
+                      >
+                        تعديل
+                      </button>
+                      <button
+                        onClick={() => void handleDeleteEvent(eventItem.id)}
+                        className="rounded-lg border border-red-300 px-3 py-1 text-red-600 transition hover:bg-red-50"
+                      >
+                        حذف
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
+      </main>
     </div>
   )
 }
