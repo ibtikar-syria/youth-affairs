@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams, useNavigate } from 'react-router-dom'
-import { CalendarDays, ChevronRight, MapPin, Calendar, Building2, ArrowRight } from 'lucide-react'
+import { Link, useParams } from 'react-router-dom'
+import { CalendarDays, MapPin, Calendar, Building2, ArrowRight } from 'lucide-react'
 import { api } from '../lib/api'
 import type { EventItem } from '../lib/types'
 
 export const EventDetailPage = () => {
   const { id } = useParams<{ id: string }>()
-  const navigate = useNavigate()
   const [event, setEvent] = useState<EventItem | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -54,17 +53,6 @@ export const EventDetailPage = () => {
   if (error || !event) {
     return (
       <div dir="rtl" className="bg-slate-50">
-        <section className="border-b border-blue-100 bg-white shadow-sm">
-          <div className="mx-auto max-w-7xl px-4 py-6">
-            <Link
-              to="/events"
-              className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-all duration-200 hover:bg-slate-50 hover:shadow-md"
-            >
-              <ChevronRight className="h-4 w-4" />
-              العودة للفعاليات
-            </Link>
-          </div>
-        </section>
         <main className="mx-auto max-w-4xl px-4 py-12">
           <div className="rounded-xl border border-blue-100 bg-white p-12 text-center shadow-sm">
             <CalendarDays className="mx-auto h-16 w-16 text-slate-300" />
@@ -94,26 +82,6 @@ export const EventDetailPage = () => {
 
   return (
     <div dir="rtl" className="bg-slate-50">
-      <section className="border-b border-blue-100 bg-white shadow-sm">
-        <div className="mx-auto max-w-7xl px-4 py-6">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={() => navigate(-1)}
-              className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-all duration-200 hover:bg-slate-50 hover:shadow-md"
-            >
-              <ChevronRight className="h-4 w-4" />
-              رجوع
-            </button>
-            <Link
-              to="/"
-              className="text-sm font-medium text-slate-600 transition-colors duration-200 hover:text-primary"
-            >
-              الصفحة الرئيسية
-            </Link>
-          </div>
-        </div>
-      </section>
-
       <main className="mx-auto max-w-5xl px-4 py-8">
         <article className="overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-lg">
           <div className="relative h-96 overflow-hidden">
