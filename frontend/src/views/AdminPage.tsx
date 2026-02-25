@@ -391,19 +391,10 @@ export const AdminPage = () => {
                       onChange={(event) => setEventForm((prev) => ({ ...prev, title: event.target.value }))}
                     />
                   </label>
-                  <label className="space-y-1 text-sm text-slate-600">
-                    <span className="font-semibold">رابط الصورة</span>
-                    <input
-                      dir="ltr"
-                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                      value={eventForm.imageUrl}
-                      onChange={(event) => setEventForm((prev) => ({ ...prev, imageUrl: event.target.value }))}
-                    />
-                  </label>
                   <div className="space-y-2 rounded-lg border border-slate-200 bg-white/60 p-3">
                     <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
                       <Image className="h-4 w-4" />
-                      أو ارفع صورة من جهازك
+                      ارفع صورة من جهازك
                     </div>
                     <input
                       type="file"
