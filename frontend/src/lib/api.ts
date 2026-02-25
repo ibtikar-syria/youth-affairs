@@ -86,6 +86,8 @@ export const api = {
   getSuperAdmins: (token: string) => request<{ items: AdminUser[] }>('/api/superadmin/admins', { token }),
   createSuperAdmin: (token: string, body: Record<string, unknown>) =>
     request<{ ok: boolean }>('/api/superadmin/admins', { method: 'POST', token, body }),
+  updateSuperAdmin: (token: string, id: number, body: Record<string, unknown>) =>
+    request<{ ok: boolean }>(`/api/superadmin/admins/${id}`, { method: 'PUT', token, body }),
   setAdminBranch: (token: string, id: number, branchId: number) =>
     request<{ ok: boolean }>(`/api/superadmin/admins/${id}/branch`, {
       method: 'PUT',

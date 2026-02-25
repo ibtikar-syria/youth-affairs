@@ -22,6 +22,12 @@ type AdminInput = {
   branchId: number
 }
 
+type UpdateAdminInput = {
+  username: string
+  displayName: string
+  branchId: number
+}
+
 type BranchRelationCounts = {
   adminsCount: number
   eventsCount: number
@@ -215,6 +221,35 @@ superadminRoutes.put('/admins/:id/branch', async (c) => {
   await c.env.DB
     .prepare(`UPDATE users SET branch_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND role = 'admin'`)
     .bind(input.branchId, userId)
+    .run()
+
+  return c.json({ ok: true })
+})
+
+superadminRoutes.put('/admins/:id', async (c) => {
+  const userId = Number(c.req.param('id'))
+  const input = await parseJsonBody<UpdateAdminInput>(c)
+
+  if (!userId || !input?.username || !input.displayName || !input.branchId) {
+    return badRequest(c, 'Invalid input')
+  }
+
+  const existing = await c.env.DB
+    .prepare('SELECT id FROM users WHERE username = ? AND id != ? LIMIT 1')
+    .bind(input.username.trim(), userId)
+    .first<{ id: number }>()
+
+  if (existing) {
+    return c.json({ error: 'Username already exists' }, 409)
+  }
+
+  await c.env.DB
+    .prepare(
+      `UPDATE users
+       SET username = ?, display_name = ?, branch_id = ?, updated_at = CURRENT_TIMESTAMP
+       WHERE id = ? AND role = 'admin'`
+    )
+    .bind(input.username.trim(), input.displayName.trim(), input.branchId, userId)
     .run()
 
   return c.json({ ok: true })
