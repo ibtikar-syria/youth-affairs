@@ -1,4 +1,4 @@
-import { CalendarDays, MapPin } from 'lucide-react'
+import { CalendarDays, MapPin, UserCircle2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 type SiteHeaderProps = {
@@ -54,8 +54,12 @@ export const SiteHeader = ({ isLanding = false, onLogoClick }: SiteHeaderProps) 
             <MapPin className="h-4 w-4" />
             الأفرع
           </Link>
-          <Link to="/login" className="rounded-lg bg-primary px-3 py-2 text-white transition-all duration-200 hover:bg-primary/90 hover:shadow-lg hover:scale-105">
-            تسجيل الدخول
+          <Link
+            to="/login"
+            aria-label="تسجيل الدخول"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-white transition-all duration-200 hover:scale-105 hover:bg-primary/90 hover:shadow-lg"
+          >
+            <UserCircle2 className="h-5 w-5" />
           </Link>
         </div>
       </div>
