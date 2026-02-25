@@ -11,7 +11,7 @@
     {
       "binding": "DB",
       "database_name": "youth-affairs-db",
-      "database_id": "replace-with-your-d1-database-id",
+      "database_id": "c44eb0f3-a7cc-484e-994c-313bceff4c76",
       "remote": true,
       "migrations_dir":"../database"
     }
@@ -19,7 +19,8 @@
   "r2_buckets": [
     {
       "binding": "R2_BUCKET",
-      "bucket_name": "youth-affairs-event-images"
+      "bucket_name": "youth-affairs-event-images",
+      "remote": true
     }
   ]
 }
