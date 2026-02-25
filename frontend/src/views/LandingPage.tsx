@@ -14,7 +14,6 @@ import {
   MapPin,
   Megaphone,
   MessageCircle,
-  Phone,
   Scale,
   Send,
   Shield,
@@ -23,6 +22,7 @@ import {
   Users,
 } from 'lucide-react'
 import { api } from '../lib/api'
+import { BranchesExplorer } from '../components/BranchesExplorer'
 import { EventsExplorer } from '../components/EventsExplorer'
 import type { Branch, EventItem } from '../lib/types'
 
@@ -109,9 +109,12 @@ export const LandingPage = () => {
   const pageRef = useRef<HTMLDivElement | null>(null)
   const [branches, setBranches] = useState<Branch[]>([])
   const [events, setEvents] = useState<EventItem[]>([])
+  const [loadingBranches, setLoadingBranches] = useState(false)
   const [filters, setFilters] = useState({ branchId: '', month: '', year: '' })
   const [loadingEvents, setLoadingEvents] = useState(false)
   const [showScrollTop, setShowScrollTop] = useState(false)
+
+  const landingBranches = useMemo(() => branches.slice(0, 6), [branches])
 
   const years = useMemo(() => {
     const currentYear = new Date().getFullYear()
@@ -119,10 +122,11 @@ export const LandingPage = () => {
   }, [])
 
   useEffect(() => {
-    void (async () => {
-      const branchesResult = await api.getPublicBranches()
-      setBranches(branchesResult.items)
-    })()
+    setLoadingBranches(true)
+    void api
+      .getPublicBranches()
+      .then((branchesResult) => setBranches(branchesResult.items))
+      .finally(() => setLoadingBranches(false))
   }, [])
 
   useEffect(() => {
@@ -328,85 +332,27 @@ export const LandingPage = () => {
 
         <section id="branches" className="animate-in js-reveal mx-auto max-w-6xl px-4 py-14">
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-            <h3 className="inline-flex items-center gap-2 text-2xl font-bold text-primary">
-              <MapPin className="h-6 w-6" />
-              دليل الأفرع
-            </h3>
-            <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
-              {branches.length} فرع
-            </span>
+            <div className="flex flex-wrap items-center gap-4">
+              <h3 className="inline-flex items-center gap-2 text-2xl font-bold text-primary">
+                <MapPin className="h-6 w-6" />
+                دليل الأفرع
+              </h3>
+              <Link
+                to="/branches"
+                className="inline-flex items-center gap-1 rounded-lg border border-primary bg-white px-4 py-2 text-sm font-semibold text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md"
+              >
+                عرض المزيد
+                <ArrowUpLeft className="h-4 w-4" />
+              </Link>
+            </div>
+            <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">{branches.length} فرع</span>
           </div>
 
-          {branches.length === 0 ? (
-            <article className="js-card rounded-2xl border border-dashed border-blue-200 bg-white p-8 text-center text-slate-600 shadow-sm">
-              لا توجد أفرع متاحة حالياً.
-            </article>
-          ) : (
-            <div className="js-stagger-cards grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {branches.map((branch) => (
-                <article
-                  key={branch.id}
-                  className="js-card group flex h-full flex-col rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-primary/30"
-                >
-                  <div className="mb-4 flex items-start justify-between gap-3">
-                    <h4 className="text-lg font-bold text-slate-900">{branch.name}</h4>
-                    <span className="shrink-0 rounded-lg bg-blue-50 px-2 py-1 text-xs font-semibold text-primary">
-                      {branch.governorate}
-                    </span>
-                  </div>
-
-                  <p className="mb-4 inline-flex items-start gap-2 text-sm text-slate-600">
-                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary/80" />
-                    <span>{branch.address || 'لا يوجد عنوان مضاف بعد.'}</span>
-                  </p>
-
-                  <div className="space-y-2 rounded-xl bg-slate-50 p-3 text-sm text-slate-700">
-                    <p className="inline-flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-primary/80" />
-                      الهاتف: {branch.phone || 'غير متوفر'}
-                    </p>
-                    <p className="inline-flex items-center gap-2">
-                      <MessageCircle className="h-4 w-4 text-primary/80" />
-                      واتساب: {branch.whatsapp || 'غير متوفر'}
-                    </p>
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap gap-2 text-sm">
-                    {branch.facebook && (
-                      <a
-                        className="rounded-lg bg-blue-50 px-3 py-1 text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md"
-                        href={branch.facebook}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Facebook
-                      </a>
-                    )}
-                    {branch.telegram && (
-                      <a
-                        className="rounded-lg bg-blue-50 px-3 py-1 text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md"
-                        href={branch.telegram}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Telegram
-                      </a>
-                    )}
-                    {branch.instagram && (
-                      <a
-                        className="rounded-lg bg-blue-50 px-3 py-1 text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md"
-                        href={branch.instagram}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Instagram
-                      </a>
-                    )}
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
+          <BranchesExplorer
+            variant="landing"
+            branches={landingBranches}
+            loadingBranches={loadingBranches}
+          />
         </section>
 
         <section id="events" className="animate-in js-reveal mx-auto max-w-6xl px-4 py-14">

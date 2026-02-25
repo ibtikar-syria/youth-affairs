@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AdminPage } from '../views/AdminPage'
+import { BranchesPage } from '../views/BranchesPage'
 import { EventDetailPage } from '../views/EventDetailPage'
 import { EventsPage } from '../views/EventsPage'
 import { LandingPage } from '../views/LandingPage'
@@ -11,6 +12,7 @@ export const AppRouter = () => (
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/branches" element={<BranchesPage />} />
       <Route path="/events" element={<EventsPage />} />
       <Route path="/events/:id" element={<EventDetailPage />} />
       <Route path="/admin" element={<AdminPage />} />
