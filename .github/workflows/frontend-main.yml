@@ -1,4 +1,4 @@
-name: (main) [frontend-main] Frontend CI/CD
+name: (main) [frontend] Deploy Main Frontend via Cloudflare Workers
 
 on:
   push:
