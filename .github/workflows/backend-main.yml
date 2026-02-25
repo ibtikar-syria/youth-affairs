@@ -5,8 +5,8 @@ on:
     branches:
       - main
     paths:
-      - 'be-main-hono/**'
-      - .github/workflows/be-hono.yml
+      - 'backend/**'
+      - .github/workflows/backend-main.yml
   workflow_dispatch:
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
     environment: main
     defaults:
       run:
-        working-directory: ./be-main-hono
+        working-directory: ./backend
 
     steps:
       - name: Checkout Repository
