@@ -85,8 +85,18 @@ export const SuperAdminPage = () => {
     loadingRelations: false,
   })
   const [editingAdminId, setEditingAdminId] = useState<number | null>(null)
-  const [editingAdminForm, setEditingAdminForm] = useState<{ username: string; displayName: string; branchId: string } | null>(null)
-  const [editingAdminInitialForm, setEditingAdminInitialForm] = useState<{ username: string; displayName: string; branchId: string } | null>(null)
+  const [editingAdminForm, setEditingAdminForm] = useState<{
+    username: string
+    displayName: string
+    branchId: string
+    password: string
+  } | null>(null)
+  const [editingAdminInitialForm, setEditingAdminInitialForm] = useState<{
+    username: string
+    displayName: string
+    branchId: string
+    password: string
+  } | null>(null)
   const [adminConfirmState, setAdminConfirmState] = useState<{
     open: boolean
     action: AdminConfirmAction | null
@@ -469,7 +479,8 @@ export const SuperAdminPage = () => {
     return (
       editingAdminForm.branchId !== editingAdminInitialForm.branchId ||
       editingAdminForm.username !== editingAdminInitialForm.username ||
-      editingAdminForm.displayName !== editingAdminInitialForm.displayName
+      editingAdminForm.displayName !== editingAdminInitialForm.displayName ||
+      editingAdminForm.password.trim().length > 0
     )
   }
 
@@ -486,11 +497,13 @@ export const SuperAdminPage = () => {
       username: admin.username,
       displayName: admin.display_name,
       branchId: branchIdValue,
+      password: '',
     })
     setEditingAdminInitialForm({
       username: admin.username,
       displayName: admin.display_name,
       branchId: branchIdValue,
+      password: '',
     })
   }
 
@@ -592,6 +605,7 @@ export const SuperAdminPage = () => {
           username: editingAdminForm.username.trim(),
           displayName: editingAdminForm.displayName.trim(),
           branchId: Number(editingAdminForm.branchId),
+          ...(editingAdminForm.password.trim() ? { password: editingAdminForm.password.trim() } : {}),
         })
         const result = await api.getSuperAdmins(token!)
         setAdmins(result.items)
@@ -992,6 +1006,19 @@ export const SuperAdminPage = () => {
                         disabled={editingAdminId !== admin.id}
                         onChange={(event) =>
                           setEditingAdminForm((prev) => (prev ? { ...prev, username: event.target.value } : prev))
+                        }
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <p className="mb-1 text-xs font-semibold text-slate-600">كلمة المرور</p>
+                      <input
+                        type="password"
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                        value={editingAdminId === admin.id ? editingAdminForm?.password ?? '' : '********'}
+                        disabled={editingAdminId !== admin.id}
+                        placeholder="اتركه فارغاً لعدم التغيير"
+                        onChange={(event) =>
+                          setEditingAdminForm((prev) => (prev ? { ...prev, password: event.target.value } : prev))
                         }
                       />
                     </div>
