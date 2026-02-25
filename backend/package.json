@@ -6,7 +6,8 @@
     "deploy": "wrangler deploy --minify",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings",
     "typecheck": "tsc --noEmit",
-    "db:migrate": "wrangler d1 migrations apply youth-affairs-db --local"
+    "db:migrate:local": "wrangler d1 migrations apply youth-affairs-db --local",
+    "db:migrate:remote": "wrangler d1 migrations apply youth-affairs-db --remote"
   },
   "dependencies": {
     "hono": "^4.12.1"
