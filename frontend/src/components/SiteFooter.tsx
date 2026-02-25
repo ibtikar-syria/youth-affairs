@@ -51,7 +51,7 @@ export const SiteFooter = ({
       <div className="grid gap-8 grid-cols-1 lg:grid-cols-2 lg:gap-10">
         <div>
           <div className="mb-4 flex items-center gap-3">
-            <img src="/ya_logo_gray.svg" alt="شعار شؤون الشباب" className="h-12 w-12" />
+            <img src="/ya_logo_white.svg" alt="شعار شؤون الشباب" className="h-12 w-12" />
             <div>
               <h3 className="text-xl font-bold">{organizationName}</h3>
               <p className="text-sm text-white/80">{slogan}</p>
