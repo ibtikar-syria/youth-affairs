@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Building2, CalendarDays, Image, LogOut, MapPin, UserCircle } from 'lucide-react'
+import { ArrowUpRight, Building2, CalendarDays, Image, LogOut, MapPin, UserCircle } from 'lucide-react'
 import { api } from '../lib/api'
 import type { Branch, EventItem, AuthUser } from '../lib/types'
 
@@ -480,7 +480,16 @@ export const AdminPage = () => {
           ) : (
             <div className="space-y-3">
               {events.map((eventItem) => (
-                <article key={eventItem.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <article key={eventItem.id} className="relative rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  <a
+                    href={`/events/${eventItem.id}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="absolute left-3 top-3 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1 text-slate-600 transition hover:border-primary hover:text-primary"
+                    aria-label="فتح صفحة الفعالية"
+                  >
+                    <ArrowUpRight className="h-4 w-4" />
+                  </a>
                   <div className="flex gap-3">
                     {eventItem.image_url && (
                       <img
