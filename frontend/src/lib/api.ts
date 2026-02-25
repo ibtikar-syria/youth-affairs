@@ -1,6 +1,6 @@
 import type { AdminUser, AuthUser, Branch, EventItem } from './types'
 
-const API_BASE = import.meta.env.VITE_API_URL ?? ''
+const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8787'
 
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
