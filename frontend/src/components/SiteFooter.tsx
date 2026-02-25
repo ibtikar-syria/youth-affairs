@@ -40,7 +40,7 @@ export const SiteFooter = ({
       style={{
         backgroundImage: `url(${backgroundTexture})`,
         backgroundRepeat: 'repeat',
-        backgroundSize: '150px 150px',
+        backgroundSize: '120px auto',
         backgroundPosition: 'center',
         filter: 'grayscale(0.5) brightness(14) invert(0.5)',
       }}
