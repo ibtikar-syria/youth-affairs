@@ -24,6 +24,7 @@ import {
 import { api } from '../lib/api'
 import { BranchesExplorer } from '../components/BranchesExplorer'
 import { EventsExplorer } from '../components/EventsExplorer'
+import { SiteFooter } from '../components/SiteFooter'
 import { SiteHeader } from '../components/SiteHeader'
 import type { Branch, EventItem } from '../lib/types'
 
@@ -358,13 +359,7 @@ export const LandingPage = () => {
         </section>
       </main>
 
-      <footer className="mt-12 bg-primary py-8 text-white">
-        <div className="mx-auto max-w-6xl px-4 text-sm">
-          <p>
-            {content.organizationName} — {content.slogan}
-          </p>
-        </div>
-      </footer>
+      <SiteFooter organizationName={content.organizationName} slogan={content.slogan} />
 
       <button
         type="button"

@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { CalendarDays } from 'lucide-react'
 import { api } from '../lib/api'
 import { EventsExplorer } from '../components/EventsExplorer'
+import { SiteFooter } from '../components/SiteFooter'
 import { SiteHeader } from '../components/SiteHeader'
 import type { Branch, EventItem } from '../lib/types'
 
@@ -103,6 +104,8 @@ export const EventsPage = () => {
           onEventClick={(eventId) => navigate(`/events/${eventId}`)}
         />
       </main>
+
+      <SiteFooter />
     </div>
   )
 }

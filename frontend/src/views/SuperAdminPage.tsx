@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { Building2, Check, LogOut, Pencil, Trash2, UserCog, Users, X } from 'lucide-react'
 import { api } from '../lib/api'
+import { SiteFooter } from '../components/SiteFooter'
 import { SiteHeader } from '../components/SiteHeader'
 import type { AdminUser, AuthUser, Branch } from '../lib/types'
 
@@ -1168,6 +1169,8 @@ export const SuperAdminPage = () => {
           </div>
         )}
       </main>
+
+      <SiteFooter />
       </div>
   )
 }

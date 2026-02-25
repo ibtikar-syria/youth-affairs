@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ShieldCheck, UserCircle } from 'lucide-react'
 import { api } from '../lib/api'
+import { SiteFooter } from '../components/SiteFooter'
 import { SiteHeader } from '../components/SiteHeader'
 
 const ADMIN_TOKEN_KEY = 'ya_admin_token'
@@ -139,6 +140,8 @@ export const LoginPage = () => {
         </div>
       </div>
       </div>
+
+      <SiteFooter />
     </div>
   )
 }

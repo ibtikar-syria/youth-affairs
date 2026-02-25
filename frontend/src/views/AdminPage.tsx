@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { ArrowUpRight, Building2, CalendarDays, Image, LogOut, MapPin, UserCircle } from 'lucide-react'
 import { api } from '../lib/api'
+import { SiteFooter } from '../components/SiteFooter'
 import { SiteHeader } from '../components/SiteHeader'
 import type { Branch, EventItem, AuthUser } from '../lib/types'
 
@@ -586,6 +587,8 @@ export const AdminPage = () => {
           </div>
         )}
       </main>
+
+      <SiteFooter />
     </div>
   )
 }

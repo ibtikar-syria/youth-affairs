@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { MapPin } from 'lucide-react'
 import { api } from '../lib/api'
 import { BranchesExplorer } from '../components/BranchesExplorer'
+import { SiteFooter } from '../components/SiteFooter'
 import { SiteHeader } from '../components/SiteHeader'
 import type { Branch } from '../lib/types'
 
@@ -43,6 +44,8 @@ export const BranchesPage = () => {
           loadingBranches={loadingBranches}
         />
       </main>
+
+      <SiteFooter />
     </div>
   )
 }
