@@ -235,7 +235,7 @@ export const LandingPage = () => {
             src="/ya_logo_gray.svg"
             alt=""
             aria-hidden="true"
-            className="pointer-events-none absolute right-0 top-1/2 w-100 max-w-none -translate-x-1/2 -translate-y-1/2 opacity-25"
+            className="pointer-events-none absolute right-0 top-1/2 w-100 max-w-none -translate-x-1/2 -translate-y-1/2 opacity-50"
           />
           <div className="animate-in relative z-10 mx-auto grid max-w-6xl gap-8 px-4 md:grid-cols-2 md:items-center">
             <div>
