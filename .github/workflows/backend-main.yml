@@ -40,6 +40,8 @@ jobs:
           # Update wrangler.jsonc with environment variables using sed
           sed -i "s|\"database_id\":[[:space:]]*\"[^\"]*\"|\"database_id\": \"${{ vars.CLOUDFLARE_D1_DATABASE_ID }}\"|g" wrangler.jsonc
           sed -i "s|\"bucket_name\":[[:space:]]*\"[^\"]*\"|\"bucket_name\": \"${{ vars.CLOUDFLARE_R2_BUCKET_NAME }}\"|g" wrangler.jsonc
+          sed -i "s|\"CORS_ORIGIN\":[[:space:]]*\"[^\"]*\"|\"CORS_ORIGIN\": \"${{ vars.CORS_ORIGIN }}\"|g" wrangler.jsonc
+          sed -i "s|\"JWT_SECRET\":[[:space:]]*\"[^\"]*\"|\"JWT_SECRET\": \"${{ secrets.JWT_SECRET }}\"|g" wrangler.jsonc
 
       - name: Deploy with wrangler
         env:
