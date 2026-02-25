@@ -1,4 +1,4 @@
-import { ArrowUpLeft, CalendarDays, Facebook, Instagram, MapPin, Phone, Send } from 'lucide-react'
+import { ArrowUpLeft, CalendarDays, Facebook, Instagram, Linkedin, Mail, MapPin, Phone, Send } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { Branch } from '../lib/types'
 
@@ -11,7 +11,11 @@ type BranchesExplorerProps = {
 export const BranchesExplorer = ({ branches, loadingBranches, variant }: BranchesExplorerProps) => {
   const isLanding = variant === 'landing'
 
-  const getWhatsappLink = (whatsapp: string) => {
+  const getWhatsappLink = (whatsapp: string | null) => {
+    if (!whatsapp) {
+      return ''
+    }
+
     if (whatsapp.startsWith('http://') || whatsapp.startsWith('https://')) {
       return whatsapp
     }
@@ -108,6 +112,42 @@ export const BranchesExplorer = ({ branches, loadingBranches, variant }: Branche
                 title="Instagram"
               >
                 <Instagram className="h-4 w-4" />
+              </a>
+            )}
+            {branch.linkedin && (
+              <a
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md"
+                href={branch.linkedin}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="LinkedIn"
+                title="LinkedIn"
+              >
+                <Linkedin className="h-4 w-4" />
+              </a>
+            )}
+            {branch.twitter && (
+              <a
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md"
+                href={branch.twitter}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="X"
+                title="X"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.901 1.153h3.68l-8.039 9.188 9.457 12.507h-7.406l-5.8-7.584-6.636 7.584H.477l8.597-9.826L0 1.154h7.594l5.243 6.932L18.901 1.153Zm-1.291 19.495h2.04L6.486 3.24H4.298L17.61 20.648Z" />
+                </svg>
+              </a>
+            )}
+            {branch.mail && (
+              <a
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-md"
+                href={`mailto:${branch.mail}`}
+                aria-label="Email"
+                title="Email"
+              >
+                <Mail className="h-4 w-4" />
               </a>
             )}
             {branch.whatsapp && getWhatsappLink(branch.whatsapp) && (

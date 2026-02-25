@@ -78,9 +78,12 @@ export const AdminPage = () => {
     setError('')
     try {
       await api.updateAdminBranch(token, {
-        address: branchDraft.address,
-        phone: branchDraft.phone,
-        whatsapp: branchDraft.whatsapp,
+        address: branchDraft.address ?? '',
+        phone: branchDraft.phone ?? '',
+        mail: branchDraft.mail ?? '',
+        linkedin: branchDraft.linkedin ?? '',
+        twitter: branchDraft.twitter ?? '',
+        whatsapp: branchDraft.whatsapp ?? '',
         facebook: branchDraft.facebook ?? '',
         telegram: branchDraft.telegram ?? '',
         instagram: branchDraft.instagram ?? '',
@@ -270,7 +273,7 @@ export const AdminPage = () => {
                   <input
                     dir="auto"
                     className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    value={branchDraft.address}
+                    value={branchDraft.address ?? ''}
                     onChange={(event) => setBranchDraft((prev) => (prev ? { ...prev, address: event.target.value } : prev))}
                   />
                 </label>
@@ -279,8 +282,17 @@ export const AdminPage = () => {
                   <input
                     dir="ltr"
                     className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    value={branchDraft.phone}
+                    value={branchDraft.phone ?? ''}
                     onChange={(event) => setBranchDraft((prev) => (prev ? { ...prev, phone: event.target.value } : prev))}
+                  />
+                </label>
+                <label className="space-y-1 text-sm text-slate-600">
+                  <span className="font-semibold">البريد الإلكتروني</span>
+                  <input
+                    dir="ltr"
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    value={branchDraft.mail ?? ''}
+                    onChange={(event) => setBranchDraft((prev) => (prev ? { ...prev, mail: event.target.value } : prev))}
                   />
                 </label>
                 <label className="space-y-1 text-sm text-slate-600">
@@ -288,8 +300,26 @@ export const AdminPage = () => {
                   <input
                     dir="ltr"
                     className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    value={branchDraft.whatsapp}
+                    value={branchDraft.whatsapp ?? ''}
                     onChange={(event) => setBranchDraft((prev) => (prev ? { ...prev, whatsapp: event.target.value } : prev))}
+                  />
+                </label>
+                <label className="space-y-1 text-sm text-slate-600">
+                  <span className="font-semibold">LinkedIn</span>
+                  <input
+                    dir="ltr"
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    value={branchDraft.linkedin ?? ''}
+                    onChange={(event) => setBranchDraft((prev) => (prev ? { ...prev, linkedin: event.target.value } : prev))}
+                  />
+                </label>
+                <label className="space-y-1 text-sm text-slate-600">
+                  <span className="font-semibold">X / Twitter</span>
+                  <input
+                    dir="ltr"
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    value={branchDraft.twitter ?? ''}
+                    onChange={(event) => setBranchDraft((prev) => (prev ? { ...prev, twitter: event.target.value } : prev))}
                   />
                 </label>
                 <label className="space-y-1 text-sm text-slate-600">
@@ -339,15 +369,27 @@ export const AdminPage = () => {
               <div className="grid gap-3 md:grid-cols-2">
                 <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                   <p className="text-xs font-semibold text-slate-600">العنوان</p>
-                  <p className="mt-1 text-sm text-slate-900">{branch.address}</p>
+                  <p className="mt-1 text-sm text-slate-900">{branch.address ?? '—'}</p>
                 </div>
                 <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                   <p className="text-xs font-semibold text-slate-600">الهاتف</p>
-                  <p className="mt-1 text-sm text-slate-900">{branch.phone}</p>
+                  <p className="mt-1 text-sm text-slate-900">{branch.phone ?? '—'}</p>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  <p className="text-xs font-semibold text-slate-600">البريد الإلكتروني</p>
+                  <p className="mt-1 text-sm text-slate-900">{branch.mail ?? '—'}</p>
                 </div>
                 <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                   <p className="text-xs font-semibold text-slate-600">واتساب</p>
-                  <p className="mt-1 text-sm text-slate-900">{branch.whatsapp}</p>
+                  <p className="mt-1 text-sm text-slate-900">{branch.whatsapp ?? '—'}</p>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  <p className="text-xs font-semibold text-slate-600">LinkedIn</p>
+                  <p className="mt-1 text-sm text-slate-900">{branch.linkedin ?? '—'}</p>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  <p className="text-xs font-semibold text-slate-600">X / Twitter</p>
+                  <p className="mt-1 text-sm text-slate-900">{branch.twitter ?? '—'}</p>
                 </div>
                 <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                   <p className="text-xs font-semibold text-slate-600">Facebook</p>

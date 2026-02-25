@@ -11,9 +11,12 @@ export type Branch = {
   id: number
   name: string
   governorate: string
-  address: string
-  phone: string
-  whatsapp: string
+  address: string | null
+  phone: string | null
+  mail: string | null
+  linkedin: string | null
+  twitter: string | null
+  whatsapp: string | null
   facebook: string | null
   telegram: string | null
   instagram: string | null

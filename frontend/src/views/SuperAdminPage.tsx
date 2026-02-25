@@ -24,6 +24,9 @@ export const SuperAdminPage = () => {
     governorate: '',
     address: '',
     phone: '',
+    mail: '',
+    linkedin: '',
+    twitter: '',
     whatsapp: '',
     facebook: '',
     telegram: '',
@@ -44,14 +47,26 @@ export const SuperAdminPage = () => {
     governorate: string
     address: string
     phone: string
+    mail: string
+    linkedin: string
+    twitter: string
     whatsapp: string
+    facebook: string
+    telegram: string
+    instagram: string
   } | null>(null)
   const [editingBranchInitialForm, setEditingBranchInitialForm] = useState<{
     name: string
     governorate: string
     address: string
     phone: string
+    mail: string
+    linkedin: string
+    twitter: string
     whatsapp: string
+    facebook: string
+    telegram: string
+    instagram: string
   } | null>(null)
   const [branchConfirmState, setBranchConfirmState] = useState<{
     open: boolean
@@ -160,6 +175,9 @@ export const SuperAdminPage = () => {
         governorate: '',
         address: '',
         phone: '',
+        mail: '',
+        linkedin: '',
+        twitter: '',
         whatsapp: '',
         facebook: '',
         telegram: '',
@@ -186,9 +204,12 @@ export const SuperAdminPage = () => {
       await api.updateSuperBranch(token, branch.id, {
         name: branch.name,
         governorate: branch.governorate,
-        address: branch.address,
-        phone: branch.phone,
-        whatsapp: branch.whatsapp,
+        address: branch.address ?? '',
+        phone: branch.phone ?? '',
+        mail: branch.mail ?? '',
+        linkedin: branch.linkedin ?? '',
+        twitter: branch.twitter ?? '',
+        whatsapp: branch.whatsapp ?? '',
         facebook: branch.facebook ?? '',
         telegram: branch.telegram ?? '',
         instagram: branch.instagram ?? '',
@@ -213,7 +234,13 @@ export const SuperAdminPage = () => {
       editingBranchForm.governorate !== editingBranchInitialForm.governorate ||
       editingBranchForm.address !== editingBranchInitialForm.address ||
       editingBranchForm.phone !== editingBranchInitialForm.phone ||
-      editingBranchForm.whatsapp !== editingBranchInitialForm.whatsapp
+      editingBranchForm.mail !== editingBranchInitialForm.mail ||
+      editingBranchForm.linkedin !== editingBranchInitialForm.linkedin ||
+      editingBranchForm.twitter !== editingBranchInitialForm.twitter ||
+      editingBranchForm.whatsapp !== editingBranchInitialForm.whatsapp ||
+      editingBranchForm.facebook !== editingBranchInitialForm.facebook ||
+      editingBranchForm.telegram !== editingBranchInitialForm.telegram ||
+      editingBranchForm.instagram !== editingBranchInitialForm.instagram
     )
   }
 
@@ -228,16 +255,28 @@ export const SuperAdminPage = () => {
     setEditingBranchForm({
       name: branch.name,
       governorate: branch.governorate,
-      address: branch.address,
-      phone: branch.phone,
-      whatsapp: branch.whatsapp,
+      address: branch.address ?? '',
+      phone: branch.phone ?? '',
+      mail: branch.mail ?? '',
+      linkedin: branch.linkedin ?? '',
+      twitter: branch.twitter ?? '',
+      whatsapp: branch.whatsapp ?? '',
+      facebook: branch.facebook ?? '',
+      telegram: branch.telegram ?? '',
+      instagram: branch.instagram ?? '',
     })
     setEditingBranchInitialForm({
       name: branch.name,
       governorate: branch.governorate,
-      address: branch.address,
-      phone: branch.phone,
-      whatsapp: branch.whatsapp,
+      address: branch.address ?? '',
+      phone: branch.phone ?? '',
+      mail: branch.mail ?? '',
+      linkedin: branch.linkedin ?? '',
+      twitter: branch.twitter ?? '',
+      whatsapp: branch.whatsapp ?? '',
+      facebook: branch.facebook ?? '',
+      telegram: branch.telegram ?? '',
+      instagram: branch.instagram ?? '',
     })
   }
 
@@ -332,7 +371,13 @@ export const SuperAdminPage = () => {
         governorate: editingBranchForm.governorate,
         address: editingBranchForm.address,
         phone: editingBranchForm.phone,
+        mail: editingBranchForm.mail,
+        linkedin: editingBranchForm.linkedin,
+        twitter: editingBranchForm.twitter,
         whatsapp: editingBranchForm.whatsapp,
+        facebook: editingBranchForm.facebook,
+        telegram: editingBranchForm.telegram,
+        instagram: editingBranchForm.instagram,
       }
 
       const success = await handleUpdateBranch(updatedBranch)
@@ -738,11 +783,53 @@ export const SuperAdminPage = () => {
                 onChange={(event) => setBranchForm((prev) => ({ ...prev, phone: event.target.value }))}
               />
               <input
+                dir="ltr"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                placeholder="البريد الإلكتروني"
+                value={branchForm.mail}
+                onChange={(event) => setBranchForm((prev) => ({ ...prev, mail: event.target.value }))}
+              />
+              <input
                 dir="auto"
                 className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 placeholder="واتساب"
                 value={branchForm.whatsapp}
                 onChange={(event) => setBranchForm((prev) => ({ ...prev, whatsapp: event.target.value }))}
+              />
+              <input
+                dir="ltr"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                placeholder="LinkedIn"
+                value={branchForm.linkedin}
+                onChange={(event) => setBranchForm((prev) => ({ ...prev, linkedin: event.target.value }))}
+              />
+              <input
+                dir="ltr"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                placeholder="X / Twitter"
+                value={branchForm.twitter}
+                onChange={(event) => setBranchForm((prev) => ({ ...prev, twitter: event.target.value }))}
+              />
+              <input
+                dir="ltr"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                placeholder="Facebook"
+                value={branchForm.facebook}
+                onChange={(event) => setBranchForm((prev) => ({ ...prev, facebook: event.target.value }))}
+              />
+              <input
+                dir="ltr"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                placeholder="Telegram"
+                value={branchForm.telegram}
+                onChange={(event) => setBranchForm((prev) => ({ ...prev, telegram: event.target.value }))}
+              />
+              <input
+                dir="ltr"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                placeholder="Instagram"
+                value={branchForm.instagram}
+                onChange={(event) => setBranchForm((prev) => ({ ...prev, instagram: event.target.value }))}
               />
               <button
                 className="rounded-lg bg-primary px-4 py-2 font-bold text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
@@ -824,7 +911,7 @@ export const SuperAdminPage = () => {
                     <input
                       dir="auto"
                       className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
-                      value={editingBranchId === branch.id ? editingBranchForm?.address ?? '' : branch.address}
+                      value={editingBranchId === branch.id ? editingBranchForm?.address ?? '' : branch.address ?? ''}
                       disabled={editingBranchId !== branch.id}
                       onChange={(event) =>
                         setEditingBranchForm((prev) => (prev ? { ...prev, address: event.target.value } : prev))
@@ -836,9 +923,19 @@ export const SuperAdminPage = () => {
                     <input
                       dir="auto"
                       className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
-                      value={editingBranchId === branch.id ? editingBranchForm?.phone ?? '' : branch.phone}
+                      value={editingBranchId === branch.id ? editingBranchForm?.phone ?? '' : branch.phone ?? ''}
                       disabled={editingBranchId !== branch.id}
                       onChange={(event) => setEditingBranchForm((prev) => (prev ? { ...prev, phone: event.target.value } : prev))}
+                    />
+                  </div>
+                  <div>
+                    <p className="mb-1 text-xs font-semibold text-slate-600">البريد الإلكتروني</p>
+                    <input
+                      dir="ltr"
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                      value={editingBranchId === branch.id ? editingBranchForm?.mail ?? '' : branch.mail ?? ''}
+                      disabled={editingBranchId !== branch.id}
+                      onChange={(event) => setEditingBranchForm((prev) => (prev ? { ...prev, mail: event.target.value } : prev))}
                     />
                   </div>
                   <div>
@@ -846,10 +943,68 @@ export const SuperAdminPage = () => {
                     <input
                       dir="auto"
                       className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
-                      value={editingBranchId === branch.id ? editingBranchForm?.whatsapp ?? '' : branch.whatsapp}
+                      value={editingBranchId === branch.id ? editingBranchForm?.whatsapp ?? '' : branch.whatsapp ?? ''}
                       disabled={editingBranchId !== branch.id}
                       onChange={(event) =>
                         setEditingBranchForm((prev) => (prev ? { ...prev, whatsapp: event.target.value } : prev))
+                      }
+                    />
+                  </div>
+                  <div>
+                    <p className="mb-1 text-xs font-semibold text-slate-600">LinkedIn</p>
+                    <input
+                      dir="ltr"
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                      value={editingBranchId === branch.id ? editingBranchForm?.linkedin ?? '' : branch.linkedin ?? ''}
+                      disabled={editingBranchId !== branch.id}
+                      onChange={(event) =>
+                        setEditingBranchForm((prev) => (prev ? { ...prev, linkedin: event.target.value } : prev))
+                      }
+                    />
+                  </div>
+                  <div>
+                    <p className="mb-1 text-xs font-semibold text-slate-600">X / Twitter</p>
+                    <input
+                      dir="ltr"
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                      value={editingBranchId === branch.id ? editingBranchForm?.twitter ?? '' : branch.twitter ?? ''}
+                      disabled={editingBranchId !== branch.id}
+                      onChange={(event) => setEditingBranchForm((prev) => (prev ? { ...prev, twitter: event.target.value } : prev))}
+                    />
+                  </div>
+                  <div>
+                    <p className="mb-1 text-xs font-semibold text-slate-600">Facebook</p>
+                    <input
+                      dir="ltr"
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                      value={editingBranchId === branch.id ? editingBranchForm?.facebook ?? '' : branch.facebook ?? ''}
+                      disabled={editingBranchId !== branch.id}
+                      onChange={(event) =>
+                        setEditingBranchForm((prev) => (prev ? { ...prev, facebook: event.target.value } : prev))
+                      }
+                    />
+                  </div>
+                  <div>
+                    <p className="mb-1 text-xs font-semibold text-slate-600">Telegram</p>
+                    <input
+                      dir="ltr"
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                      value={editingBranchId === branch.id ? editingBranchForm?.telegram ?? '' : branch.telegram ?? ''}
+                      disabled={editingBranchId !== branch.id}
+                      onChange={(event) =>
+                        setEditingBranchForm((prev) => (prev ? { ...prev, telegram: event.target.value } : prev))
+                      }
+                    />
+                  </div>
+                  <div>
+                    <p className="mb-1 text-xs font-semibold text-slate-600">Instagram</p>
+                    <input
+                      dir="ltr"
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                      value={editingBranchId === branch.id ? editingBranchForm?.instagram ?? '' : branch.instagram ?? ''}
+                      disabled={editingBranchId !== branch.id}
+                      onChange={(event) =>
+                        setEditingBranchForm((prev) => (prev ? { ...prev, instagram: event.target.value } : prev))
                       }
                     />
                   </div>

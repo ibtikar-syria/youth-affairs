@@ -4,9 +4,12 @@ import type { AppEnv, BranchRecord, EventRecord } from '../lib/types'
 import { requireAuth, requireRole } from '../middleware/auth'
 
 type BranchInput = {
-  address: string
-  phone: string
-  whatsapp: string
+  address?: string
+  phone?: string
+  mail?: string
+  linkedin?: string
+  twitter?: string
+  whatsapp?: string
   facebook?: string
   telegram?: string
   instagram?: string
@@ -102,20 +105,23 @@ adminRoutes.put('/branch', async (c) => {
   }
 
   const input = await parseJsonBody<BranchInput>(c)
-  if (!input?.address || !input.phone || !input.whatsapp) {
-    return badRequest(c, 'Address, phone, and WhatsApp are required')
+  if (!input) {
+    return badRequest(c, 'Invalid branch payload')
   }
 
   await c.env.DB
     .prepare(
       `UPDATE branches
-       SET address = ?, phone = ?, whatsapp = ?, facebook = ?, telegram = ?, instagram = ?, updated_at = CURRENT_TIMESTAMP
+       SET address = ?, phone = ?, mail = ?, linkedin = ?, twitter = ?, whatsapp = ?, facebook = ?, telegram = ?, instagram = ?, updated_at = CURRENT_TIMESTAMP
        WHERE id = ?`
     )
     .bind(
-      input.address.trim(),
-      input.phone.trim(),
-      input.whatsapp.trim(),
+      input.address?.trim() || null,
+      input.phone?.trim() || null,
+      input.mail?.trim() || null,
+      input.linkedin?.trim() || null,
+      input.twitter?.trim() || null,
+      input.whatsapp?.trim() || null,
       input.facebook?.trim() || null,
       input.telegram?.trim() || null,
       input.instagram?.trim() || null,

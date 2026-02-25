@@ -7,9 +7,12 @@ import { requireAuth, requireRole } from '../middleware/auth'
 type BranchInput = {
   name: string
   governorate: string
-  address: string
-  phone: string
-  whatsapp: string
+  address?: string
+  phone?: string
+  mail?: string
+  linkedin?: string
+  twitter?: string
+  whatsapp?: string
   facebook?: string
   telegram?: string
   instagram?: string
@@ -84,21 +87,24 @@ superadminRoutes.get('/branches/:id/relations', async (c) => {
 
 superadminRoutes.post('/branches', async (c) => {
   const input = await parseJsonBody<BranchInput>(c)
-  if (!input?.name || !input.governorate || !input.address || !input.phone || !input.whatsapp) {
+  if (!input?.name || !input.governorate) {
     return badRequest(c, 'Missing required branch fields')
   }
 
   await c.env.DB
     .prepare(
-      `INSERT INTO branches (name, governorate, address, phone, whatsapp, facebook, telegram, instagram)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO branches (name, governorate, address, phone, mail, linkedin, twitter, whatsapp, facebook, telegram, instagram)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .bind(
       input.name.trim(),
       input.governorate.trim(),
-      input.address.trim(),
-      input.phone.trim(),
-      input.whatsapp.trim(),
+      input.address?.trim() || null,
+      input.phone?.trim() || null,
+      input.mail?.trim() || null,
+      input.linkedin?.trim() || null,
+      input.twitter?.trim() || null,
+      input.whatsapp?.trim() || null,
       input.facebook?.trim() || null,
       input.telegram?.trim() || null,
       input.instagram?.trim() || null
@@ -115,22 +121,25 @@ superadminRoutes.put('/branches/:id', async (c) => {
   }
 
   const input = await parseJsonBody<BranchInput>(c)
-  if (!input?.name || !input.governorate || !input.address || !input.phone || !input.whatsapp) {
+  if (!input?.name || !input.governorate) {
     return badRequest(c, 'Missing required branch fields')
   }
 
   await c.env.DB
     .prepare(
       `UPDATE branches
-       SET name = ?, governorate = ?, address = ?, phone = ?, whatsapp = ?, facebook = ?, telegram = ?, instagram = ?, updated_at = CURRENT_TIMESTAMP
+       SET name = ?, governorate = ?, address = ?, phone = ?, mail = ?, linkedin = ?, twitter = ?, whatsapp = ?, facebook = ?, telegram = ?, instagram = ?, updated_at = CURRENT_TIMESTAMP
        WHERE id = ?`
     )
     .bind(
       input.name.trim(),
       input.governorate.trim(),
-      input.address.trim(),
-      input.phone.trim(),
-      input.whatsapp.trim(),
+      input.address?.trim() || null,
+      input.phone?.trim() || null,
+      input.mail?.trim() || null,
+      input.linkedin?.trim() || null,
+      input.twitter?.trim() || null,
+      input.whatsapp?.trim() || null,
       input.facebook?.trim() || null,
       input.telegram?.trim() || null,
       input.instagram?.trim() || null,
