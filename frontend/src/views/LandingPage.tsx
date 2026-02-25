@@ -262,7 +262,11 @@ export const LandingPage = () => {
                   aria-hidden="true"
                   className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-primary/70 to-accent/70 transition-all duration-300 group-hover:w-1.5"
                 />
-                <h4 className="mb-4 flex items-start justify-between gap-3 text-lg font-bold text-slate-900">
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(148,163,184,0.16)_1px,transparent_0)] [background-size:12px_12px] opacity-50 transition-opacity duration-300 group-hover:opacity-50"
+                />
+                <h4 className="relative z-10 mb-4 flex items-start justify-between gap-3 text-lg font-bold text-slate-900">
                   <span className="inline-flex items-start gap-2">
                     <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                       <Icon className="h-4 w-4" />
@@ -273,7 +277,7 @@ export const LandingPage = () => {
                     {String(index + 1).padStart(2, '0')}
                   </span>
                 </h4>
-                <ul className="space-y-2.5 text-slate-700">
+                <ul className="relative z-10 space-y-2.5 text-slate-700">
                   {goal.points.map((point) => (
                     <li key={point} className="flex items-start gap-2.5 rounded-lg px-1 leading-7 transition-colors duration-200 group-hover:bg-slate-50/70">
                       <span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
