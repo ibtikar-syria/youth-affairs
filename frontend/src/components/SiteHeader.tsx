@@ -1,4 +1,5 @@
-import { CalendarDays, MapPin } from 'lucide-react'
+import { CalendarDays, MapPin, Menu, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
 type SiteHeaderProps = {
@@ -10,6 +11,11 @@ export const SiteHeader = ({ isLanding = false, onLogoClick }: SiteHeaderProps) 
   const location = useLocation()
   const isLandingRoute = location.pathname === '/'
   const useLandingMode = isLanding || isLandingRoute
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false)
+  }, [location.pathname])
 
   const handleLandingLogoClick = () => {
     if (onLogoClick) {
@@ -36,7 +42,8 @@ export const SiteHeader = ({ isLanding = false, onLogoClick }: SiteHeaderProps) 
 
   return (
     <header dir="rtl" className="sticky top-0 z-30 border-b border-blue-100 bg-white/95 backdrop-blur">
-      <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:py-4">
+      <div className="mx-auto max-w-7xl px-4 py-3 sm:py-4">
+        <div className="flex items-center justify-between gap-3">
         {useLandingMode ? (
           <button
             type="button"
@@ -56,22 +63,52 @@ export const SiteHeader = ({ isLanding = false, onLogoClick }: SiteHeaderProps) 
           </Link>
         )}
 
-        <div className="flex w-full items-center gap-2 text-sm sm:w-auto sm:gap-3">
+        <button
+          type="button"
+          aria-label={isMobileMenuOpen ? 'إغلاق القائمة' : 'فتح القائمة'}
+          aria-expanded={isMobileMenuOpen}
+          onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+          className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-700 transition-all duration-200 hover:border-primary/30 hover:bg-primary/10 hover:text-primary sm:hidden"
+        >
+          {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
+
+        <div className="hidden items-center gap-3 text-sm sm:flex">
           <Link
             to="/events"
-            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 font-medium text-slate-700 transition-all duration-200 hover:border-primary/30 hover:bg-primary/10 hover:text-primary hover:shadow-sm sm:flex-none"
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 font-medium text-slate-700 transition-all duration-200 hover:border-primary/30 hover:bg-primary/10 hover:text-primary hover:shadow-sm"
           >
             <CalendarDays className="h-4 w-4" />
             الفعاليات
           </Link>
           <Link
             to="/branches"
-            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 font-medium text-slate-700 transition-all duration-200 hover:border-primary/30 hover:bg-primary/10 hover:text-primary hover:shadow-sm sm:flex-none"
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 font-medium text-slate-700 transition-all duration-200 hover:border-primary/30 hover:bg-primary/10 hover:text-primary hover:shadow-sm"
           >
             <MapPin className="h-4 w-4" />
             الأفرع
           </Link>
         </div>
+        </div>
+
+        {isMobileMenuOpen && (
+          <div className="mt-3 grid gap-2 border-t border-blue-100 pt-3 sm:hidden">
+            <Link
+              to="/events"
+              className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 font-medium text-slate-700 transition-all duration-200 hover:border-primary/30 hover:bg-primary/10 hover:text-primary hover:shadow-sm"
+            >
+              <CalendarDays className="h-4 w-4" />
+              الفعاليات
+            </Link>
+            <Link
+              to="/branches"
+              className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 font-medium text-slate-700 transition-all duration-200 hover:border-primary/30 hover:bg-primary/10 hover:text-primary hover:shadow-sm"
+            >
+              <MapPin className="h-4 w-4" />
+              الأفرع
+            </Link>
+          </div>
+        )}
       </div>
     </header>
   )
