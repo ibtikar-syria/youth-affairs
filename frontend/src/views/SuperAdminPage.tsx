@@ -809,43 +809,58 @@ export const SuperAdminPage = () => {
                   </div>
                 )}
 
-                <input
-                  className="mb-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
-                  value={editingBranchId === branch.id ? editingBranchForm?.name ?? '' : branch.name}
-                  disabled={editingBranchId !== branch.id}
-                  onChange={(event) => setEditingBranchForm((prev) => (prev ? { ...prev, name: event.target.value } : prev))}
-                />
+                <div className="mb-2">
+                  <p className="mb-1 text-xs font-semibold text-slate-600">اسم الفرع</p>
+                  <input
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                    value={editingBranchId === branch.id ? editingBranchForm?.name ?? '' : branch.name}
+                    disabled={editingBranchId !== branch.id}
+                    onChange={(event) => setEditingBranchForm((prev) => (prev ? { ...prev, name: event.target.value } : prev))}
+                  />
+                </div>
                 <div className="grid gap-2 md:grid-cols-2">
-                  <input
-                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
-                    value={editingBranchId === branch.id ? editingBranchForm?.governorate ?? '' : branch.governorate}
-                    disabled={editingBranchId !== branch.id}
-                    onChange={(event) =>
-                      setEditingBranchForm((prev) => (prev ? { ...prev, governorate: event.target.value } : prev))
-                    }
-                  />
-                  <input
-                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
-                    value={editingBranchId === branch.id ? editingBranchForm?.address ?? '' : branch.address}
-                    disabled={editingBranchId !== branch.id}
-                    onChange={(event) =>
-                      setEditingBranchForm((prev) => (prev ? { ...prev, address: event.target.value } : prev))
-                    }
-                  />
-                  <input
-                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
-                    value={editingBranchId === branch.id ? editingBranchForm?.phone ?? '' : branch.phone}
-                    disabled={editingBranchId !== branch.id}
-                    onChange={(event) => setEditingBranchForm((prev) => (prev ? { ...prev, phone: event.target.value } : prev))}
-                  />
-                  <input
-                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
-                    value={editingBranchId === branch.id ? editingBranchForm?.whatsapp ?? '' : branch.whatsapp}
-                    disabled={editingBranchId !== branch.id}
-                    onChange={(event) =>
-                      setEditingBranchForm((prev) => (prev ? { ...prev, whatsapp: event.target.value } : prev))
-                    }
-                  />
+                  <div>
+                    <p className="mb-1 text-xs font-semibold text-slate-600">المحافظة</p>
+                    <input
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                      value={editingBranchId === branch.id ? editingBranchForm?.governorate ?? '' : branch.governorate}
+                      disabled={editingBranchId !== branch.id}
+                      onChange={(event) =>
+                        setEditingBranchForm((prev) => (prev ? { ...prev, governorate: event.target.value } : prev))
+                      }
+                    />
+                  </div>
+                  <div>
+                    <p className="mb-1 text-xs font-semibold text-slate-600">العنوان</p>
+                    <input
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                      value={editingBranchId === branch.id ? editingBranchForm?.address ?? '' : branch.address}
+                      disabled={editingBranchId !== branch.id}
+                      onChange={(event) =>
+                        setEditingBranchForm((prev) => (prev ? { ...prev, address: event.target.value } : prev))
+                      }
+                    />
+                  </div>
+                  <div>
+                    <p className="mb-1 text-xs font-semibold text-slate-600">الهاتف</p>
+                    <input
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                      value={editingBranchId === branch.id ? editingBranchForm?.phone ?? '' : branch.phone}
+                      disabled={editingBranchId !== branch.id}
+                      onChange={(event) => setEditingBranchForm((prev) => (prev ? { ...prev, phone: event.target.value } : prev))}
+                    />
+                  </div>
+                  <div>
+                    <p className="mb-1 text-xs font-semibold text-slate-600">واتساب</p>
+                    <input
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                      value={editingBranchId === branch.id ? editingBranchForm?.whatsapp ?? '' : branch.whatsapp}
+                      disabled={editingBranchId !== branch.id}
+                      onChange={(event) =>
+                        setEditingBranchForm((prev) => (prev ? { ...prev, whatsapp: event.target.value } : prev))
+                      }
+                    />
+                  </div>
                 </div>
               </div>
             ))}
@@ -949,24 +964,34 @@ export const SuperAdminPage = () => {
                     </div>
                   )}
 
-                  <p className="font-semibold text-slate-900">
-                    {admin.display_name} <span className="font-normal text-slate-500">({admin.username})</span>
-                  </p>
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <select
-                      className="rounded-lg border border-slate-300 bg-white px-3 py-1 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
-                      value={editingAdminId === admin.id ? editingAdminForm?.branchId ?? '' : String(admin.branch_id ?? '')}
-                      disabled={editingAdminId !== admin.id}
-                      onChange={(event) =>
-                        setEditingAdminForm((prev) => (prev ? { ...prev, branchId: event.target.value } : prev))
-                      }
-                    >
-                      {branches.map((branch) => (
-                        <option key={branch.id} value={branch.id}>
-                          {branch.governorate}
-                        </option>
-                      ))}
-                    </select>
+                  <div className="grid gap-2 md:grid-cols-2">
+                    <div>
+                      <p className="mb-1 text-xs font-semibold text-slate-600">الاسم الكامل</p>
+                      <p className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900">{admin.display_name}</p>
+                    </div>
+                    <div>
+                      <p className="mb-1 text-xs font-semibold text-slate-600">اسم المستخدم</p>
+                      <p className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900">{admin.username}</p>
+                    </div>
+                  </div>
+                  <div className="mt-2 flex flex-wrap items-end gap-2">
+                    <div className="min-w-[220px] flex-1">
+                      <p className="mb-1 text-xs font-semibold text-slate-600">المحافظة</p>
+                      <select
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                        value={editingAdminId === admin.id ? editingAdminForm?.branchId ?? '' : String(admin.branch_id ?? '')}
+                        disabled={editingAdminId !== admin.id}
+                        onChange={(event) =>
+                          setEditingAdminForm((prev) => (prev ? { ...prev, branchId: event.target.value } : prev))
+                        }
+                      >
+                        {branches.map((branch) => (
+                          <option key={branch.id} value={branch.id}>
+                            {branch.governorate}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                     <button
                       type="button"
                       onClick={() =>
