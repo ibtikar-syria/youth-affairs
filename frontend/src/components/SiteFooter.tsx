@@ -34,16 +34,21 @@ export const SiteFooter = ({
   slogan = 'جيل شبابي متمكّن وواعٍ',
 }: SiteFooterProps) => (
   <footer className="relative overflow-hidden bg-primary text-white" dir="rtl">
-    <img
-      src={backgroundTexture}
-      alt=""
+    <div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-25"
+      className="pointer-events-none absolute inset-0 opacity-60 mix-blend-screen"
+      style={{
+        backgroundImage: `url(${backgroundTexture})`,
+        backgroundRepeat: 'repeat',
+        backgroundSize: '150px 150px',
+        backgroundPosition: 'center',
+        filter: 'grayscale(0.5) brightness(14) invert(0.5)',
+      }}
     />
-    <div className="pointer-events-none absolute inset-0 bg-gradient-to-l from-primary/90 via-primary to-primary/95" />
+    <div className="pointer-events-none absolute inset-0 bg-gradient-to-l from-primary/50 via-primary/60 to-primary/55" />
 
     <div className="relative mx-auto max-w-7xl px-4 py-10">
-      <div className="grid gap-8 md:grid-cols-2 md:items-center">
+      <div className="grid gap-8 grid-cols-1 lg:grid-cols-2 lg:gap-10">
         <div>
           <div className="mb-4 flex items-center gap-3">
             <img src="/ya_logo_gray.svg" alt="شعار شؤون الشباب" className="h-12 w-12" />
@@ -57,7 +62,7 @@ export const SiteFooter = ({
           </p>
         </div>
 
-        <div className="md:justify-self-end">
+        <div className="lg:justify-self-end">
           <p className="mb-3 text-sm font-semibold text-white/90">تابعنا على المنصات الاجتماعية</p>
           <div className="flex flex-wrap items-center gap-2">
             {socialLinks.map((item) => {
