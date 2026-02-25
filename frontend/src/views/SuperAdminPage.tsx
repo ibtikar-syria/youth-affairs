@@ -34,6 +34,8 @@ export const SuperAdminPage = () => {
     password: '',
     branchId: '',
   })
+  const [showAddBranchForm, setShowAddBranchForm] = useState(false)
+  const [showAddAdminForm, setShowAddAdminForm] = useState(false)
 
   const refreshData = async (activeToken: string) => {
     const [me, branchesResult, adminsResult] = await Promise.all([
@@ -104,6 +106,7 @@ export const SuperAdminPage = () => {
         telegram: '',
         instagram: '',
       })
+      setShowAddBranchForm(false)
       const result = await api.getSuperBranches(token)
       setBranches(result.items)
     } catch (branchError) {
@@ -156,6 +159,7 @@ export const SuperAdminPage = () => {
         branchId: Number(adminForm.branchId),
       })
       setAdminForm({ username: '', displayName: '', password: '', branchId: '' })
+      setShowAddAdminForm(false)
       const result = await api.getSuperAdmins(token)
       setAdmins(result.items)
     } catch (adminError) {
@@ -299,37 +303,49 @@ export const SuperAdminPage = () => {
 
         {error && <p className="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          <form onSubmit={handleCreateBranch} className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
-            <h2 className="mb-1 text-lg font-bold">إضافة فرع جديد</h2>
-            <p className="mb-4 text-sm text-slate-500">أدخل بيانات الفرع الأساسية ومعلومات التواصل</p>
-            <div className="grid gap-3">
+        <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="mb-1 text-lg font-bold">الأفرع الحالية</h2>
+              <p className="text-sm text-slate-500">عرض وتعديل الأفرع الحالية أو إضافة فرع جديد</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowAddBranchForm((prev) => !prev)}
+              className="rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary hover:text-white"
+            >
+              {showAddBranchForm ? 'إخفاء الإضافة' : 'إضافة جديد'}
+            </button>
+          </div>
+
+          {showAddBranchForm && (
+            <form onSubmit={handleCreateBranch} className="mb-4 grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
               <input
-                className="rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 placeholder="اسم الفرع"
                 value={branchForm.name}
                 onChange={(event) => setBranchForm((prev) => ({ ...prev, name: event.target.value }))}
               />
               <input
-                className="rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 placeholder="المحافظة"
                 value={branchForm.governorate}
                 onChange={(event) => setBranchForm((prev) => ({ ...prev, governorate: event.target.value }))}
               />
               <input
-                className="rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 placeholder="العنوان"
                 value={branchForm.address}
                 onChange={(event) => setBranchForm((prev) => ({ ...prev, address: event.target.value }))}
               />
               <input
-                className="rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 placeholder="الهاتف"
                 value={branchForm.phone}
                 onChange={(event) => setBranchForm((prev) => ({ ...prev, phone: event.target.value }))}
               />
               <input
-                className="rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 placeholder="واتساب"
                 value={branchForm.whatsapp}
                 onChange={(event) => setBranchForm((prev) => ({ ...prev, whatsapp: event.target.value }))}
@@ -340,113 +356,121 @@ export const SuperAdminPage = () => {
               >
                 إضافة الفرع
               </button>
-            </div>
-          </form>
+            </form>
+          )}
 
-          <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
-            <h2 className="mb-1 text-lg font-bold">إدارة الأفرع الحالية</h2>
-            <p className="mb-4 text-sm text-slate-500">تعديل معلومات كل فرع ثم حفظ التغييرات</p>
-            <div className="max-h-[620px] space-y-3 overflow-auto pr-1">
-              {branches.map((branch, index) => (
-                <div key={branch.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+          <div className="max-h-[620px] space-y-3 overflow-auto pr-1">
+            {branches.map((branch, index) => (
+              <div key={branch.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <input
+                  className="mb-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  value={branch.name}
+                  onChange={(event) =>
+                    setBranches((prev) =>
+                      prev.map((item, currentIndex) =>
+                        currentIndex === index ? { ...item, name: event.target.value } : item,
+                      ),
+                    )
+                  }
+                />
+                <div className="grid gap-2 md:grid-cols-2">
                   <input
-                    className="mb-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    value={branch.name}
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    value={branch.governorate}
                     onChange={(event) =>
                       setBranches((prev) =>
                         prev.map((item, currentIndex) =>
-                          currentIndex === index ? { ...item, name: event.target.value } : item,
+                          currentIndex === index ? { ...item, governorate: event.target.value } : item,
                         ),
                       )
                     }
                   />
-                  <div className="grid gap-2 md:grid-cols-2">
-                    <input
-                      className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                      value={branch.governorate}
-                      onChange={(event) =>
-                        setBranches((prev) =>
-                          prev.map((item, currentIndex) =>
-                            currentIndex === index ? { ...item, governorate: event.target.value } : item,
-                          ),
-                        )
-                      }
-                    />
-                    <input
-                      className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                      value={branch.address}
-                      onChange={(event) =>
-                        setBranches((prev) =>
-                          prev.map((item, currentIndex) =>
-                            currentIndex === index ? { ...item, address: event.target.value } : item,
-                          ),
-                        )
-                      }
-                    />
-                    <input
-                      className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                      value={branch.phone}
-                      onChange={(event) =>
-                        setBranches((prev) =>
-                          prev.map((item, currentIndex) =>
-                            currentIndex === index ? { ...item, phone: event.target.value } : item,
-                          ),
-                        )
-                      }
-                    />
-                    <input
-                      className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                      value={branch.whatsapp}
-                      onChange={(event) =>
-                        setBranches((prev) =>
-                          prev.map((item, currentIndex) =>
-                            currentIndex === index ? { ...item, whatsapp: event.target.value } : item,
-                          ),
-                        )
-                      }
-                    />
-                  </div>
-                  <button
-                    onClick={() => void handleUpdateBranch(branch)}
-                    className="mt-2 rounded-lg border border-primary px-3 py-1 text-sm font-semibold text-primary transition hover:bg-primary hover:text-white"
-                  >
-                    حفظ الفرع
-                  </button>
+                  <input
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    value={branch.address}
+                    onChange={(event) =>
+                      setBranches((prev) =>
+                        prev.map((item, currentIndex) =>
+                          currentIndex === index ? { ...item, address: event.target.value } : item,
+                        ),
+                      )
+                    }
+                  />
+                  <input
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    value={branch.phone}
+                    onChange={(event) =>
+                      setBranches((prev) =>
+                        prev.map((item, currentIndex) =>
+                          currentIndex === index ? { ...item, phone: event.target.value } : item,
+                        ),
+                      )
+                    }
+                  />
+                  <input
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    value={branch.whatsapp}
+                    onChange={(event) =>
+                      setBranches((prev) =>
+                        prev.map((item, currentIndex) =>
+                          currentIndex === index ? { ...item, whatsapp: event.target.value } : item,
+                        ),
+                      )
+                    }
+                  />
                 </div>
-              ))}
-              {branches.length === 0 && (
-                <p className="rounded-lg bg-slate-50 px-3 py-5 text-center text-sm text-slate-600">لا توجد أفرع حالياً</p>
-              )}
-            </div>
-          </section>
-        </div>
+                <button
+                  onClick={() => void handleUpdateBranch(branch)}
+                  className="mt-2 rounded-lg border border-primary px-3 py-1 text-sm font-semibold text-primary transition hover:bg-primary hover:text-white"
+                >
+                  حفظ الفرع
+                </button>
+              </div>
+            ))}
+            {branches.length === 0 && (
+              <p className="rounded-lg bg-slate-50 px-3 py-5 text-center text-sm text-slate-600">لا توجد أفرع حالياً</p>
+            )}
+          </div>
+        </section>
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          <form onSubmit={handleCreateAdmin} className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
-            <h2 className="mb-1 text-lg font-bold">إضافة مشرف محافظة</h2>
-            <p className="mb-4 text-sm text-slate-500">إنشاء حساب جديد وتحديد المحافظة التابعة له</p>
-            <div className="grid gap-3">
+        <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="mb-1 text-lg font-bold">المشرفين</h2>
+              <p className="text-sm text-slate-500">عرض المشرفين وتغيير المحافظة أو إضافة مشرف جديد</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowAddAdminForm((prev) => !prev)}
+              className="rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary hover:text-white"
+            >
+              {showAddAdminForm ? 'إخفاء الإضافة' : 'إضافة جديد'}
+            </button>
+          </div>
+
+          {showAddAdminForm && (
+            <form onSubmit={handleCreateAdmin} className="mb-4 grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
               <input
-                className="rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 placeholder="اسم المستخدم"
                 value={adminForm.username}
                 onChange={(event) => setAdminForm((prev) => ({ ...prev, username: event.target.value }))}
               />
               <input
-                className="rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 placeholder="الاسم الكامل"
                 value={adminForm.displayName}
                 onChange={(event) => setAdminForm((prev) => ({ ...prev, displayName: event.target.value }))}
               />
               <input
                 type="password"
-                className="rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 placeholder="كلمة المرور"
                 value={adminForm.password}
                 onChange={(event) => setAdminForm((prev) => ({ ...prev, password: event.target.value }))}
               />
               <select
-                className="rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 value={adminForm.branchId}
                 onChange={(event) => setAdminForm((prev) => ({ ...prev, branchId: event.target.value }))}
               >
@@ -463,47 +487,43 @@ export const SuperAdminPage = () => {
               >
                 إضافة المشرف
               </button>
-            </div>
-          </form>
+            </form>
+          )}
 
-          <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
-            <h2 className="mb-1 text-lg font-bold">إدارة المشرفين</h2>
-            <p className="mb-4 text-sm text-slate-500">تغيير المحافظة أو حذف الحساب عند الحاجة</p>
-            <div className="max-h-[560px] space-y-3 overflow-auto pr-1">
-              {admins
-                .filter((admin) => admin.role === 'admin')
-                .map((admin) => (
-                  <article key={admin.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-                    <p className="font-semibold text-slate-900">
-                      {admin.display_name} <span className="font-normal text-slate-500">({admin.username})</span>
-                    </p>
-                    <div className="mt-2 flex flex-wrap items-center gap-2">
-                      <select
-                        className="rounded-lg border border-slate-300 bg-white px-3 py-1 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                        value={admin.branch_id ?? ''}
-                        onChange={(event) => void handleChangeAdminBranch(admin.id, Number(event.target.value))}
-                      >
-                        {branches.map((branch) => (
-                          <option key={branch.id} value={branch.id}>
-                            {branch.governorate}
-                          </option>
-                        ))}
-                      </select>
-                      <button
-                        onClick={() => void handleDeleteAdmin(admin.id)}
-                        className="rounded-lg border border-red-300 bg-white px-3 py-1 text-red-600 transition hover:bg-red-50"
-                      >
-                        حذف
-                      </button>
-                    </div>
-                  </article>
-                ))}
-              {branchAdminsCount === 0 && (
-                <p className="rounded-lg bg-slate-50 px-3 py-5 text-center text-sm text-slate-600">لا يوجد مشرفون حتى الآن</p>
-              )}
-            </div>
-          </section>
-        </div>
+          <div className="max-h-[560px] space-y-3 overflow-auto pr-1">
+            {admins
+              .filter((admin) => admin.role === 'admin')
+              .map((admin) => (
+                <article key={admin.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  <p className="font-semibold text-slate-900">
+                    {admin.display_name} <span className="font-normal text-slate-500">({admin.username})</span>
+                  </p>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <select
+                      className="rounded-lg border border-slate-300 bg-white px-3 py-1 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                      value={admin.branch_id ?? ''}
+                      onChange={(event) => void handleChangeAdminBranch(admin.id, Number(event.target.value))}
+                    >
+                      {branches.map((branch) => (
+                        <option key={branch.id} value={branch.id}>
+                          {branch.governorate}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={() => void handleDeleteAdmin(admin.id)}
+                      className="rounded-lg border border-red-300 bg-white px-3 py-1 text-red-600 transition hover:bg-red-50"
+                    >
+                      حذف
+                    </button>
+                  </div>
+                </article>
+              ))}
+            {branchAdminsCount === 0 && (
+              <p className="rounded-lg bg-slate-50 px-3 py-5 text-center text-sm text-slate-600">لا يوجد مشرفون حتى الآن</p>
+            )}
+          </div>
+        </section>
       </main>
       </div>
   )
