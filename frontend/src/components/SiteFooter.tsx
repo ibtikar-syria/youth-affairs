@@ -1,4 +1,4 @@
-import { Facebook, Instagram, Send, Youtube } from 'lucide-react'
+import { Facebook, Instagram, Send, Youtube, Github } from 'lucide-react'
 import backgroundTexture from '../assets/background_texture1.svg'
 
 type SiteFooterProps = {
@@ -14,7 +14,7 @@ const socialLinks = [
   },
   {
     label: 'إنستغرام',
-    href: 'https://instagram.com',
+    href: 'https://www.instagram.com/youthafairs',
     icon: Instagram,
   },
   {
@@ -27,6 +27,11 @@ const socialLinks = [
     href: 'https://youtube.com',
     icon: Youtube,
   },
+  {
+    label: 'github',
+    href: 'https://github.com/ibtikar-syria/youth-affairs',
+    icon: Github
+  }
 ]
 
 export const SiteFooter = ({
