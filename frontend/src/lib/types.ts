@@ -18,6 +18,8 @@ export type Branch = {
   facebook: string | null
   telegram: string | null
   instagram: string | null
+  admins_count?: number
+  events_count?: number
 }
 
 export type EventItem = {

@@ -78,6 +78,10 @@ export const api = {
     request<{ ok: boolean }>('/api/superadmin/branches', { method: 'POST', token, body }),
   updateSuperBranch: (token: string, id: number, body: Record<string, unknown>) =>
     request<{ ok: boolean }>(`/api/superadmin/branches/${id}`, { method: 'PUT', token, body }),
+  getSuperBranchRelations: (token: string, id: number) =>
+    request<{ item: { adminsCount: number; eventsCount: number } }>(`/api/superadmin/branches/${id}/relations`, { token }),
+  deleteSuperBranch: (token: string, id: number) =>
+    request<{ ok: boolean }>(`/api/superadmin/branches/${id}`, { method: 'DELETE', token }),
 
   getSuperAdmins: (token: string) => request<{ items: AdminUser[] }>('/api/superadmin/admins', { token }),
   createSuperAdmin: (token: string, body: Record<string, unknown>) =>

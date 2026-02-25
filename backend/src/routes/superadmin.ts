@@ -22,13 +22,57 @@ type AdminInput = {
   branchId: number
 }
 
+type BranchRelationCounts = {
+  adminsCount: number
+  eventsCount: number
+}
+
+const getBranchRelationCounts = async (db: D1Database, branchId: number): Promise<BranchRelationCounts> => {
+  const [adminsResult, eventsResult] = await Promise.all([
+    db
+      .prepare(`SELECT COUNT(*) AS count FROM users WHERE role = 'admin' AND branch_id = ?`)
+      .bind(branchId)
+      .first<{ count: number }>(),
+    db.prepare(`SELECT COUNT(*) AS count FROM events WHERE branch_id = ?`).bind(branchId).first<{ count: number }>(),
+  ])
+
+  return {
+    adminsCount: Number(adminsResult?.count ?? 0),
+    eventsCount: Number(eventsResult?.count ?? 0),
+  }
+}
+
 export const superadminRoutes = new Hono<AppEnv>()
 
 superadminRoutes.use('*', requireAuth, requireRole('superadmin'))
 
 superadminRoutes.get('/branches', async (c) => {
-  const branches = await c.env.DB.prepare('SELECT * FROM branches ORDER BY governorate ASC').all<BranchRecord>()
+  const branches = await c.env.DB
+    .prepare(
+      `SELECT
+         b.*,
+         (SELECT COUNT(*) FROM users u WHERE u.role = 'admin' AND u.branch_id = b.id) AS admins_count,
+         (SELECT COUNT(*) FROM events e WHERE e.branch_id = b.id) AS events_count
+       FROM branches b
+       ORDER BY b.governorate ASC`
+    )
+    .all<BranchRecord & { admins_count: number; events_count: number }>()
   return c.json({ items: branches.results })
+})
+
+superadminRoutes.get('/branches/:id/relations', async (c) => {
+  const branchId = Number(c.req.param('id'))
+  if (!branchId) {
+    return badRequest(c, 'Invalid branch id')
+  }
+
+  const branch = await c.env.DB.prepare('SELECT id FROM branches WHERE id = ? LIMIT 1').bind(branchId).first<{ id: number }>()
+  if (!branch) {
+    return c.json({ error: 'Branch not found' }, 404)
+  }
+
+  const relations = await getBranchRelationCounts(c.env.DB, branchId)
+  return c.json({ item: relations })
 })
 
 superadminRoutes.post('/branches', async (c) => {
@@ -87,6 +131,32 @@ superadminRoutes.put('/branches/:id', async (c) => {
     )
     .run()
 
+  return c.json({ ok: true })
+})
+
+superadminRoutes.delete('/branches/:id', async (c) => {
+  const branchId = Number(c.req.param('id'))
+  if (!branchId) {
+    return badRequest(c, 'Invalid branch id')
+  }
+
+  const branch = await c.env.DB.prepare('SELECT id FROM branches WHERE id = ? LIMIT 1').bind(branchId).first<{ id: number }>()
+  if (!branch) {
+    return c.json({ error: 'Branch not found' }, 404)
+  }
+
+  const relations = await getBranchRelationCounts(c.env.DB, branchId)
+  if (relations.adminsCount > 0 || relations.eventsCount > 0) {
+    return c.json(
+      {
+        error: 'Cannot delete branch with related records',
+        relations,
+      },
+      409,
+    )
+  }
+
+  await c.env.DB.prepare('DELETE FROM branches WHERE id = ?').bind(branchId).run()
   return c.json({ ok: true })
 })
 
