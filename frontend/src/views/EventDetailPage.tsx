@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { CalendarDays, MapPin, Calendar, Building2, ArrowRight } from 'lucide-react'
+import { CalendarDays, MapPin, Calendar, Building2, ArrowRight, Link2 } from 'lucide-react'
 import { api } from '../lib/api'
 import type { EventItem } from '../lib/types'
 
@@ -127,6 +127,28 @@ export const EventDetailPage = () => {
                 <p className="whitespace-pre-wrap text-base leading-relaxed">{event.announcement}</p>
               </div>
             </div>
+
+            {event.urls.length > 0 && (
+              <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6">
+                <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-slate-900">
+                  <Link2 className="h-5 w-5 text-primary" />
+                  روابط مرفقة
+                </h2>
+                <div className="space-y-2">
+                  {event.urls.map((item, index) => (
+                    <a
+                      key={`${item.url}-${item.title}-${index}`}
+                      href={item.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-primary transition hover:border-primary/40 hover:bg-primary/5"
+                    >
+                      {item.title || item.url}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-6">
               <div className="text-sm text-slate-600">

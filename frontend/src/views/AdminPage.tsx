@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import { ArrowUpRight, Building2, CalendarDays, Image, LogOut, MapPin, UserCircle } from 'lucide-react'
+import { ArrowUpRight, Building2, CalendarDays, Image, Link2, LogOut, MapPin, Plus, Trash2, UserCircle } from 'lucide-react'
 import { api } from '../lib/api'
-import type { Branch, EventItem, AuthUser } from '../lib/types'
+import type { Branch, EventItem, EventUrlItem, AuthUser } from '../lib/types'
 
 const TOKEN_KEY = 'ya_admin_token'
 
@@ -10,14 +10,21 @@ type EventFormState = {
   title: string
   imageUrl: string
   announcement: string
+  urls: EventUrlItem[]
   eventDate: string
   location: string
+}
+
+const emptyEventUrl: EventUrlItem = {
+  url: '',
+  title: '',
 }
 
 const emptyEvent: EventFormState = {
   title: '',
   imageUrl: '',
   announcement: '',
+  urls: [],
   eventDate: '',
   location: '',
 }
@@ -110,6 +117,27 @@ export const AdminPage = () => {
     setIsEditingBranch(false)
   }
 
+  const setEventUrlField = (index: number, key: keyof EventUrlItem, value: string) => {
+    setEventForm((prev) => ({
+      ...prev,
+      urls: prev.urls.map((item, itemIndex) => (itemIndex === index ? { ...item, [key]: value } : item)),
+    }))
+  }
+
+  const addEventUrl = () => {
+    setEventForm((prev) => ({
+      ...prev,
+      urls: [...prev.urls, { ...emptyEventUrl }],
+    }))
+  }
+
+  const removeEventUrl = (index: number) => {
+    setEventForm((prev) => ({
+      ...prev,
+      urls: prev.urls.filter((_, itemIndex) => itemIndex !== index),
+    }))
+  }
+
   const handleSaveEvent = async (event: React.FormEvent) => {
     event.preventDefault()
     if (!token) {
@@ -119,10 +147,20 @@ export const AdminPage = () => {
     setLoading(true)
     setError('')
     try {
+      const payload = {
+        ...eventForm,
+        urls: eventForm.urls
+          .map((item) => ({
+            url: item.url.trim(),
+            title: item.title.trim(),
+          }))
+          .filter((item) => item.url || item.title),
+      }
+
       if (editingId) {
-        await api.updateAdminEvent(token, editingId, eventForm)
+        await api.updateAdminEvent(token, editingId, payload)
       } else {
-        await api.createAdminEvent(token, eventForm)
+        await api.createAdminEvent(token, payload)
       }
       const updated = await api.getAdminEvents(token)
       setEvents(updated.items)
@@ -500,6 +538,65 @@ export const AdminPage = () => {
                     onChange={(event) => setEventForm((prev) => ({ ...prev, location: event.target.value }))}
                   />
                 </label>
+                <div className="space-y-3 rounded-lg border border-slate-200 bg-white p-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                      <Link2 className="h-4 w-4" />
+                      روابط مرفقة بالفعالية
+                    </div>
+                    <button
+                      type="button"
+                      onClick={addEventUrl}
+                      className="inline-flex items-center gap-1 rounded-lg border border-primary px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary hover:text-white"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      إضافة رابط
+                    </button>
+                  </div>
+                  {eventForm.urls.length === 0 ? (
+                    <p className="text-xs text-slate-500">لا توجد روابط مضافة. يمكنك إضافة أي عدد من الروابط.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {eventForm.urls.map((item, index) => (
+                        <div key={index} className="rounded-lg border border-slate-200 bg-slate-50 p-2.5">
+                          <div className="mb-2 flex items-center justify-between">
+                            <p className="text-xs font-semibold text-slate-600">الرابط {index + 1}</p>
+                            <button
+                              type="button"
+                              onClick={() => removeEventUrl(index)}
+                              className="inline-flex items-center gap-1 rounded-md border border-red-300 px-2 py-1 text-xs text-red-600 transition hover:bg-red-50"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                              حذف
+                            </button>
+                          </div>
+                          <div className="grid gap-2 md:grid-cols-2">
+                            <label className="space-y-1 text-xs text-slate-600">
+                              <span className="font-semibold">العنوان (اختياري)</span>
+                              <input
+                                dir="auto"
+                                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                                value={item.title}
+                                onChange={(event) => setEventUrlField(index, 'title', event.target.value)}
+                              />
+                            </label>
+                            <label className="space-y-1 text-xs text-slate-600">
+                              <span className="font-semibold">الرابط</span>
+                              <input
+                                dir="ltr"
+                                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                                value={item.url}
+                                onChange={(event) => setEventUrlField(index, 'url', event.target.value)}
+                                placeholder="https://example.com"
+                              />
+                            </label>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-xs text-slate-500">يمكن ترك العنوان فارغاً، وسيتم عرض الرابط نفسه كعنوان.</p>
+                </div>
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
                 <button
@@ -573,6 +670,7 @@ export const AdminPage = () => {
                           title: eventItem.title,
                           imageUrl: eventItem.image_url,
                           announcement: eventItem.announcement,
+                          urls: eventItem.urls,
                           eventDate: eventItem.event_date,
                           location: eventItem.location,
                         })

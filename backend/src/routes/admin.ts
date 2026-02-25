@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { badRequest, parseJsonBody } from '../lib/http'
-import type { AppEnv, BranchRecord, EventRecord } from '../lib/types'
+import type { AppEnv, BranchRecord, EventRecord, EventUrl } from '../lib/types'
 import { requireAuth, requireRole } from '../middleware/auth'
 
 type BranchInput = {
@@ -19,9 +19,12 @@ type EventInput = {
   title: string
   imageUrl: string
   announcement: string
+  urls?: EventUrl[]
   eventDate: string
   location: string
 }
+
+type EventRecordDb = Omit<EventRecord, 'urls'> & { urls: string }
 
 export const adminRoutes = new Hono<AppEnv>()
 
@@ -33,6 +36,66 @@ const extensionForMimeType = (mimeType: string) => {
   if (mimeType === 'image/webp') return 'webp'
   return 'jpg'
 }
+
+const normalizeEventUrls = (value: unknown): EventUrl[] | null => {
+  if (value === undefined || value === null) {
+    return []
+  }
+
+  if (!Array.isArray(value)) {
+    return null
+  }
+
+  const normalized: EventUrl[] = []
+  for (const item of value) {
+    if (!item || typeof item !== 'object') {
+      return null
+    }
+
+    const rawUrl = 'url' in item ? item.url : undefined
+    const rawTitle = 'title' in item ? item.title : ''
+
+    if (typeof rawUrl !== 'string' || typeof rawTitle !== 'string') {
+      return null
+    }
+
+    const url = rawUrl.trim()
+    const title = rawTitle.trim()
+
+    if (!url) {
+      return null
+    }
+
+    try {
+      new URL(url)
+    } catch {
+      return null
+    }
+
+    normalized.push({ url, title })
+  }
+
+  return normalized
+}
+
+const parseEventUrlsFromDb = (urlsJson: string | null | undefined): EventUrl[] => {
+  if (!urlsJson) {
+    return []
+  }
+
+  try {
+    const parsed = JSON.parse(urlsJson)
+    const normalized = normalizeEventUrls(parsed)
+    return normalized ?? []
+  } catch {
+    return []
+  }
+}
+
+const mapEventRecord = (event: EventRecordDb): EventRecord => ({
+  ...event,
+  urls: parseEventUrlsFromDb(event.urls),
+})
 
 adminRoutes.use('*', requireAuth, requireRole('admin', 'superadmin'))
 
@@ -157,9 +220,9 @@ adminRoutes.get('/events', async (c) => {
        ORDER BY e.event_date DESC`
     )
     .bind(...bindings)
-    .all<EventRecord & { branch_name: string }>()
+    .all<EventRecordDb & { branch_name: string }>()
 
-  return c.json({ items: events.results })
+  return c.json({ items: events.results.map(mapEventRecord) })
 })
 
 adminRoutes.post('/events', async (c) => {
@@ -173,16 +236,22 @@ adminRoutes.post('/events', async (c) => {
     return badRequest(c, 'Missing required event fields')
   }
 
+  const normalizedUrls = normalizeEventUrls(input.urls)
+  if (!normalizedUrls) {
+    return badRequest(c, 'Invalid event urls. Each url must be valid and may include an optional title')
+  }
+
   await c.env.DB
     .prepare(
-      `INSERT INTO events (branch_id, title, image_url, announcement, event_date, location, created_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO events (branch_id, title, image_url, announcement, urls, event_date, location, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .bind(
       authUser.branchId,
       input.title.trim(),
       input.imageUrl.trim(),
       input.announcement.trim(),
+      JSON.stringify(normalizedUrls),
       input.eventDate,
       input.location.trim(),
       authUser.sub
@@ -204,13 +273,27 @@ adminRoutes.put('/events/:id', async (c) => {
     return badRequest(c, 'Invalid event data')
   }
 
+  const normalizedUrls = normalizeEventUrls(input.urls)
+  if (!normalizedUrls) {
+    return badRequest(c, 'Invalid event urls. Each url must be valid and may include an optional title')
+  }
+
   await c.env.DB
     .prepare(
       `UPDATE events
-       SET title = ?, image_url = ?, announcement = ?, event_date = ?, location = ?, updated_at = CURRENT_TIMESTAMP
+       SET title = ?, image_url = ?, announcement = ?, urls = ?, event_date = ?, location = ?, updated_at = CURRENT_TIMESTAMP
        WHERE id = ? AND branch_id = ?`
     )
-    .bind(input.title.trim(), input.imageUrl.trim(), input.announcement.trim(), input.eventDate, input.location.trim(), eventId, authUser.branchId)
+    .bind(
+      input.title.trim(),
+      input.imageUrl.trim(),
+      input.announcement.trim(),
+      JSON.stringify(normalizedUrls),
+      input.eventDate,
+      input.location.trim(),
+      eventId,
+      authUser.branchId
+    )
     .run()
 
   return c.json({ ok: true })

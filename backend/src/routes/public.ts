@@ -1,7 +1,58 @@
 import { Hono } from 'hono'
-import type { AppEnv, BranchRecord, EventRecord } from '../lib/types'
+import type { AppEnv, BranchRecord, EventRecord, EventUrl } from '../lib/types'
 
 export const publicRoutes = new Hono<AppEnv>()
+
+type EventRecordDb = Omit<EventRecord, 'urls'> & { urls: string }
+
+const normalizeEventUrls = (value: unknown): EventUrl[] | null => {
+  if (!Array.isArray(value)) {
+    return null
+  }
+
+  const normalized: EventUrl[] = []
+  for (const item of value) {
+    if (!item || typeof item !== 'object') {
+      return null
+    }
+
+    const rawUrl = 'url' in item ? item.url : undefined
+    const rawTitle = 'title' in item ? item.title : ''
+
+    if (typeof rawUrl !== 'string' || typeof rawTitle !== 'string') {
+      return null
+    }
+
+    const url = rawUrl.trim()
+    const title = rawTitle.trim()
+    if (!url) {
+      return null
+    }
+
+    normalized.push({ url, title })
+  }
+
+  return normalized
+}
+
+const parseEventUrlsFromDb = (urlsJson: string | null | undefined): EventUrl[] => {
+  if (!urlsJson) {
+    return []
+  }
+
+  try {
+    const parsed = JSON.parse(urlsJson)
+    const normalized = normalizeEventUrls(parsed)
+    return normalized ?? []
+  } catch {
+    return []
+  }
+}
+
+const mapEventRecord = (event: EventRecordDb): EventRecord => ({
+  ...event,
+  urls: parseEventUrlsFromDb(event.urls),
+})
 
 publicRoutes.get('/images/*', async (c) => {
   const bucket = c.env.R2_BUCKET
@@ -71,7 +122,7 @@ publicRoutes.get('/events', async (c) => {
 
   const events = await c.env.DB.prepare(query)
     .bind(...bindings)
-    .all<EventRecord & { branch_name: string; branch_governorate: string }>()
+    .all<EventRecordDb & { branch_name: string; branch_governorate: string }>()
 
-  return c.json({ items: events.results })
+  return c.json({ items: events.results.map(mapEventRecord) })
 })

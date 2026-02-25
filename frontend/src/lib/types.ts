@@ -30,10 +30,16 @@ export type EventItem = {
   title: string
   image_url: string
   announcement: string
+  urls: EventUrlItem[]
   event_date: string
   location: string
   branch_name?: string
   branch_governorate?: string
+}
+
+export type EventUrlItem = {
+  url: string
+  title: string
 }
 
 export type AdminUser = {

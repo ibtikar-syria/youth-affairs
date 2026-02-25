@@ -39,12 +39,18 @@ export type BranchRecord = {
   updated_at: string
 }
 
+export type EventUrl = {
+  url: string
+  title: string
+}
+
 export type EventRecord = {
   id: number
   branch_id: number
   title: string
   image_url: string
   announcement: string
+  urls: EventUrl[]
   event_date: string
   location: string
   created_by: number

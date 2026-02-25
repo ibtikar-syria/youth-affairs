@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS events (
 	title TEXT NOT NULL,
 	image_url TEXT NOT NULL,
 	announcement TEXT NOT NULL,
+	urls TEXT NOT NULL DEFAULT '[]',
 	event_date TEXT NOT NULL,
 	location TEXT NOT NULL,
 	created_by INTEGER NOT NULL,
