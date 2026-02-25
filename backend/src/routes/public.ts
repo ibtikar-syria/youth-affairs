@@ -83,7 +83,14 @@ publicRoutes.get('/images/*', async (c) => {
 })
 
 publicRoutes.get('/branches', async (c) => {
-  const branches = await c.env.DB.prepare('SELECT * FROM branches ORDER BY governorate ASC').all<BranchRecord>()
+  const branches = await c.env.DB
+    .prepare(
+      `SELECT *
+       FROM branches b
+       ORDER BY (SELECT COUNT(*) FROM events e WHERE e.branch_id = b.id) DESC,
+                b.governorate ASC`
+    )
+    .all<BranchRecord>()
   return c.json({ items: branches.results })
 })
 

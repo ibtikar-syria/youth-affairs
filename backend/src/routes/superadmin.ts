@@ -64,7 +64,7 @@ superadminRoutes.get('/branches', async (c) => {
          (SELECT COUNT(*) FROM users u WHERE u.role = 'admin' AND u.branch_id = b.id) AS admins_count,
          (SELECT COUNT(*) FROM events e WHERE e.branch_id = b.id) AS events_count
        FROM branches b
-       ORDER BY b.governorate ASC`
+       ORDER BY events_count DESC, b.governorate ASC`
     )
     .all<BranchRecord & { admins_count: number; events_count: number }>()
   return c.json({ items: branches.results })
