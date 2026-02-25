@@ -615,20 +615,21 @@ export const SuperAdminPage = () => {
 
         {error && <p className="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
 
-        <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h2 className="mb-1 text-lg font-bold">الأفرع الحالية</h2>
-              <p className="text-sm text-slate-500">عرض وتعديل الأفرع الحالية أو إضافة فرع جديد</p>
+        <div className="flex flex-col gap-6 xl:flex-row">
+          <section className="min-w-0 flex-1 rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="mb-1 text-lg font-bold">الأفرع الحالية</h2>
+                <p className="text-sm text-slate-500">عرض وتعديل الأفرع الحالية أو إضافة فرع جديد</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddBranchForm((prev) => !prev)}
+                className="rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary hover:text-white"
+              >
+                {showAddBranchForm ? 'إخفاء الإضافة' : 'إضافة جديد'}
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => setShowAddBranchForm((prev) => !prev)}
-              className="rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary hover:text-white"
-            >
-              {showAddBranchForm ? 'إخفاء الإضافة' : 'إضافة جديد'}
-            </button>
-          </div>
 
           {showAddBranchForm && (
             <form onSubmit={handleCreateBranch} className="mb-4 grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
@@ -671,7 +672,7 @@ export const SuperAdminPage = () => {
             </form>
           )}
 
-          <div className="max-h-[620px] space-y-3 overflow-auto pr-1">
+            <div className="max-h-[620px] space-y-3 overflow-auto pr-1">
             {branches.map((branch) => (
               <div key={branch.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                 {editingBranchId === branch.id ? (
@@ -749,23 +750,23 @@ export const SuperAdminPage = () => {
             {branches.length === 0 && (
               <p className="rounded-lg bg-slate-50 px-3 py-5 text-center text-sm text-slate-600">لا توجد أفرع حالياً</p>
             )}
-          </div>
-        </section>
-
-        <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h2 className="mb-1 text-lg font-bold">المشرفين</h2>
-              <p className="text-sm text-slate-500">عرض المشرفين وتغيير المحافظة أو إضافة مشرف جديد</p>
             </div>
-            <button
-              type="button"
-              onClick={() => setShowAddAdminForm((prev) => !prev)}
-              className="rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary hover:text-white"
-            >
-              {showAddAdminForm ? 'إخفاء الإضافة' : 'إضافة جديد'}
-            </button>
-          </div>
+          </section>
+
+          <section className="min-w-0 flex-1 rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="mb-1 text-lg font-bold">المشرفين</h2>
+                <p className="text-sm text-slate-500">عرض المشرفين وتغيير المحافظة أو إضافة مشرف جديد</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddAdminForm((prev) => !prev)}
+                className="rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary hover:text-white"
+              >
+                {showAddAdminForm ? 'إخفاء الإضافة' : 'إضافة جديد'}
+              </button>
+            </div>
 
           {showAddAdminForm && (
             <form onSubmit={handleCreateAdmin} className="mb-4 grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
@@ -809,7 +810,7 @@ export const SuperAdminPage = () => {
             </form>
           )}
 
-          <div className="max-h-[560px] space-y-3 overflow-auto pr-1">
+            <div className="max-h-[560px] space-y-3 overflow-auto pr-1">
             {admins
               .filter((admin) => admin.role === 'admin')
               .map((admin) => (
@@ -876,8 +877,9 @@ export const SuperAdminPage = () => {
             {branchAdminsCount === 0 && (
               <p className="rounded-lg bg-slate-50 px-3 py-5 text-center text-sm text-slate-600">لا يوجد مشرفون حتى الآن</p>
             )}
-          </div>
-        </section>
+            </div>
+          </section>
+        </div>
 
         {branchConfirmState.open && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4">
