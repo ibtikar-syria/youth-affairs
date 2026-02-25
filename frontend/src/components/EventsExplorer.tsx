@@ -35,6 +35,8 @@ export const EventsExplorer = ({
 }: EventsExplorerProps) => {
   const hasActiveFilters = Boolean(filters.branchId || filters.month || filters.year)
   const isLanding = variant === 'landing'
+  const displayedEvents = isLanding ? events.slice(0, 3) : events
+  const remainingEventsCount = Math.max(events.length - displayedEvents.length, 0)
 
   return (
     <>
@@ -140,8 +142,13 @@ export const EventsExplorer = ({
               عدد النتائج: <span className="font-semibold text-primary">{events.length}</span>
             </div>
           )}
+          {isLanding && remainingEventsCount > 0 && (
+            <div className="mb-3 text-sm text-slate-600">
+              +{remainingEventsCount} فعالية أخرى
+            </div>
+          )}
           <div className={isLanding ? 'js-stagger-cards grid gap-4 md:grid-cols-2 lg:grid-cols-3' : 'grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}>
-            {events.map((eventItem) => (
+            {displayedEvents.map((eventItem) => (
               <article
                 key={eventItem.id}
                 onClick={() => onEventClick(eventItem.id)}
