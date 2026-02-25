@@ -199,6 +199,29 @@ export const LandingPage = () => {
           },
         })
       })
+
+      const workScopeSection = document.querySelector<HTMLElement>('.js-workscope-section')
+      if (workScopeSection) {
+        const movingIcons = workScopeSection.querySelectorAll<HTMLElement>('.js-workscope-icon')
+        movingIcons.forEach((icon) => {
+          const moveY = Number(icon.dataset.moveY ?? 0)
+          const moveX = Number(icon.dataset.moveX ?? 0)
+          const rotateTo = Number(icon.dataset.rotateTo ?? 0)
+
+          gsap.to(icon, {
+            y: moveY,
+            x: moveX,
+            rotate: rotateTo,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: workScopeSection,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: true,
+            },
+          })
+        })
+      }
     }, pageRef)
 
     return () => ctx.revert()
@@ -312,7 +335,7 @@ export const LandingPage = () => {
           </div>
         </section>
 
-        <section className="animate-in js-reveal relative overflow-hidden py-16">
+        <section className="animate-in js-reveal js-workscope-section relative overflow-hidden py-16">
           <span
             aria-hidden="true"
             className="pointer-events-none absolute inset-x-0 top-0 h-full bg-gradient-to-l from-primary/[0.08] via-white to-accent/[0.08]"
@@ -323,13 +346,19 @@ export const LandingPage = () => {
           />
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute -bottom-16 -left-10 text-slate-300/40"
+            className="js-workscope-icon pointer-events-none absolute -bottom-16 -left-10 text-slate-300/40 will-change-transform"
+            data-move-y="-140"
+            data-move-x="36"
+            data-rotate-to="-12"
           >
             <Globe2 className="h-56 w-56 rotate-[-14deg]" strokeWidth={1.2} />
           </span>
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute -top-10 right-8 text-slate-300/30"
+            className="js-workscope-icon pointer-events-none absolute -top-10 right-8 text-slate-300/30 will-change-transform"
+            data-move-y="160"
+            data-move-x="-32"
+            data-rotate-to="30"
           >
             <Globe2 className="h-32 w-32 rotate-[12deg]" strokeWidth={1.2} />
           </span>
@@ -343,7 +372,13 @@ export const LandingPage = () => {
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-primary/70 to-accent/70"
               />
-              <span aria-hidden="true" className="pointer-events-none absolute -bottom-7 -left-6 text-slate-300/70">
+              <span
+                aria-hidden="true"
+                className="js-workscope-icon pointer-events-none absolute -bottom-7 -left-6 text-slate-300/70 will-change-transform"
+                data-move-y="-85"
+                data-move-x="18"
+                data-rotate-to="-14"
+              >
                 <Globe2 className="h-24 w-24 rotate-[-16deg]" strokeWidth={1.5} />
               </span>
 
