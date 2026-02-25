@@ -7,7 +7,7 @@ import type { AdminUser, AuthUser, Branch } from '../lib/types'
 const TOKEN_KEY = 'ya_superadmin_token'
 
 type BranchConfirmAction = 'save' | 'discard' | 'switch'
-type AdminConfirmAction = 'save' | 'discard' | 'switch'
+type AdminConfirmAction = 'save' | 'discard' | 'switch' | 'delete'
 
 export const SuperAdminPage = () => {
   const [token, setToken] = useState<string>(localStorage.getItem(TOKEN_KEY) ?? '')
@@ -514,6 +514,20 @@ export const SuperAdminPage = () => {
       await handleChangeAdminBranch(adminConfirmState.targetAdmin.id, Number(editingAdminForm.branchId))
       clearAdminEditing()
       closeAdminConfirm()
+      return
+    }
+
+    if (adminConfirmState.action === 'delete') {
+      if (!adminConfirmState.targetAdmin) {
+        closeAdminConfirm()
+        return
+      }
+
+      await handleDeleteAdmin(adminConfirmState.targetAdmin.id)
+      if (editingAdminId === adminConfirmState.targetAdmin.id) {
+        clearAdminEditing()
+      }
+      closeAdminConfirm()
     }
   }
 
@@ -866,7 +880,16 @@ export const SuperAdminPage = () => {
                       ))}
                     </select>
                     <button
-                      onClick={() => void handleDeleteAdmin(admin.id)}
+                      type="button"
+                      onClick={() =>
+                        openAdminConfirm(
+                          'delete',
+                          'تأكيد حذف المشرف',
+                          `هل أنت متأكد من حذف المشرف ${admin.display_name}؟`,
+                          'حذف المشرف',
+                          admin,
+                        )
+                      }
                       className="rounded-lg border border-red-300 bg-white px-3 py-1 text-red-600 transition hover:bg-red-50"
                     >
                       حذف
