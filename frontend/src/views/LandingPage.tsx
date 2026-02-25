@@ -244,22 +244,38 @@ export const LandingPage = () => {
         </section>
 
         <section className="animate-in js-reveal mx-auto max-w-6xl px-4 py-14">
-          <h3 className="mb-6 inline-flex items-center gap-2 text-2xl font-bold text-primary">
-            <Target className="h-6 w-6" />
-            أهدافنا
-          </h3>
-          <div className="js-stagger-cards grid gap-4 md:grid-cols-2">
+          <div className="mb-8 space-y-3">
+            <h3 className="inline-flex items-center gap-2 text-2xl font-bold text-primary">
+              <Target className="h-6 w-6" />
+              أهدافنا
+            </h3>
+            <p className="max-w-3xl text-sm leading-7 text-slate-600 md:text-base">
+              نعمل على تمكين الشباب عبر مسارات متكاملة تجمع بين الوعي، المهارة، الهوية، والمشاركة الفاعلة في خدمة المجتمع.
+            </p>
+          </div>
+          <div className="js-stagger-cards grid gap-5 md:grid-cols-2">
             {goals.map((goal, index) => {
               const Icon = goalIcons[index % goalIcons.length]
               return (
-              <article key={goal.title} className="js-card rounded-xl border border-blue-100 bg-white p-5 shadow-sm transition-all duration-300 hover:rounded-l-[3rem] hover:shadow-lg hover:scale-[1.02] hover:border-primary/30">
-                <h4 className="mb-3 inline-flex items-center gap-2 text-lg font-bold text-slate-900">
-                  <Icon className="h-5 w-5 text-primary" />
-                  {goal.title}
+              <article key={goal.title} className="js-card group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:rounded-l-[3.5rem] hover:border-primary/35 hover:shadow-xl">
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-primary/70 to-accent/70 transition-all duration-300 group-hover:w-1.5"
+                />
+                <h4 className="mb-4 flex items-start justify-between gap-3 text-lg font-bold text-slate-900">
+                  <span className="inline-flex items-start gap-2">
+                    <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <span>{goal.title}</span>
+                  </span>
+                  <span className="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-500">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
                 </h4>
-                <ul className="space-y-2 text-slate-700">
+                <ul className="space-y-2.5 text-slate-700">
                   {goal.points.map((point) => (
-                    <li key={point} className="flex items-start gap-2 leading-7">
+                    <li key={point} className="flex items-start gap-2.5 rounded-lg px-1 leading-7 transition-colors duration-200 group-hover:bg-slate-50/70">
                       <span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
                       <span>{point}</span>
                     </li>
