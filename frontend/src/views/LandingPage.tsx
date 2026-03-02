@@ -233,7 +233,7 @@ export const LandingPage = () => {
           />
           <div className="animate-in relative z-10 mx-auto grid max-w-6xl gap-8 px-4 md:grid-cols-2 md:items-center">
             <div>
-              <h2 className="js-hero-reveal mb-4 text-2xl font-bold leading-tight sm:text-3xl md:text-4xl">{content.slogan}</h2>
+              <h1 className="js-hero-reveal mb-4 text-2xl font-bold leading-tight sm:text-3xl md:text-4xl">{content.slogan}</h1>
               <p className="js-hero-reveal mb-6 text-base leading-8 md:text-lg">{content.definition}</p>
               <a
                 href={content.volunteerFormUrl}

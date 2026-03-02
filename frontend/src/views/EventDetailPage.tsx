@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { CalendarDays, MapPin, Calendar, Building2, ArrowRight, Link2 } from 'lucide-react'
 import { api } from '../lib/api'
+import { applySeo } from '../lib/seo'
 import type { EventItem } from '../lib/types'
 
 export const EventDetailPage = () => {
@@ -38,6 +39,53 @@ export const EventDetailPage = () => {
       }
     })()
   }, [id])
+
+  useEffect(() => {
+    if (loading) return
+
+    if (!event || error) {
+      applySeo({
+        title: 'الفعالية غير موجودة | شؤون الشباب',
+        description: 'لم يتم العثور على الفعالية المطلوبة ضمن فعاليات شؤون الشباب.',
+        path: `/events/${id ?? ''}`,
+      })
+      return
+    }
+
+    const normalizedDescription = event.announcement.replace(/\s+/g, ' ').trim()
+    const maxDescriptionLength = 170
+    const description =
+      normalizedDescription.length > maxDescriptionLength
+        ? `${normalizedDescription.slice(0, maxDescriptionLength - 1)}…`
+        : normalizedDescription
+
+    applySeo({
+      title: `${event.title} | شؤون الشباب`,
+      description,
+      path: `/events/${event.id}`,
+      image: event.image_url,
+      type: 'article',
+      structuredData: {
+        '@context': 'https://schema.org',
+        '@type': 'Event',
+        name: event.title,
+        startDate: event.event_date,
+        eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+        eventStatus: 'https://schema.org/EventScheduled',
+        location: {
+          '@type': 'Place',
+          name: event.location,
+          address: event.branch_governorate,
+        },
+        image: [event.image_url],
+        organizer: {
+          '@type': 'Organization',
+          name: 'شؤون الشباب',
+        },
+        description,
+      },
+    })
+  }, [loading, event, error, id])
 
   if (loading) {
     return (
