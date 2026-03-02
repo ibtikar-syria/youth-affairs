@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { logAuditEvent } from '../lib/audit'
 import { badRequest, parseJsonBody } from '../lib/http'
 import { hashPassword } from '../lib/password'
 import type { AppEnv, BranchRecord, UserRecord } from '../lib/types'
@@ -210,13 +211,26 @@ superadminRoutes.post('/admins', async (c) => {
   }
 
   const passwordHash = await hashPassword(input.password)
-  await c.env.DB
+  const result = await c.env.DB
     .prepare(
       `INSERT INTO users (username, display_name, password_hash, role, branch_id)
        VALUES (?, ?, ?, 'admin', ?)`
     )
     .bind(input.username.trim(), input.displayName.trim(), passwordHash, input.branchId)
     .run()
+
+  const superadmin = c.get('authUser')
+  const createdAdminId = Number(result.meta.last_row_id)
+  await logAuditEvent(c, {
+    action: 'admin_create',
+    actorUserId: superadmin.sub,
+    targetUserId: Number.isFinite(createdAdminId) ? createdAdminId : null,
+    details: {
+      username: input.username.trim(),
+      displayName: input.displayName.trim(),
+      branchId: input.branchId,
+    },
+  })
 
   return c.json({ ok: true }, 201)
 })
@@ -253,9 +267,11 @@ superadminRoutes.put('/admins/:id', async (c) => {
     return c.json({ error: 'Username already exists' }, 409)
   }
 
+  let updateResult: D1Result
+
   if (input.password && input.password.trim()) {
     const passwordHash = await hashPassword(input.password.trim())
-    await c.env.DB
+    updateResult = await c.env.DB
       .prepare(
         `UPDATE users
          SET username = ?, display_name = ?, branch_id = ?, password_hash = ?, updated_at = CURRENT_TIMESTAMP
@@ -264,7 +280,7 @@ superadminRoutes.put('/admins/:id', async (c) => {
       .bind(input.username.trim(), input.displayName.trim(), input.branchId, passwordHash, userId)
       .run()
   } else {
-    await c.env.DB
+    updateResult = await c.env.DB
       .prepare(
         `UPDATE users
          SET username = ?, display_name = ?, branch_id = ?, updated_at = CURRENT_TIMESTAMP
@@ -272,6 +288,21 @@ superadminRoutes.put('/admins/:id', async (c) => {
       )
       .bind(input.username.trim(), input.displayName.trim(), input.branchId, userId)
       .run()
+  }
+
+  if ((updateResult.meta.changes ?? 0) > 0) {
+    const superadmin = c.get('authUser')
+    await logAuditEvent(c, {
+      action: 'admin_update',
+      actorUserId: superadmin.sub,
+      targetUserId: userId,
+      details: {
+        username: input.username.trim(),
+        displayName: input.displayName.trim(),
+        branchId: input.branchId,
+        passwordUpdated: Boolean(input.password && input.password.trim()),
+      },
+    })
   }
 
   return c.json({ ok: true })
@@ -283,6 +314,28 @@ superadminRoutes.delete('/admins/:id', async (c) => {
     return badRequest(c, 'Invalid user id')
   }
 
-  await c.env.DB.prepare(`DELETE FROM users WHERE id = ? AND role = 'admin'`).bind(userId).run()
+  const targetAdmin = await c.env.DB
+    .prepare(`SELECT id, username, display_name, branch_id FROM users WHERE id = ? AND role = 'admin' LIMIT 1`)
+    .bind(userId)
+    .first<Pick<UserRecord, 'id' | 'username' | 'display_name' | 'branch_id'>>()
+
+  const deleteResult = await c.env.DB.prepare(`DELETE FROM users WHERE id = ? AND role = 'admin'`).bind(userId).run()
+
+  if ((deleteResult.meta.changes ?? 0) > 0) {
+    const superadmin = c.get('authUser')
+    await logAuditEvent(c, {
+      action: 'admin_delete',
+      actorUserId: superadmin.sub,
+      targetUserId: userId,
+      details: targetAdmin
+        ? {
+            username: targetAdmin.username,
+            displayName: targetAdmin.display_name,
+            branchId: targetAdmin.branch_id,
+          }
+        : undefined,
+    })
+  }
+
   return c.json({ ok: true })
 })

@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { logAuditEvent } from '../lib/audit'
 import { badRequest, parseJsonBody } from '../lib/http'
 import { signJwt } from '../lib/jwt'
 import { verifyPassword } from '../lib/password'
@@ -40,6 +41,15 @@ authRoutes.post('/login', async (c) => {
     },
     c.env.JWT_SECRET
   )
+
+  await logAuditEvent(c, {
+    action: 'login',
+    actorUserId: user.id,
+    details: {
+      role: user.role,
+      username: user.username,
+    },
+  })
 
   return c.json({
     token,
