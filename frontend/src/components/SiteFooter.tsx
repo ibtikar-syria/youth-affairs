@@ -1,4 +1,4 @@
-import { Twitter, Instagram, Send, Youtube, Github } from 'lucide-react'
+import { Twitter, Instagram, Send, Youtube, /* Github */ } from 'lucide-react'
 import backgroundTexture from '../assets/background_texture1.svg'
 
 type SiteFooterProps = {
