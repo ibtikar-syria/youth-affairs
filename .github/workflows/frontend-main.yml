@@ -33,6 +33,7 @@ jobs:
       - name: Build Frontend
         env:
           VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_SITE_URL: ${{ vars.VITE_SITE_URL }}
         run: npm run build
 
       - name: Deploy to Cloudflare Workers
