@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# env files
+.env
+
+# build output
+sitemap.xml
+robots.txt
