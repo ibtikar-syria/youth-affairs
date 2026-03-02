@@ -1,4 +1,4 @@
-import type { AdminUser, AuthUser, Branch, EventItem } from './types'
+import type { AdminUser, AuditLogItem, AuthUser, Branch, EventItem } from './types'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8787'
 
@@ -84,6 +84,8 @@ export const api = {
     request<{ ok: boolean }>(`/api/superadmin/branches/${id}`, { method: 'DELETE', token }),
 
   getSuperAdmins: (token: string) => request<{ items: AdminUser[] }>('/api/superadmin/admins', { token }),
+  getSuperAuditLogs: (token: string, limit = 100) =>
+    request<{ items: AuditLogItem[] }>(`/api/superadmin/logs?limit=${limit}`, { token }),
   createSuperAdmin: (token: string, body: Record<string, unknown>) =>
     request<{ ok: boolean }>('/api/superadmin/admins', { method: 'POST', token, body }),
   updateSuperAdmin: (token: string, id: number, body: Record<string, unknown>) =>

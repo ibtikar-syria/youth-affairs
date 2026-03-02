@@ -38,6 +38,32 @@ type BranchRelationCounts = {
   eventsCount: number
 }
 
+type AuditLogAction = 'login' | 'admin_create' | 'admin_update' | 'admin_delete'
+
+type AuditLogRecord = {
+  id: number
+  action: AuditLogAction
+  actor_user_id: number
+  target_user_id: number | null
+  actor_username: string | null
+  target_username: string | null
+  ip_address: string
+  details: string | null
+  created_at: string
+}
+
+const parseAuditDetails = (value: string | null): Record<string, unknown> | null => {
+  if (!value) {
+    return null
+  }
+
+  try {
+    return JSON.parse(value) as Record<string, unknown>
+  } catch {
+    return null
+  }
+}
+
 const getBranchRelationCounts = async (db: D1Database, branchId: number): Promise<BranchRelationCounts> => {
   const [adminsResult, eventsResult] = await Promise.all([
     db
@@ -193,6 +219,39 @@ superadminRoutes.get('/admins', async (c) => {
     )
     .all<UserRecord & { branch_name: string | null }>()
   return c.json({ items: admins.results })
+})
+
+superadminRoutes.get('/logs', async (c) => {
+  const requestedLimit = Number(c.req.query('limit') ?? 100)
+  const limit = Number.isFinite(requestedLimit) ? Math.min(Math.max(requestedLimit, 1), 200) : 100
+
+  const logs = await c.env.DB
+    .prepare(
+      `SELECT
+         l.id,
+         l.action,
+         l.actor_user_id,
+         l.target_user_id,
+         l.ip_address,
+         l.details,
+         l.created_at,
+         actor.username AS actor_username,
+         target.username AS target_username
+       FROM audit_logs l
+       LEFT JOIN users actor ON actor.id = l.actor_user_id
+       LEFT JOIN users target ON target.id = l.target_user_id
+       ORDER BY l.created_at DESC, l.id DESC
+       LIMIT ?`
+    )
+    .bind(limit)
+    .all<AuditLogRecord>()
+
+  return c.json({
+    items: logs.results.map((item) => ({
+      ...item,
+      details: parseAuditDetails(item.details),
+    })),
+  })
 })
 
 superadminRoutes.post('/admins', async (c) => {

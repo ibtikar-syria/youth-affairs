@@ -50,3 +50,17 @@ export type AdminUser = {
   branch_id: number | null
   branch_name: string | null
 }
+
+export type AuditLogAction = 'login' | 'admin_create' | 'admin_update' | 'admin_delete'
+
+export type AuditLogItem = {
+  id: number
+  action: AuditLogAction
+  actor_user_id: number
+  target_user_id: number | null
+  actor_username: string | null
+  target_username: string | null
+  ip_address: string
+  details: Record<string, unknown> | null
+  created_at: string
+}

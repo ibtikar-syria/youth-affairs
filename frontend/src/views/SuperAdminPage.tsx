@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import { Building2, Check, LogOut, Pencil, Trash2, UserCog, Users, X } from 'lucide-react'
+import { Building2, Check, LogOut, Pencil, ShieldCheck, Trash2, UserCog, Users, X } from 'lucide-react'
 import { api } from '../lib/api'
-import type { AdminUser, AuthUser, Branch } from '../lib/types'
+import type { AdminUser, AuditLogAction, AuditLogItem, AuthUser, Branch } from '../lib/types'
 
 const TOKEN_KEY = 'ya_superadmin_token'
 
@@ -18,6 +18,7 @@ export const SuperAdminPage = () => {
 
   const [branches, setBranches] = useState<Branch[]>([])
   const [admins, setAdmins] = useState<AdminUser[]>([])
+  const [logs, setLogs] = useState<AuditLogItem[]>([])
 
   const [branchForm, setBranchForm] = useState({
     name: '',
@@ -129,10 +130,11 @@ export const SuperAdminPage = () => {
   })
 
   const refreshData = async (activeToken: string) => {
-    const [me, branchesResult, adminsResult] = await Promise.all([
+    const [me, branchesResult, adminsResult, logsResult] = await Promise.all([
       api.getAdminMe(activeToken),
       api.getSuperBranches(activeToken),
       api.getSuperAdmins(activeToken),
+      api.getSuperAuditLogs(activeToken),
     ])
 
     if (me.user.role !== 'superadmin') {
@@ -143,6 +145,7 @@ export const SuperAdminPage = () => {
     console.log('Loaded superadmin data:', { user: me.user, branches: branchesResult.items, admins: adminsResult.items })
     setBranches(branchesResult.items)
     setAdmins(adminsResult.items)
+    setLogs(logsResult.items)
   }
 
   useEffect(() => {
@@ -390,6 +393,28 @@ export const SuperAdminPage = () => {
 
   const branchAdminsCount = admins.filter((admin) => admin.role === 'admin').length
 
+  const actionLabels: Record<AuditLogAction, string> = {
+    login: 'تسجيل دخول',
+    admin_create: 'إنشاء مشرف',
+    admin_update: 'تعديل مشرف',
+    admin_delete: 'حذف مشرف',
+  }
+
+  const formatLogDate = (value: string) => {
+    const parsed = new Date(value.includes('T') ? value : `${value.replace(' ', 'T')}Z`)
+    if (Number.isNaN(parsed.getTime())) {
+      return value
+    }
+
+    return new Intl.DateTimeFormat('en-CA', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(parsed)
+  }
+
   const handleCreateAdmin = async (event: React.FormEvent) => {
     event.preventDefault()
     if (!token) {
@@ -407,8 +432,9 @@ export const SuperAdminPage = () => {
       })
       setAdminForm({ username: '', displayName: '', password: '', branchId: '' })
       setShowAddAdminForm(false)
-      const result = await api.getSuperAdmins(token)
-      setAdmins(result.items)
+      const [adminsResult, logsResult] = await Promise.all([api.getSuperAdmins(token), api.getSuperAuditLogs(token)])
+      setAdmins(adminsResult.items)
+      setLogs(logsResult.items)
     } catch (adminError) {
       setError(adminError instanceof Error ? adminError.message : 'فشل إضافة المشرف')
     } finally {
@@ -490,8 +516,9 @@ export const SuperAdminPage = () => {
     setError('')
     try {
       await api.deleteAdmin(token, adminId)
-      const result = await api.getSuperAdmins(token)
-      setAdmins(result.items)
+      const [adminsResult, logsResult] = await Promise.all([api.getSuperAdmins(token), api.getSuperAuditLogs(token)])
+      setAdmins(adminsResult.items)
+      setLogs(logsResult.items)
     } catch (deleteError) {
       setError(deleteError instanceof Error ? deleteError.message : 'فشل حذف المشرف')
     } finally {
@@ -647,8 +674,9 @@ export const SuperAdminPage = () => {
           branchId: Number(editingAdminForm.branchId),
           ...(editingAdminForm.password.trim() ? { password: editingAdminForm.password.trim() } : {}),
         })
-        const result = await api.getSuperAdmins(token!)
-        setAdmins(result.items)
+        const [adminsResult, logsResult] = await Promise.all([api.getSuperAdmins(token!), api.getSuperAuditLogs(token!)])
+        setAdmins(adminsResult.items)
+        setLogs(logsResult.items)
         clearAdminEditing()
       } catch (updateError) {
         setError(updateError instanceof Error ? updateError.message : 'فشل تحديث بيانات المشرف')
@@ -1209,6 +1237,74 @@ export const SuperAdminPage = () => {
             </div>
           </section>
         </div>
+
+        <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="mb-1 text-lg font-bold">سجل العمليات</h2>
+              <p className="text-sm text-slate-500">آخر عمليات تسجيل الدخول وإدارة المشرفين مع عنوان IP</p>
+            </div>
+            <button
+              type="button"
+              onClick={async () => {
+                if (!token) {
+                  return
+                }
+
+                setLoading(true)
+                setError('')
+                try {
+                  const result = await api.getSuperAuditLogs(token)
+                  setLogs(result.items)
+                } catch (logsError) {
+                  setError(logsError instanceof Error ? logsError.message : 'تعذر تحميل سجل العمليات')
+                } finally {
+                  setLoading(false)
+                }
+              }}
+              className="inline-flex items-center gap-2 rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary hover:text-white"
+              disabled={loading}
+            >
+              <ShieldCheck className="h-4 w-4" />
+              تحديث السجل
+            </button>
+          </div>
+
+          <div className="max-h-[420px] space-y-3 overflow-auto pr-1">
+            {logs.map((log) => {
+              const details = log.details
+              return (
+                <article key={log.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-sm font-bold text-slate-900">{actionLabels[log.action]}</p>
+                    <p className="text-xs text-slate-500">{formatLogDate(log.created_at)}</p>
+                  </div>
+                  <div className="mt-2 grid gap-2 text-sm text-slate-700 md:grid-cols-2">
+                    <p>
+                      المنفذ: <span className="font-semibold">{log.actor_username ?? `#${log.actor_user_id}`}</span>
+                    </p>
+                    <p>
+                      الهدف:{' '}
+                      <span className="font-semibold">{log.target_username ?? (log.target_user_id ? `#${log.target_user_id}` : '-')}</span>
+                    </p>
+                    <p dir="ltr" className="text-left md:text-right">
+                      IP: <span className="font-semibold">{log.ip_address}</span>
+                    </p>
+                    {details?.branchId !== undefined && <p>الفرع: <span className="font-semibold">{String(details.branchId)}</span></p>}
+                    {details?.username !== undefined && (
+                      <p dir="ltr" className="text-left md:text-right">
+                        Username: <span className="font-semibold">{String(details.username)}</span>
+                      </p>
+                    )}
+                  </div>
+                </article>
+              )
+            })}
+            {logs.length === 0 && (
+              <p className="rounded-lg bg-slate-50 px-3 py-5 text-center text-sm text-slate-600">لا توجد سجلات حالياً</p>
+            )}
+          </div>
+        </section>
 
         {branchConfirmState.open && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4">
