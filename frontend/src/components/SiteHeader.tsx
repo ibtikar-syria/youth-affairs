@@ -1,4 +1,4 @@
-import { CalendarDays, Image, MapPin, Menu, X } from 'lucide-react'
+import { CalendarDays, MapPin, Menu, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import YaLogoColor from '../assets/ya_logo_color.svg?react'
