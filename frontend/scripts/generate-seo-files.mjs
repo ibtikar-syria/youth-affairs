@@ -16,6 +16,7 @@ const publicRoutes = [
   { path: '/', changefreq: 'weekly', priority: '1.0' },
   { path: '/branches', changefreq: 'weekly', priority: '0.9' },
   { path: '/events', changefreq: 'daily', priority: '0.9' },
+  { path: '/logos', changefreq: 'monthly', priority: '0.7' },
 ]
 
 const robotsContent = `User-agent: *

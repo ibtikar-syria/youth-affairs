@@ -9,6 +9,7 @@ import { EventDetailPage } from '../views/EventDetailPage'
 import { EventsPage } from '../views/EventsPage'
 import { LandingPage } from '../views/LandingPage'
 import { LoginPage } from '../views/LoginPage'
+import { LogosPage } from '../views/LogosPage'
 import { SuperAdminPage } from '../views/SuperAdminPage'
 
 const routeSeo = (pathname: string) => {
@@ -40,6 +41,14 @@ const routeSeo = (pathname: string) => {
     return {
       title: 'الفعاليات | شؤون الشباب',
       description: 'تصفح الفعاليات والأنشطة الشبابية المعلنة من شؤون الشباب في مختلف المحافظات السورية.',
+      robots: 'index,follow',
+    }
+  }
+
+  if (pathname === '/logos') {
+    return {
+      title: 'الشعارات الرسمية | شؤون الشباب',
+      description: 'صفحة تحميل الشعارات الرسمية المتاحة من مجلدي public وassets في منصة شؤون الشباب.',
       robots: 'index,follow',
     }
   }
@@ -114,6 +123,7 @@ export const AppRouter = () => (
           <Route path="/login" element={<LoginPage />} />
           <Route path="/branches" element={<BranchesPage />} />
           <Route path="/events" element={<EventsPage />} />
+          <Route path="/logos" element={<LogosPage />} />
           <Route path="/events/:id" element={<EventDetailPage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/superadmin" element={<SuperAdminPage />} />
