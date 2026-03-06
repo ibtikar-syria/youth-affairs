@@ -24,3 +24,27 @@ body {
 #root {
   min-height: 100vh;
 }
+
+.site-logo-split #body-grouped,
+.site-logo-split #points-grouped {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 3600ms linear;
+}
+
+.group:hover .site-logo-split #body-grouped,
+.group:focus-visible .site-logo-split #body-grouped {
+  transform: rotate(360deg);
+}
+
+.group:hover .site-logo-split #points-grouped,
+.group:focus-visible .site-logo-split #points-grouped {
+  transform: rotate(-360deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-logo-split #body-grouped,
+  .site-logo-split #points-grouped {
+    transition: none;
+  }
+}
