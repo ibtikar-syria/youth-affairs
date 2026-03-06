@@ -76,13 +76,6 @@ export const SiteHeader = ({ isLanding = false, onLogoClick }: SiteHeaderProps) 
 
         <div className="hidden items-center gap-3 text-sm sm:flex">
           <Link
-            to="/logos"
-            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 font-medium text-slate-700 transition-all duration-200 hover:border-primary/30 hover:bg-primary/10 hover:text-primary hover:shadow-sm"
-          >
-            <Image className="h-4 w-4" />
-            الشعارات
-          </Link>
-          <Link
             to="/events"
             className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 font-medium text-slate-700 transition-all duration-200 hover:border-primary/30 hover:bg-primary/10 hover:text-primary hover:shadow-sm"
           >
@@ -101,13 +94,6 @@ export const SiteHeader = ({ isLanding = false, onLogoClick }: SiteHeaderProps) 
 
         {isMobileMenuOpen && (
           <div className="mt-3 grid gap-2 border-t border-blue-100 pt-3 sm:hidden">
-            <Link
-              to="/logos"
-              className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 font-medium text-slate-700 transition-all duration-200 hover:border-primary/30 hover:bg-primary/10 hover:text-primary hover:shadow-sm"
-            >
-              <Image className="h-4 w-4" />
-              الشعارات
-            </Link>
             <Link
               to="/events"
               className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 font-medium text-slate-700 transition-all duration-200 hover:border-primary/30 hover:bg-primary/10 hover:text-primary hover:shadow-sm"

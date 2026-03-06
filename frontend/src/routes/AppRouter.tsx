@@ -48,7 +48,7 @@ const routeSeo = (pathname: string) => {
   if (pathname === '/logos') {
     return {
       title: 'الشعارات الرسمية | شؤون الشباب',
-      description: 'صفحة تحميل الشعارات الرسمية المتاحة من مجلدي public وassets في منصة شؤون الشباب.',
+      description: 'صفحة تحميل الشعارات الرسمية المتاحة من منصة شؤون الشباب.',
       robots: 'index,follow',
     }
   }
