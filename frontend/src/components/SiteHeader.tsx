@@ -32,7 +32,7 @@ export const SiteHeader = ({ isLanding = false, onLogoClick }: SiteHeaderProps) 
       <YaLogoColor
         role="img"
         aria-label="شعار شؤون الشباب"
-        className="site-logo-split h-10 w-10 sm:h-12 sm:w-12"
+        className="h-10 w-10 sm:h-12 sm:w-12 [&_#body-grouped]:origin-center [&_#body-grouped]:[transform-box:fill-box] [&_#body-grouped]:transition-transform [&_#body-grouped]:duration-[3600ms] [&_#body-grouped]:ease-linear [&_#points-grouped]:origin-center [&_#points-grouped]:[transform-box:fill-box] [&_#points-grouped]:transition-transform [&_#points-grouped]:duration-[3600ms] [&_#points-grouped]:ease-linear group-hover:[&_#body-grouped]:rotate-[360deg] group-hover:[&_#points-grouped]:-rotate-[360deg] motion-reduce:[&_#body-grouped]:transition-none motion-reduce:[&_#points-grouped]:transition-none"
       />
       <div className="text-right">
         <h1 className="text-lg font-bold text-primary sm:text-xl">شؤون الشباب</h1>
