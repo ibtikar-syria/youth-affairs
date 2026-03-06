@@ -1,7 +1,7 @@
 import { CalendarDays, MapPin, Menu, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import ya_logo_color from '../assets/ya_logo_color.svg'
+import YaLogoColor from '../assets/ya_logo_color.svg?react'
 
 type SiteHeaderProps = {
   isLanding?: boolean
@@ -29,9 +29,9 @@ export const SiteHeader = ({ isLanding = false, onLogoClick }: SiteHeaderProps) 
 
   const LogoContent = (
     <>
-      <img
-        src={ya_logo_color}
-        alt="شعار شؤون الشباب"
+      <YaLogoColor
+        role="img"
+        aria-label="شعار شؤون الشباب"
         className="h-10 w-10 transition-transform duration-[3600ms] ease-linear group-hover:rotate-[360deg] sm:h-12 sm:w-12"
       />
       <div className="text-right">
