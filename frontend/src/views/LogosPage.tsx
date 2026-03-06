@@ -1,4 +1,6 @@
 import { Download } from 'lucide-react'
+import backgroundTexture1 from '../assets/background_texture1.svg'
+import backgroundTexture2 from '../assets/background_texture2.svg'
 import yaLogoColorAsset from '../assets/ya_logo_color.svg'
 
 type LogoFile = {
@@ -27,14 +29,24 @@ const logos: LogoFile[] = [
     fileName: 'ya_logo_color.svg',
     href: yaLogoColorAsset,
   },
+  {
+    arabicName: 'الخلفية النسيجية 1 (SVG)',
+    fileName: 'background_texture1.svg',
+    href: backgroundTexture1,
+  },
+  {
+    arabicName: 'الخلفية النسيجية 2 (SVG)',
+    fileName: 'background_texture2.svg',
+    href: backgroundTexture2,
+  },
 ]
 
 export const LogosPage = () => (
   <div dir="rtl" className="bg-slate-50">
     <main className="mx-auto max-w-7xl px-4 py-8">
       <section className="mb-6 rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
-        <h1 className="text-2xl font-bold text-primary sm:text-3xl">مكتبة الشعارات</h1>
-        <p className="mt-1 text-sm text-slate-600">حمّل الشعارات الرسمية من مكان واحد.</p>
+        <h1 className="text-2xl font-bold text-primary sm:text-3xl">مكتبة الشعارات والخلفيات</h1>
+        <p className="mt-1 text-sm text-slate-600">حمّل الشعارات والخلفيات الرسمية من مكان واحد.</p>
       </section>
 
       <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
