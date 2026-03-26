@@ -28,6 +28,8 @@ export type EventItem = {
   id: number
   branch_id: number
   created_by?: number
+  created_by_username?: string | null
+  created_by_display_name?: string | null
   title: string
   image_url: string
   announcement: string

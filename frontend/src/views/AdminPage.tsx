@@ -771,7 +771,15 @@ export const AdminPage = () => {
                         </span>
                         <span className="inline-flex items-center gap-1" dir="ltr">
                           <UserCircle className="h-3.5 w-3.5" />
-                          {eventItem.created_by !== undefined ? `#${eventItem.created_by}` : '-'}
+                          <span
+                            title={
+                              eventItem.created_by_username || eventItem.created_by_display_name
+                                ? `username: ${eventItem.created_by_username ?? '-'}\ndisplay name: ${eventItem.created_by_display_name ?? '-'}`
+                                : undefined
+                            }
+                          >
+                            {eventItem.created_by !== undefined ? `#${eventItem.created_by}` : '-'}
+                          </span>
                         </span>
                       </div>
                       <p className="mt-2 text-sm text-slate-600">{eventItem.announcement}</p>

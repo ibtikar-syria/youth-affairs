@@ -233,9 +233,10 @@ adminRoutes.get('/events', async (c) => {
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''
   const events = await c.env.DB
     .prepare(
-      `SELECT e.*, b.name AS branch_name
+      `SELECT e.*, b.name AS branch_name, u.username AS created_by_username, u.display_name AS created_by_display_name
        FROM events e
        JOIN branches b ON b.id = e.branch_id
+       LEFT JOIN users u ON u.id = e.created_by
        ${where}
        ORDER BY e.event_date DESC`
     )
