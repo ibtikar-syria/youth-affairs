@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { Building2, Check, LogOut, Pencil, ShieldCheck, Trash2, UserCog, Users, X } from 'lucide-react'
 import { api } from '../lib/api'
@@ -19,6 +19,9 @@ export const SuperAdminPage = () => {
   const [branches, setBranches] = useState<Branch[]>([])
   const [admins, setAdmins] = useState<AdminUser[]>([])
   const [logs, setLogs] = useState<AuditLogItem[]>([])
+  const [logActionFilter, setLogActionFilter] = useState<'all' | AuditLogAction>('all')
+  const [logActorFilter, setLogActorFilter] = useState<'all' | string>('all')
+  const [logSearch, setLogSearch] = useState('')
 
   const [branchForm, setBranchForm] = useState({
     name: '',
@@ -466,6 +469,49 @@ export const SuperAdminPage = () => {
 
     return rows
   }
+
+  const logActorOptions = useMemo(() => {
+    const actorMap = new Map<number, string>()
+    for (const item of logs) {
+      if (!actorMap.has(item.actor_user_id)) {
+        actorMap.set(item.actor_user_id, item.actor_username ?? `#${item.actor_user_id}`)
+      }
+    }
+
+    return Array.from(actorMap.entries())
+      .map(([id, label]) => ({ id, label }))
+      .sort((a, b) => a.label.localeCompare(b.label, 'ar'))
+  }, [logs])
+
+  const filteredLogs = useMemo(() => {
+    const normalizedSearch = logSearch.trim().toLowerCase()
+
+    return logs.filter((log) => {
+      if (logActionFilter !== 'all' && log.action !== logActionFilter) {
+        return false
+      }
+
+      if (logActorFilter !== 'all' && String(log.actor_user_id) !== logActorFilter) {
+        return false
+      }
+
+      if (!normalizedSearch) {
+        return true
+      }
+
+      const detailRows = formatAuditDetailRows(log)
+      const searchableText = [
+        actionLabels[log.action],
+        log.actor_username ?? `#${log.actor_user_id}`,
+        log.ip_address,
+        ...detailRows.flatMap((item) => [item.label, item.value]),
+      ]
+        .join(' ')
+        .toLowerCase()
+
+      return searchableText.includes(normalizedSearch)
+    })
+  }, [logs, logActionFilter, logActorFilter, logSearch])
 
   const formatLogDate = (value: string) => {
     const parsed = new Date(value.includes('T') ? value : `${value.replace(' ', 'T')}Z`)
@@ -1346,8 +1392,52 @@ export const SuperAdminPage = () => {
             </button>
           </div>
 
+          <div className="mb-4 grid gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3 md:grid-cols-3">
+            <label className="space-y-1 text-sm text-slate-600">
+              <span className="font-semibold">نوع العملية</span>
+              <select
+                value={logActionFilter}
+                onChange={(event) => setLogActionFilter(event.target.value as 'all' | AuditLogAction)}
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+              >
+                <option value="all">كل العمليات</option>
+                {Object.entries(actionLabels).map(([action, label]) => (
+                  <option key={action} value={action}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="space-y-1 text-sm text-slate-600">
+              <span className="font-semibold">المنفذ</span>
+              <select
+                value={logActorFilter}
+                onChange={(event) => setLogActorFilter(event.target.value)}
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+              >
+                <option value="all">كل المستخدمين</option>
+                {logActorOptions.map((actor) => (
+                  <option key={actor.id} value={actor.id}>
+                    {actor.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="space-y-1 text-sm text-slate-600">
+              <span className="font-semibold">بحث</span>
+              <input
+                value={logSearch}
+                onChange={(event) => setLogSearch(event.target.value)}
+                placeholder="ابحث في تفاصيل السجل"
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+              />
+            </label>
+          </div>
+
           <div className="max-h-[420px] space-y-3 overflow-auto pr-1">
-            {logs.map((log) => {
+            {filteredLogs.map((log) => {
               const detailRows = formatAuditDetailRows(log)
               return (
                 <article key={log.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
@@ -1376,7 +1466,7 @@ export const SuperAdminPage = () => {
                 </article>
               )
             })}
-            {logs.length === 0 && (
+            {filteredLogs.length === 0 && (
               <p className="rounded-lg bg-slate-50 px-3 py-5 text-center text-sm text-slate-600">لا توجد سجلات حالياً</p>
             )}
           </div>
