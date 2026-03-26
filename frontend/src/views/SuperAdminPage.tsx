@@ -403,6 +403,67 @@ export const SuperAdminPage = () => {
     event_delete: 'حذف فعالية',
   }
 
+  const branchNameById = new Map(branches.map((item) => [item.id, item.name]))
+
+  const resolveBranchLabel = (value: unknown) => {
+    const branchId = typeof value === 'number' ? value : Number(value)
+    if (!Number.isFinite(branchId) || branchId <= 0) {
+      return String(value)
+    }
+
+    const branchName = branchNameById.get(branchId)
+    return branchName ? `${branchName} (#${branchId})` : `#${branchId}`
+  }
+
+  const formatAuditDetailRows = (log: AuditLogItem) => {
+    const details = log.details
+    if (!details) {
+      return [] as Array<{ label: string; value: string; ltr?: boolean }>
+    }
+
+    const read = (key: string) => details[key]
+    const rows: Array<{ label: string; value: string; ltr?: boolean }> = []
+
+    if (read('eventId') !== undefined) {
+      rows.push({ label: 'رقم الفعالية', value: String(read('eventId')) })
+    }
+    if (read('title') !== undefined) {
+      rows.push({ label: 'العنوان', value: String(read('title')) })
+    }
+    if (read('titleBefore') !== undefined) {
+      rows.push({ label: 'العنوان السابق', value: String(read('titleBefore')) })
+    }
+    if (read('titleAfter') !== undefined) {
+      rows.push({ label: 'العنوان الجديد', value: String(read('titleAfter')) })
+    }
+    if (read('eventDate') !== undefined) {
+      rows.push({ label: 'تاريخ الفعالية', value: String(read('eventDate')), ltr: true })
+    }
+    if (read('location') !== undefined) {
+      rows.push({ label: 'المكان', value: String(read('location')) })
+    }
+    if (read('branchId') !== undefined) {
+      rows.push({ label: 'الفرع', value: resolveBranchLabel(read('branchId')) })
+    }
+    if (read('displayName') !== undefined) {
+      rows.push({ label: 'الاسم', value: String(read('displayName')) })
+    }
+    if (read('username') !== undefined) {
+      rows.push({ label: 'اسم المستخدم', value: String(read('username')), ltr: true })
+    }
+    if (read('role') !== undefined) {
+      rows.push({ label: 'الصلاحية', value: String(read('role')), ltr: true })
+    }
+    if (read('passwordUpdated') !== undefined) {
+      rows.push({
+        label: 'تحديث كلمة المرور',
+        value: read('passwordUpdated') ? 'نعم' : 'لا',
+      })
+    }
+
+    return rows
+  }
+
   const formatLogDate = (value: string) => {
     const parsed = new Date(value.includes('T') ? value : `${value.replace(' ', 'T')}Z`)
     if (Number.isNaN(parsed.getTime())) {
@@ -1254,7 +1315,7 @@ export const SuperAdminPage = () => {
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="mb-1 text-lg font-bold">سجل العمليات</h2>
-              <p className="text-sm text-slate-500">آخر عمليات تسجيل الدخول وإدارة المشرفين مع عنوان IP</p>
+              <p className="text-sm text-slate-500">آخر عمليات تسجيل الدخول وإدارة المشرفين والفعاليات مع عنوان IP</p>
             </div>
             <button
               type="button"
@@ -1284,7 +1345,7 @@ export const SuperAdminPage = () => {
 
           <div className="max-h-[420px] space-y-3 overflow-auto pr-1">
             {logs.map((log) => {
-              const details = log.details
+              const detailRows = formatAuditDetailRows(log)
               return (
                 <article key={log.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
@@ -1302,12 +1363,11 @@ export const SuperAdminPage = () => {
                     <p dir="ltr" className="text-left md:text-right">
                       IP: <span className="font-semibold">{log.ip_address}</span>
                     </p>
-                    {details?.branchId !== undefined && <p>الفرع: <span className="font-semibold">{String(details.branchId)}</span></p>}
-                    {details?.username !== undefined && (
-                      <p dir="ltr" className="text-left md:text-right">
-                        Username: <span className="font-semibold">{String(details.username)}</span>
+                    {detailRows.map((item) => (
+                      <p key={`${log.id}-${item.label}`} dir={item.ltr ? 'ltr' : 'auto'} className={item.ltr ? 'text-left md:text-right' : undefined}>
+                        {item.label}: <span className="font-semibold">{item.value}</span>
                       </p>
-                    )}
+                    ))}
                   </div>
                 </article>
               )
