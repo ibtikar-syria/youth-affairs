@@ -97,23 +97,58 @@ const parseEventUrlsFromDb = (urlsJson: string | null | undefined): EventUrl[] =
   }
 }
 
+const isValidDateParts = (year: number, month: number, day: number): boolean => {
+  const date = new Date(Date.UTC(year, month - 1, day))
+  return date.getUTCFullYear() === year && date.getUTCMonth() + 1 === month && date.getUTCDate() === day
+}
+
 const normalizeEventDateValue = (value: string): string | null => {
   const normalized = value.trim().replace('T', ' ')
 
-  if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
-    return normalized
+  const dateOnlyMatch = normalized.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (dateOnlyMatch) {
+    const year = Number(dateOnlyMatch[1])
+    const month = Number(dateOnlyMatch[2])
+    const day = Number(dateOnlyMatch[3])
+    if (!isValidDateParts(year, month, day)) {
+      return null
+    }
+    return `${dateOnlyMatch[1]}-${dateOnlyMatch[2]}-${dateOnlyMatch[3]}`
   }
 
-  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(normalized)) {
-    return `${normalized}:00 ${SYRIA_TIMEZONE_OFFSET}`
+  const dateTimeMinuteMatch = normalized.match(/^(\d{4})-(\d{2})-(\d{2}) (([01]\d|2[0-3]):([0-5]\d))$/)
+  if (dateTimeMinuteMatch) {
+    const year = Number(dateTimeMinuteMatch[1])
+    const month = Number(dateTimeMinuteMatch[2])
+    const day = Number(dateTimeMinuteMatch[3])
+    if (!isValidDateParts(year, month, day)) {
+      return null
+    }
+    return `${dateTimeMinuteMatch[1]}-${dateTimeMinuteMatch[2]}-${dateTimeMinuteMatch[3]} ${dateTimeMinuteMatch[4]}:00 ${SYRIA_TIMEZONE_OFFSET}`
   }
 
-  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(normalized)) {
-    return `${normalized} ${SYRIA_TIMEZONE_OFFSET}`
+  const dateTimeSecondMatch = normalized.match(/^(\d{4})-(\d{2})-(\d{2}) (([01]\d|2[0-3]):([0-5]\d):([0-5]\d))$/)
+  if (dateTimeSecondMatch) {
+    const year = Number(dateTimeSecondMatch[1])
+    const month = Number(dateTimeSecondMatch[2])
+    const day = Number(dateTimeSecondMatch[3])
+    if (!isValidDateParts(year, month, day)) {
+      return null
+    }
+    return `${dateTimeSecondMatch[1]}-${dateTimeSecondMatch[2]}-${dateTimeSecondMatch[3]} ${dateTimeSecondMatch[4]} ${SYRIA_TIMEZONE_OFFSET}`
   }
 
-  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} [+-]\d{4}$/.test(normalized)) {
-    return normalized
+  const dateTimeSecondTzMatch = normalized.match(
+    /^(\d{4})-(\d{2})-(\d{2}) (([01]\d|2[0-3]):([0-5]\d):([0-5]\d)) ([+-](?:0\d|1[0-4])[0-5]\d)$/
+  )
+  if (dateTimeSecondTzMatch) {
+    const year = Number(dateTimeSecondTzMatch[1])
+    const month = Number(dateTimeSecondTzMatch[2])
+    const day = Number(dateTimeSecondTzMatch[3])
+    if (!isValidDateParts(year, month, day)) {
+      return null
+    }
+    return `${dateTimeSecondTzMatch[1]}-${dateTimeSecondTzMatch[2]}-${dateTimeSecondTzMatch[3]} ${dateTimeSecondTzMatch[4]} ${dateTimeSecondTzMatch[8]}`
   }
 
   return null
@@ -284,6 +319,9 @@ adminRoutes.post('/events', async (c) => {
   }
 
   const normalizedEventDuration = typeof input.eventDuration === 'string' ? input.eventDuration.trim() : ''
+  if (normalizedEventDuration && !/^[1-9]\d*$/.test(normalizedEventDuration)) {
+    return badRequest(c, 'eventDuration must be an integer number of hours')
+  }
 
   let targetBranchId = authUser.branchId
   if (authUser.role === 'superadmin') {
@@ -359,6 +397,9 @@ adminRoutes.put('/events/:id', async (c) => {
   }
 
   const normalizedEventDuration = typeof input.eventDuration === 'string' ? input.eventDuration.trim() : ''
+  if (normalizedEventDuration && !/^[1-9]\d*$/.test(normalizedEventDuration)) {
+    return badRequest(c, 'eventDuration must be an integer number of hours')
+  }
 
   const normalizedUrls = normalizeEventUrls(input.urls)
   if (!normalizedUrls) {

@@ -51,6 +51,8 @@ const splitEventDateValue = (value: string): { eventDate: string; eventTime: str
   }
 }
 
+const isValid24HourTime = (value: string): boolean => /^([01]\d|2[0-3]):([0-5]\d)$/.test(value)
+
 const buildEventDateValue = (eventDate: string, eventTime: string): string => {
   const normalizedDate = eventDate.trim()
   if (!normalizedDate) {
@@ -62,7 +64,7 @@ const buildEventDateValue = (eventDate: string, eventTime: string): string => {
     return normalizedDate
   }
 
-  if (!/^\d{2}:\d{2}$/.test(normalizedTime)) {
+  if (!isValid24HourTime(normalizedTime)) {
     return ''
   }
 
@@ -244,6 +246,10 @@ export const AdminPage = () => {
       }
 
       const normalizedEventDuration = eventForm.eventDuration.trim()
+      if (normalizedEventDuration && !/^[1-9]\d*$/.test(normalizedEventDuration)) {
+        setError('مدة الفعالية يجب أن تكون رقماً صحيحاً موجباً (ساعات)')
+        return
+      }
 
       const payload = {
         title: eventForm.title,
@@ -692,20 +698,23 @@ export const AdminPage = () => {
                   <span className="font-semibold">الوقت (اختياري)</span>
                   <input
                     type="time"
+                    step={60}
                     className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                     value={eventForm.eventTime}
                     onChange={(event) => setEventForm((prev) => ({ ...prev, eventTime: event.target.value }))}
                   />
-                  <p className="text-xs text-slate-500">عند إدخال الوقت يتم حفظ المنطقة الزمنية تلقائياً: {SYRIA_TIMEZONE_OFFSET} (دمشق)</p>
+                  <p className="text-xs text-slate-500">تنسيق 24 ساعة فقط (HH:MM). عند إدخال الوقت يتم حفظ المنطقة الزمنية تلقائياً: {SYRIA_TIMEZONE_OFFSET} (دمشق)</p>
                 </label>
                 <label className="space-y-1 text-sm text-slate-600">
                   <span className="font-semibold">مدة الفعالية (بالساعات)</span>
                   <input
                     type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                     value={eventForm.eventDuration}
                     onChange={(event) => setEventForm((prev) => ({ ...prev, eventDuration: event.target.value }))}
-                    placeholder="مثال: 2 أو ساعتين"
+                    placeholder="مثال: 2"
                   />
                 </label>
                 <label className="space-y-1 text-sm text-slate-600">
