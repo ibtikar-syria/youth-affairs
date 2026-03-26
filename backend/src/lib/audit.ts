@@ -1,7 +1,7 @@
 import type { Context } from 'hono'
 import type { AppEnv } from './types'
 
-type AuditAction = 'login' | 'admin_create' | 'admin_update' | 'admin_delete'
+type AuditAction = 'login' | 'admin_create' | 'admin_update' | 'admin_delete' | 'event_create' | 'event_update' | 'event_delete'
 
 type LogAuditEventInput = {
   action: AuditAction

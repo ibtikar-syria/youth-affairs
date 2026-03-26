@@ -51,7 +51,14 @@ export type AdminUser = {
   branch_name: string | null
 }
 
-export type AuditLogAction = 'login' | 'admin_create' | 'admin_update' | 'admin_delete'
+export type AuditLogAction =
+  | 'login'
+  | 'admin_create'
+  | 'admin_update'
+  | 'admin_delete'
+  | 'event_create'
+  | 'event_update'
+  | 'event_delete'
 
 export type AuditLogItem = {
   id: number

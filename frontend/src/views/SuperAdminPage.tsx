@@ -398,6 +398,9 @@ export const SuperAdminPage = () => {
     admin_create: 'إنشاء مشرف',
     admin_update: 'تعديل مشرف',
     admin_delete: 'حذف مشرف',
+    event_create: 'إنشاء فعالية',
+    event_update: 'تعديل فعالية',
+    event_delete: 'حذف فعالية',
   }
 
   const formatLogDate = (value: string) => {

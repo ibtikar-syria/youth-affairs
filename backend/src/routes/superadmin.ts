@@ -38,7 +38,14 @@ type BranchRelationCounts = {
   eventsCount: number
 }
 
-type AuditLogAction = 'login' | 'admin_create' | 'admin_update' | 'admin_delete'
+type AuditLogAction =
+  | 'login'
+  | 'admin_create'
+  | 'admin_update'
+  | 'admin_delete'
+  | 'event_create'
+  | 'event_update'
+  | 'event_delete'
 
 type AuditLogRecord = {
   id: number

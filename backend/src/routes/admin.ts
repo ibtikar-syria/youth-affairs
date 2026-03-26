@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { logAuditEvent } from '../lib/audit'
 import { badRequest, parseJsonBody } from '../lib/http'
 import type { AppEnv, BranchRecord, EventRecord, EventUrl } from '../lib/types'
 import { requireAuth, requireRole } from '../middleware/auth'
@@ -26,6 +27,7 @@ type EventInput = {
 }
 
 type EventRecordDb = Omit<EventRecord, 'urls'> & { urls: string }
+type EventIdentityRecord = Pick<EventRecord, 'id' | 'branch_id' | 'title'>
 
 export const adminRoutes = new Hono<AppEnv>()
 
@@ -275,7 +277,7 @@ adminRoutes.post('/events', async (c) => {
     return badRequest(c, 'Invalid event urls. Each url must be valid and may include an optional title')
   }
 
-  await c.env.DB
+  const createResult = await c.env.DB
     .prepare(
       `INSERT INTO events (branch_id, title, image_url, announcement, urls, event_date, location, created_by)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
@@ -292,6 +294,19 @@ adminRoutes.post('/events', async (c) => {
     )
     .run()
 
+  const createdEventId = Number(createResult.meta.last_row_id)
+  await logAuditEvent(c, {
+    action: 'event_create',
+    actorUserId: authUser.sub,
+    details: {
+      eventId: Number.isFinite(createdEventId) ? createdEventId : null,
+      branchId: targetBranchId,
+      title: input.title.trim(),
+      eventDate: input.eventDate,
+      location: input.location.trim(),
+    },
+  })
+
   return c.json({ ok: true }, 201)
 })
 
@@ -307,6 +322,27 @@ adminRoutes.put('/events/:id', async (c) => {
   const normalizedUrls = normalizeEventUrls(input.urls)
   if (!normalizedUrls) {
     return badRequest(c, 'Invalid event urls. Each url must be valid and may include an optional title')
+  }
+
+  let targetEvent: EventIdentityRecord | null = null
+  if (authUser.role === 'superadmin') {
+    targetEvent = await c.env.DB
+      .prepare('SELECT id, branch_id, title FROM events WHERE id = ? LIMIT 1')
+      .bind(eventId)
+      .first<EventIdentityRecord>()
+  } else {
+    if (!authUser.branchId) {
+      return badRequest(c, 'Admin has no assigned branch')
+    }
+
+    targetEvent = await c.env.DB
+      .prepare('SELECT id, branch_id, title FROM events WHERE id = ? AND branch_id = ? LIMIT 1')
+      .bind(eventId, authUser.branchId)
+      .first<EventIdentityRecord>()
+  }
+
+  if (!targetEvent) {
+    return c.json({ error: 'Event not found' }, 404)
   }
 
   if (authUser.role === 'superadmin') {
@@ -327,10 +363,6 @@ adminRoutes.put('/events/:id', async (c) => {
       )
       .run()
   } else {
-    if (!authUser.branchId) {
-      return badRequest(c, 'Admin has no assigned branch')
-    }
-
     await c.env.DB
       .prepare(
         `UPDATE events
@@ -350,6 +382,19 @@ adminRoutes.put('/events/:id', async (c) => {
       .run()
   }
 
+  await logAuditEvent(c, {
+    action: 'event_update',
+    actorUserId: authUser.sub,
+    details: {
+      eventId,
+      branchId: targetEvent.branch_id,
+      titleBefore: targetEvent.title,
+      titleAfter: input.title.trim(),
+      eventDate: input.eventDate,
+      location: input.location.trim(),
+    },
+  })
+
   return c.json({ ok: true })
 })
 
@@ -361,13 +406,42 @@ adminRoutes.delete('/events/:id', async (c) => {
     return badRequest(c, 'Invalid event id')
   }
 
+  let targetEvent: EventIdentityRecord | null = null
   if (authUser.role === 'superadmin') {
-    await c.env.DB.prepare('DELETE FROM events WHERE id = ?').bind(eventId).run()
+    targetEvent = await c.env.DB
+      .prepare('SELECT id, branch_id, title FROM events WHERE id = ? LIMIT 1')
+      .bind(eventId)
+      .first<EventIdentityRecord>()
   } else {
     if (!authUser.branchId) {
       return badRequest(c, 'Admin has no assigned branch')
     }
+
+    targetEvent = await c.env.DB
+      .prepare('SELECT id, branch_id, title FROM events WHERE id = ? AND branch_id = ? LIMIT 1')
+      .bind(eventId, authUser.branchId)
+      .first<EventIdentityRecord>()
+  }
+
+  if (!targetEvent) {
+    return c.json({ error: 'Event not found' }, 404)
+  }
+
+  if (authUser.role === 'superadmin') {
+    await c.env.DB.prepare('DELETE FROM events WHERE id = ?').bind(eventId).run()
+  } else {
     await c.env.DB.prepare('DELETE FROM events WHERE id = ? AND branch_id = ?').bind(eventId, authUser.branchId).run()
   }
+
+  await logAuditEvent(c, {
+    action: 'event_delete',
+    actorUserId: authUser.sub,
+    details: {
+      eventId,
+      branchId: targetEvent.branch_id,
+      title: targetEvent.title,
+    },
+  })
+
   return c.json({ ok: true })
 })
