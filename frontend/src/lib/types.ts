@@ -27,6 +27,7 @@ export type Branch = {
 export type EventItem = {
   id: number
   branch_id: number
+  created_by?: number
   title: string
   image_url: string
   announcement: string

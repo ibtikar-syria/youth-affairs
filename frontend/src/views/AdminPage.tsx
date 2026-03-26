@@ -769,6 +769,10 @@ export const AdminPage = () => {
                           <MapPin className="h-3.5 w-3.5" />
                           {eventItem.location}
                         </span>
+                        <span className="inline-flex items-center gap-1" dir="ltr">
+                          <UserCircle className="h-3.5 w-3.5" />
+                          {eventItem.created_by !== undefined ? `#${eventItem.created_by}` : '-'}
+                        </span>
                       </div>
                       <p className="mt-2 text-sm text-slate-600">{eventItem.announcement}</p>
                     </div>
