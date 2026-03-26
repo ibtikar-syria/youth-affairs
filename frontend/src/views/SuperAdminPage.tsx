@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { Building2, Check, LogOut, Pencil, ShieldCheck, Trash2, UserCog, Users, X } from 'lucide-react'
 import { api } from '../lib/api'
 import type { AdminUser, AuditLogAction, AuditLogItem, AuthUser, Branch } from '../lib/types'
@@ -728,13 +728,22 @@ export const SuperAdminPage = () => {
               <h1 className="text-2xl font-bold text-primary">لوحة المدير العام</h1>
               <p className="text-sm text-slate-600 text-right" dir='rtl'>{user.username}</p>
             </div>
-            <button
-              onClick={logout}
-              className="inline-flex items-center gap-2 rounded-lg border border-primary px-4 py-2 text-primary transition hover:bg-primary hover:text-white"
-            >
-              <LogOut className="h-4 w-4" />
-              تسجيل الخروج
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                to="/admin"
+                className="inline-flex items-center gap-2 rounded-lg border border-primary px-4 py-2 text-primary transition hover:bg-primary hover:text-white"
+              >
+                <Building2 className="h-4 w-4" />
+                إدارة الفعاليات
+              </Link>
+              <button
+                onClick={logout}
+                className="inline-flex items-center gap-2 rounded-lg border border-primary px-4 py-2 text-primary transition hover:bg-primary hover:text-white"
+              >
+                <LogOut className="h-4 w-4" />
+                تسجيل الخروج
+              </button>
+            </div>
           </div>
         </section>
 

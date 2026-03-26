@@ -43,15 +43,24 @@ export const api = {
   },
 
   getAdminMe: (token: string) => request<{ user: AuthUser }>('/api/auth/me', { token }),
-  getAdminBranch: (token: string) => request<{ item: Branch }>('/api/admin/branch', { token }),
+  getAdminBranch: (token: string, branchId?: number) => {
+    const query = branchId ? `?branchId=${branchId}` : ''
+    return request<{ item: Branch }>(`/api/admin/branch${query}`, { token })
+  },
   updateAdminBranch: (token: string, body: Record<string, unknown>) =>
     request<{ ok: boolean }>('/api/admin/branch', { method: 'PUT', token, body }),
-  getAdminEvents: (token: string) => request<{ items: EventItem[] }>('/api/admin/events', { token }),
+  getAdminEvents: (token: string, branchId?: number) => {
+    const query = branchId ? `?branchId=${branchId}` : ''
+    return request<{ items: EventItem[] }>(`/api/admin/events${query}`, { token })
+  },
   createAdminEvent: (token: string, body: Record<string, unknown>) =>
     request<{ ok: boolean }>('/api/admin/events', { method: 'POST', token, body }),
-  uploadAdminR2Image: async (token: string, file: File) => {
+  uploadAdminR2Image: async (token: string, file: File, branchId?: number) => {
     const formData = new FormData()
     formData.append('image', file)
+    if (branchId) {
+      formData.append('branchId', String(branchId))
+    }
 
     const response = await fetch(`${API_BASE}/api/admin/r2/upload-image`, {
       method: 'POST',

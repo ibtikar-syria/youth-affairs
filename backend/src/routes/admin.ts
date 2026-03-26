@@ -16,6 +16,7 @@ type BranchInput = {
 }
 
 type EventInput = {
+  branchId?: number
   title: string
   imageUrl: string
   announcement: string
@@ -106,13 +107,30 @@ adminRoutes.post('/r2/upload-image', async (c) => {
   }
 
   const authUser = c.get('authUser')
-  if (!authUser.branchId) {
-    return badRequest(c, 'Admin has no assigned branch')
-  }
 
   const formData = await c.req.formData().catch(() => null)
   if (!formData) {
     return badRequest(c, 'Invalid multipart form data')
+  }
+
+  let targetBranchId = authUser.branchId
+  if (authUser.role === 'superadmin') {
+    const rawBranchId = formData.get('branchId')
+    const parsedBranchId = typeof rawBranchId === 'string' ? Number(rawBranchId) : 0
+    if (!parsedBranchId) {
+      return badRequest(c, 'Branch is required')
+    }
+
+    const branch = await c.env.DB.prepare('SELECT id FROM branches WHERE id = ? LIMIT 1').bind(parsedBranchId).first<{ id: number }>()
+    if (!branch) {
+      return c.json({ error: 'Branch not found' }, 404)
+    }
+
+    targetBranchId = parsedBranchId
+  }
+
+  if (!targetBranchId) {
+    return badRequest(c, 'Admin has no assigned branch')
   }
 
   const fileEntry = formData.get('image')
@@ -129,7 +147,7 @@ adminRoutes.post('/r2/upload-image', async (c) => {
   }
 
   const extension = extensionForMimeType(fileEntry.type)
-  const objectKey = `r2/${authUser.branchId}/${crypto.randomUUID()}.${extension}`
+  const objectKey = `r2/${targetBranchId}/${crypto.randomUUID()}.${extension}`
 
   await bucket.put(objectKey, fileEntry.stream(), {
     httpMetadata: {
@@ -227,13 +245,29 @@ adminRoutes.get('/events', async (c) => {
 
 adminRoutes.post('/events', async (c) => {
   const authUser = c.get('authUser')
-  if (!authUser.branchId) {
-    return badRequest(c, 'Admin has no assigned branch')
-  }
 
   const input = await parseJsonBody<EventInput>(c)
   if (!input?.title || !input.announcement || !input.eventDate || !input.location || !input.imageUrl) {
     return badRequest(c, 'Missing required event fields')
+  }
+
+  let targetBranchId = authUser.branchId
+  if (authUser.role === 'superadmin') {
+    const parsedBranchId = Number(input.branchId ?? 0)
+    if (!parsedBranchId) {
+      return badRequest(c, 'Branch is required')
+    }
+
+    const branch = await c.env.DB.prepare('SELECT id FROM branches WHERE id = ? LIMIT 1').bind(parsedBranchId).first<{ id: number }>()
+    if (!branch) {
+      return c.json({ error: 'Branch not found' }, 404)
+    }
+
+    targetBranchId = parsedBranchId
+  }
+
+  if (!targetBranchId) {
+    return badRequest(c, 'Admin has no assigned branch')
   }
 
   const normalizedUrls = normalizeEventUrls(input.urls)
@@ -247,7 +281,7 @@ adminRoutes.post('/events', async (c) => {
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .bind(
-      authUser.branchId,
+      targetBranchId,
       input.title.trim(),
       input.imageUrl.trim(),
       input.announcement.trim(),
@@ -263,9 +297,6 @@ adminRoutes.post('/events', async (c) => {
 
 adminRoutes.put('/events/:id', async (c) => {
   const authUser = c.get('authUser')
-  if (!authUser.branchId) {
-    return badRequest(c, 'Admin has no assigned branch')
-  }
 
   const eventId = Number(c.req.param('id'))
   const input = await parseJsonBody<EventInput>(c)
@@ -278,38 +309,65 @@ adminRoutes.put('/events/:id', async (c) => {
     return badRequest(c, 'Invalid event urls. Each url must be valid and may include an optional title')
   }
 
-  await c.env.DB
-    .prepare(
-      `UPDATE events
-       SET title = ?, image_url = ?, announcement = ?, urls = ?, event_date = ?, location = ?, updated_at = CURRENT_TIMESTAMP
-       WHERE id = ? AND branch_id = ?`
-    )
-    .bind(
-      input.title.trim(),
-      input.imageUrl.trim(),
-      input.announcement.trim(),
-      JSON.stringify(normalizedUrls),
-      input.eventDate,
-      input.location.trim(),
-      eventId,
-      authUser.branchId
-    )
-    .run()
+  if (authUser.role === 'superadmin') {
+    await c.env.DB
+      .prepare(
+        `UPDATE events
+         SET title = ?, image_url = ?, announcement = ?, urls = ?, event_date = ?, location = ?, updated_at = CURRENT_TIMESTAMP
+         WHERE id = ?`
+      )
+      .bind(
+        input.title.trim(),
+        input.imageUrl.trim(),
+        input.announcement.trim(),
+        JSON.stringify(normalizedUrls),
+        input.eventDate,
+        input.location.trim(),
+        eventId
+      )
+      .run()
+  } else {
+    if (!authUser.branchId) {
+      return badRequest(c, 'Admin has no assigned branch')
+    }
+
+    await c.env.DB
+      .prepare(
+        `UPDATE events
+         SET title = ?, image_url = ?, announcement = ?, urls = ?, event_date = ?, location = ?, updated_at = CURRENT_TIMESTAMP
+         WHERE id = ? AND branch_id = ?`
+      )
+      .bind(
+        input.title.trim(),
+        input.imageUrl.trim(),
+        input.announcement.trim(),
+        JSON.stringify(normalizedUrls),
+        input.eventDate,
+        input.location.trim(),
+        eventId,
+        authUser.branchId
+      )
+      .run()
+  }
 
   return c.json({ ok: true })
 })
 
 adminRoutes.delete('/events/:id', async (c) => {
   const authUser = c.get('authUser')
-  if (!authUser.branchId) {
-    return badRequest(c, 'Admin has no assigned branch')
-  }
 
   const eventId = Number(c.req.param('id'))
   if (!eventId) {
     return badRequest(c, 'Invalid event id')
   }
 
-  await c.env.DB.prepare('DELETE FROM events WHERE id = ? AND branch_id = ?').bind(eventId, authUser.branchId).run()
+  if (authUser.role === 'superadmin') {
+    await c.env.DB.prepare('DELETE FROM events WHERE id = ?').bind(eventId).run()
+  } else {
+    if (!authUser.branchId) {
+      return badRequest(c, 'Admin has no assigned branch')
+    }
+    await c.env.DB.prepare('DELETE FROM events WHERE id = ? AND branch_id = ?').bind(eventId, authUser.branchId).run()
+  }
   return c.json({ ok: true })
 })

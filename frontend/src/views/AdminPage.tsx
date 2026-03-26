@@ -5,8 +5,10 @@ import { api } from '../lib/api'
 import type { Branch, EventItem, EventUrlItem, AuthUser } from '../lib/types'
 
 const TOKEN_KEY = 'ya_admin_token'
+const SUPERADMIN_TOKEN_KEY = 'ya_superadmin_token'
 
 type EventFormState = {
+  branchId: string
   title: string
   imageUrl: string
   announcement: string
@@ -21,6 +23,7 @@ const emptyEventUrl: EventUrlItem = {
 }
 
 const emptyEvent: EventFormState = {
+  branchId: '',
   title: '',
   imageUrl: '',
   announcement: '',
@@ -30,11 +33,13 @@ const emptyEvent: EventFormState = {
 }
 
 export const AdminPage = () => {
-  const [token, setToken] = useState<string>(localStorage.getItem(TOKEN_KEY) ?? '')
+  const [token, setToken] = useState<string>(localStorage.getItem(TOKEN_KEY) ?? localStorage.getItem(SUPERADMIN_TOKEN_KEY) ?? '')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
   const [user, setUser] = useState<AuthUser | null>(null)
+  const [branches, setBranches] = useState<Branch[]>([])
+  const [selectedBranchId, setSelectedBranchId] = useState('')
   const [branch, setBranch] = useState<Branch | null>(null)
   const [branchDraft, setBranchDraft] = useState<Branch | null>(null)
   const [isEditingBranch, setIsEditingBranch] = useState(false)
@@ -50,12 +55,29 @@ export const AdminPage = () => {
   })
 
   const loadAdminData = async (activeToken: string) => {
-    const [me, branchResult, eventsResult] = await Promise.all([
-      api.getAdminMe(activeToken),
-      api.getAdminBranch(activeToken),
-      api.getAdminEvents(activeToken),
-    ])
+    const me = await api.getAdminMe(activeToken)
     setUser(me.user)
+
+    if (me.user.role === 'superadmin') {
+      const branchesResult = await api.getSuperBranches(activeToken)
+      setBranches(branchesResult.items)
+
+      const defaultBranchId = selectedBranchId ? Number(selectedBranchId) : branchesResult.items[0]?.id
+      const normalizedBranchId = defaultBranchId ? String(defaultBranchId) : ''
+      setSelectedBranchId(normalizedBranchId)
+      setEventForm((prev) => ({
+        ...prev,
+        branchId: prev.branchId || normalizedBranchId,
+      }))
+
+      if (!normalizedBranchId) {
+        setBranch(null)
+        setEvents([])
+      }
+      return
+    }
+
+    const [branchResult, eventsResult] = await Promise.all([api.getAdminBranch(activeToken), api.getAdminEvents(activeToken)])
     setBranch(branchResult.item)
     setEvents(eventsResult.items)
   }
@@ -71,9 +93,34 @@ export const AdminPage = () => {
         setError(authError instanceof Error ? authError.message : 'تعذر تحميل بيانات الحساب')
         setToken('')
         localStorage.removeItem(TOKEN_KEY)
+        localStorage.removeItem(SUPERADMIN_TOKEN_KEY)
       })
       .finally(() => setLoading(false))
   }, [token])
+
+  useEffect(() => {
+    if (!token || !user || user.role !== 'superadmin') {
+      return
+    }
+
+    const branchId = Number(selectedBranchId)
+    if (!branchId) {
+      setBranch(null)
+      setEvents([])
+      return
+    }
+
+    setLoading(true)
+    void Promise.all([api.getAdminBranch(token, branchId), api.getAdminEvents(token, branchId)])
+      .then(([branchResult, eventsResult]) => {
+        setBranch(branchResult.item)
+        setEvents(eventsResult.items)
+      })
+      .catch((loadError) => {
+        setError(loadError instanceof Error ? loadError.message : 'تعذر تحميل بيانات الفرع')
+      })
+      .finally(() => setLoading(false))
+  }, [token, user, selectedBranchId])
 
   const handleUpdateBranch = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -140,7 +187,13 @@ export const AdminPage = () => {
 
   const handleSaveEvent = async (event: React.FormEvent) => {
     event.preventDefault()
-    if (!token) {
+    if (!token || !user) {
+      return
+    }
+
+    const targetBranchId = user.role === 'superadmin' ? Number(eventForm.branchId || selectedBranchId) : undefined
+    if (user.role === 'superadmin' && !targetBranchId) {
+      setError('يرجى اختيار الفرع قبل إضافة الفعالية')
       return
     }
 
@@ -149,6 +202,7 @@ export const AdminPage = () => {
     try {
       const payload = {
         ...eventForm,
+        ...(targetBranchId ? { branchId: targetBranchId } : {}),
         urls: eventForm.urls
           .map((item) => ({
             url: item.url.trim(),
@@ -162,9 +216,12 @@ export const AdminPage = () => {
       } else {
         await api.createAdminEvent(token, payload)
       }
-      const updated = await api.getAdminEvents(token)
+      const updated = await api.getAdminEvents(token, targetBranchId)
       setEvents(updated.items)
-      setEventForm(emptyEvent)
+      setEventForm((prev) => ({
+        ...emptyEvent,
+        branchId: user.role === 'superadmin' ? prev.branchId || selectedBranchId : '',
+      }))
       setEditingId(null)
       setShowEventForm(false)
     } catch (saveError) {
@@ -175,14 +232,20 @@ export const AdminPage = () => {
   }
 
   const handleUploadR2Image = async (file: File) => {
-    if (!token) {
+    if (!token || !user) {
+      return
+    }
+
+    const targetBranchId = user.role === 'superadmin' ? Number(eventForm.branchId || selectedBranchId) : undefined
+    if (user.role === 'superadmin' && !targetBranchId) {
+      setError('يرجى اختيار الفرع قبل رفع الصورة')
       return
     }
 
     setUploadingImage(true)
     setError('')
     try {
-      const result = await api.uploadAdminR2Image(token, file)
+      const result = await api.uploadAdminR2Image(token, file, targetBranchId)
       setEventForm((prev) => ({ ...prev, imageUrl: result.imageUrl }))
     } catch (uploadError) {
       setError(uploadError instanceof Error ? uploadError.message : 'فشل رفع الصورة')
@@ -192,15 +255,17 @@ export const AdminPage = () => {
   }
 
   const handleDeleteEvent = async (eventId: number) => {
-    if (!token) {
+    if (!token || !user) {
       return
     }
+
+    const targetBranchId = user.role === 'superadmin' ? Number(selectedBranchId || eventForm.branchId) || undefined : undefined
 
     setLoading(true)
     setError('')
     try {
       await api.deleteAdminEvent(token, eventId)
-      const updated = await api.getAdminEvents(token)
+      const updated = await api.getAdminEvents(token, targetBranchId)
       setEvents(updated.items)
       setEventDeleteState({ open: false, eventId: null, title: '' })
     } catch (deleteError) {
@@ -212,8 +277,11 @@ export const AdminPage = () => {
 
   const logout = () => {
     localStorage.removeItem(TOKEN_KEY)
+    localStorage.removeItem(SUPERADMIN_TOKEN_KEY)
     setToken('')
     setUser(null)
+    setBranches([])
+    setSelectedBranchId('')
     setBranch(null)
     setEvents([])
   }
@@ -244,7 +312,7 @@ export const AdminPage = () => {
         <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h1 className="text-2xl font-bold text-primary">لوحة مشرف الفرع</h1>
+              <h1 className="text-2xl font-bold text-primary">{user.role === 'superadmin' ? 'لوحة إدارة الفعاليات' : 'لوحة مشرف الفرع'}</h1>
               <p className="text-sm text-slate-600 text-right" dir='ltr'>{user.username}</p>
             </div>
             <button
@@ -292,7 +360,7 @@ export const AdminPage = () => {
               </div>
               <div className="flex items-center gap-2">
                 <span className="rounded-lg bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700">{branch.name}</span>
-                {!isEditingBranch && (
+                {!isEditingBranch && user.role === 'admin' && (
                   <button
                     type="button"
                     onClick={startBranchEditing}
@@ -304,7 +372,7 @@ export const AdminPage = () => {
               </div>
             </div>
 
-            {isEditingBranch && branchDraft ? (
+            {isEditingBranch && branchDraft && user.role === 'admin' ? (
               <form onSubmit={handleUpdateBranch} className="grid gap-3 md:grid-cols-2">
                 <label className="space-y-1 text-sm text-slate-600 md:col-span-2">
                   <span className="font-semibold">العنوان</span>
@@ -449,14 +517,37 @@ export const AdminPage = () => {
         <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-lg font-bold">فعاليات الفرع</h2>
-              <p className="text-sm text-slate-500">إدارة قائمة الفعاليات الحالية</p>
+              <h2 className="text-lg font-bold">{user.role === 'superadmin' ? 'فعاليات الأفرع' : 'فعاليات الفرع'}</h2>
+              <p className="text-sm text-slate-500">
+                {user.role === 'superadmin' ? 'إدارة فعاليات أي فرع مع ربط كل فعالية بفرع محدد' : 'إدارة قائمة الفعاليات الحالية'}
+              </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
+              {user.role === 'superadmin' && (
+                <select
+                  className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  value={selectedBranchId}
+                  onChange={(event) => {
+                    const nextBranchId = event.target.value
+                    setSelectedBranchId(nextBranchId)
+                    setEventForm((prev) => ({ ...prev, branchId: nextBranchId, imageUrl: '' }))
+                    setEditingId(null)
+                    setShowEventForm(false)
+                  }}
+                >
+                  <option value="">اختر فرعاً</option>
+                  {branches.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name} - {item.governorate}
+                    </option>
+                  ))}
+                </select>
+              )}
               <span className="text-sm font-semibold text-slate-600">عدد الفعاليات: {events.length}</span>
               <button
                 type="button"
                 onClick={() => setShowEventForm((prev) => !prev)}
+                disabled={user.role === 'superadmin' && !selectedBranchId}
                 className="rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary hover:text-white"
               >
                 {showEventForm ? 'إخفاء الإضافة' : 'إضافة جديدة'}
@@ -474,6 +565,23 @@ export const AdminPage = () => {
                 {editingId && <span className="rounded-lg bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">وضع التعديل</span>}
               </div>
               <div className="space-y-3">
+                {user.role === 'superadmin' && (
+                  <label className="space-y-1 text-sm text-slate-600">
+                    <span className="font-semibold">الفرع</span>
+                    <select
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                      value={eventForm.branchId || selectedBranchId}
+                      onChange={(event) => setEventForm((prev) => ({ ...prev, branchId: event.target.value, imageUrl: '' }))}
+                    >
+                      <option value="">اختر فرعاً</option>
+                      {branches.map((item) => (
+                        <option key={item.id} value={item.id}>
+                          {item.name} - {item.governorate}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
                 <label className="space-y-1 text-sm text-slate-600">
                   <span className="font-semibold">اسم الفعالية</span>
                   <input
@@ -610,7 +718,10 @@ export const AdminPage = () => {
                     type="button"
                     onClick={() => {
                       setEditingId(null)
-                      setEventForm(emptyEvent)
+                      setEventForm((prev) => ({
+                        ...emptyEvent,
+                        branchId: user.role === 'superadmin' ? prev.branchId || selectedBranchId : '',
+                      }))
                       setShowEventForm(false)
                     }}
                     className="rounded-lg border border-slate-300 px-4 py-2 text-slate-700 transition hover:bg-slate-100"
@@ -667,6 +778,7 @@ export const AdminPage = () => {
                       onClick={() => {
                         setEditingId(eventItem.id)
                         setEventForm({
+                          branchId: user.role === 'superadmin' ? String(eventItem.branch_id) : '',
                           title: eventItem.title,
                           imageUrl: eventItem.image_url,
                           announcement: eventItem.announcement,
