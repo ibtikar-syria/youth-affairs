@@ -112,6 +112,7 @@ export const LoginPage = () => {
               <UserCircle className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
                 dir="ltr"
+                tabIndex={1}
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 pl-9 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 placeholder="اسم المستخدم"
                 value={form.username}
@@ -122,6 +123,7 @@ export const LoginPage = () => {
               <input
                 type={showPassword ? 'text' : 'password'}
                 dir="ltr"
+                tabIndex={2}
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 pr-10 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 placeholder="كلمة المرور"
                 value={form.password}
@@ -130,7 +132,7 @@ export const LoginPage = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
-                tabIndex={-1}
+                tabIndex={4}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 transition hover:text-slate-700"
                 aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
               >
@@ -139,6 +141,7 @@ export const LoginPage = () => {
             </div>
             <button
               className="w-full rounded-lg bg-primary px-4 py-2 font-bold text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+              tabIndex={3}
               disabled={loading}
             >
               {loading ? 'جار تسجيل الدخول...' : 'تسجيل الدخول'}
