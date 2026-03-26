@@ -51,9 +51,7 @@ type AuditLogRecord = {
   id: number
   action: AuditLogAction
   actor_user_id: number
-  target_user_id: number | null
   actor_username: string | null
-  target_username: string | null
   ip_address: string
   details: string | null
   created_at: string
@@ -238,15 +236,12 @@ superadminRoutes.get('/logs', async (c) => {
          l.id,
          l.action,
          l.actor_user_id,
-         l.target_user_id,
          l.ip_address,
          l.details,
          l.created_at,
-         actor.username AS actor_username,
-         target.username AS target_username
+        actor.username AS actor_username
        FROM audit_logs l
        LEFT JOIN users actor ON actor.id = l.actor_user_id
-       LEFT JOIN users target ON target.id = l.target_user_id
        ORDER BY l.created_at DESC, l.id DESC
        LIMIT ?`
     )

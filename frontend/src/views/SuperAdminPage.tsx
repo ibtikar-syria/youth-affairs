@@ -451,6 +451,9 @@ export const SuperAdminPage = () => {
     if (read('username') !== undefined) {
       rows.push({ label: 'اسم المستخدم', value: String(read('username')), ltr: true })
     }
+    if (read('targetUserId') !== undefined && read('targetUserId') !== null) {
+      rows.push({ label: 'معرّف الهدف', value: `#${String(read('targetUserId'))}`, ltr: true })
+    }
     if (read('role') !== undefined) {
       rows.push({ label: 'الصلاحية', value: String(read('role')), ltr: true })
     }
@@ -1355,10 +1358,6 @@ export const SuperAdminPage = () => {
                   <div className="mt-2 grid gap-2 text-sm text-slate-700 md:grid-cols-2">
                     <p>
                       المنفذ: <span className="font-semibold">{log.actor_username ?? `#${log.actor_user_id}`}</span>
-                    </p>
-                    <p>
-                      الهدف:{' '}
-                      <span className="font-semibold">{log.target_username ?? (log.target_user_id ? `#${log.target_user_id}` : '-')}</span>
                     </p>
                     <p dir="ltr" className="text-left md:text-right">
                       IP: <span className="font-semibold">{log.ip_address}</span>

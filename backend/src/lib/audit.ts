@@ -34,17 +34,21 @@ export const getClientIp = (c: Context<AppEnv>): string => {
 }
 
 export const logAuditEvent = async (c: Context<AppEnv>, input: LogAuditEventInput): Promise<void> => {
+  const mergedDetails: Record<string, unknown> | undefined = {
+    ...(input.details ?? {}),
+    ...(input.targetUserId !== undefined ? { targetUserId: input.targetUserId } : {}),
+  }
+
   await c.env.DB
     .prepare(
-      `INSERT INTO audit_logs (action, actor_user_id, target_user_id, ip_address, details)
-       VALUES (?, ?, ?, ?, ?)`
+      `INSERT INTO audit_logs (action, actor_user_id, ip_address, details)
+       VALUES (?, ?, ?, ?)`
     )
     .bind(
       input.action,
       input.actorUserId,
-      input.targetUserId ?? null,
       getClientIp(c),
-      input.details ? JSON.stringify(input.details) : null
+      Object.keys(mergedDetails).length > 0 ? JSON.stringify(mergedDetails) : null
     )
     .run()
 }

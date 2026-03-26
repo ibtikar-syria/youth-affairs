@@ -47,10 +47,8 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	action TEXT NOT NULL,
 	actor_user_id INTEGER NOT NULL,
-	target_user_id INTEGER,
 	ip_address TEXT NOT NULL,
 	details TEXT,
 	created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	FOREIGN KEY (actor_user_id) REFERENCES users (id),
-	FOREIGN KEY (target_user_id) REFERENCES users (id)
+	FOREIGN KEY (actor_user_id) REFERENCES users (id)
 );

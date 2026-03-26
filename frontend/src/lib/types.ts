@@ -64,9 +64,7 @@ export type AuditLogItem = {
   id: number
   action: AuditLogAction
   actor_user_id: number
-  target_user_id: number | null
   actor_username: string | null
-  target_username: string | null
   ip_address: string
   details: Record<string, unknown> | null
   created_at: string
