@@ -130,6 +130,7 @@ export const LoginPage = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
+                tabIndex={-1}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 transition hover:text-slate-700"
                 aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
               >
