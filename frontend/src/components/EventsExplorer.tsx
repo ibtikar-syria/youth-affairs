@@ -156,10 +156,12 @@ export const EventsExplorer = ({
                       <CalendarDays className="h-3.5 w-3.5" />
                       {eventItem.event_date}
                     </p>
-                    <p className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700">
-                      <Clock3 className="h-3.5 w-3.5" />
-                      {eventItem.event_duration ?? '-'} ساعة
-                    </p>
+                    {eventItem.event_duration && (
+                      <p className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700">
+                        <Clock3 className="h-3.5 w-3.5" />
+                        {eventItem.event_duration} ساعة
+                      </p>
+                    )}
                     {eventItem.urls.length > 0 && (
                       <p className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700">
                         <Link2 className="h-3.5 w-3.5" />

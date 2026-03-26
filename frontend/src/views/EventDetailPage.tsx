@@ -164,13 +164,15 @@ export const EventDetailPage = () => {
                   <p className="mt-1 text-base font-bold text-slate-900">{event.location}</p>
                 </div>
               </div>
-              <div className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
-                <Clock3 className="mt-0.5 h-5 w-5 text-primary" />
-                <div>
-                  <p className="text-xs font-semibold text-slate-600">المدة</p>
-                  <p className="mt-1 text-base font-bold text-slate-900">{event.event_duration ?? '-'} ساعة</p>
+              {event.event_duration && (
+                <div className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <Clock3 className="mt-0.5 h-5 w-5 text-primary" />
+                  <div>
+                    <p className="text-xs font-semibold text-slate-600">المدة</p>
+                    <p className="mt-1 text-base font-bold text-slate-900">{event.event_duration} ساعة</p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4 sm:p-6">

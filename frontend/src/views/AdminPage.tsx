@@ -849,10 +849,12 @@ export const AdminPage = () => {
                           <MapPin className="h-3.5 w-3.5" />
                           {eventItem.location}
                         </span>
-                        <span className="inline-flex items-center gap-1">
-                          <Clock3 className="h-3.5 w-3.5" />
-                          {eventItem.event_duration ?? '-'} ساعة
-                        </span>
+                        {eventItem.event_duration && (
+                          <span className="inline-flex items-center gap-1">
+                            <Clock3 className="h-3.5 w-3.5" />
+                            {eventItem.event_duration} ساعة
+                          </span>
+                        )}
                         <span className="inline-flex items-center gap-1" dir="ltr">
                           <UserCircle className="h-3.5 w-3.5" />
                           <span
