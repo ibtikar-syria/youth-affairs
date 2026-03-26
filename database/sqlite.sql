@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS events (
 	announcement TEXT NOT NULL,
 	urls TEXT NOT NULL DEFAULT '[]',
 	event_date TEXT NOT NULL,
+	event_duration TEXT,
 	location TEXT NOT NULL,
 	created_by INTEGER NOT NULL,
 	created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,

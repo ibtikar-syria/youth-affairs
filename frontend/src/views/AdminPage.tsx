@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import { ArrowUpRight, Building2, CalendarDays, Image, Link2, LogOut, MapPin, Plus, Trash2, UserCircle } from 'lucide-react'
+import { ArrowUpRight, Building2, CalendarDays, Clock3, Image, Link2, LogOut, MapPin, Plus, Trash2, UserCircle } from 'lucide-react'
 import { api } from '../lib/api'
 import type { Branch, EventItem, EventUrlItem, AuthUser } from '../lib/types'
 
@@ -14,8 +14,12 @@ type EventFormState = {
   announcement: string
   urls: EventUrlItem[]
   eventDate: string
+  eventTime: string
+  eventDuration: string
   location: string
 }
+
+const SYRIA_TIMEZONE_OFFSET = '+0300'
 
 const emptyEventUrl: EventUrlItem = {
   url: '',
@@ -29,7 +33,40 @@ const emptyEvent: EventFormState = {
   announcement: '',
   urls: [],
   eventDate: '',
+  eventTime: '',
+  eventDuration: '',
   location: '',
+}
+
+const splitEventDateValue = (value: string): { eventDate: string; eventTime: string } => {
+  const normalized = value.trim().replace('T', ' ')
+  const match = normalized.match(/^(\d{4}-\d{2}-\d{2})(?: (\d{2}:\d{2})(?::\d{2})?(?: [+-]\d{4})?)?$/)
+  if (!match) {
+    return { eventDate: '', eventTime: '' }
+  }
+
+  return {
+    eventDate: match[1] ?? '',
+    eventTime: match[2] ?? '',
+  }
+}
+
+const buildEventDateValue = (eventDate: string, eventTime: string): string => {
+  const normalizedDate = eventDate.trim()
+  if (!normalizedDate) {
+    return ''
+  }
+
+  const normalizedTime = eventTime.trim()
+  if (!normalizedTime) {
+    return normalizedDate
+  }
+
+  if (!/^\d{2}:\d{2}$/.test(normalizedTime)) {
+    return ''
+  }
+
+  return `${normalizedDate} ${normalizedTime}:00 ${SYRIA_TIMEZONE_OFFSET}`
 }
 
 export const AdminPage = () => {
@@ -200,8 +237,21 @@ export const AdminPage = () => {
     setLoading(true)
     setError('')
     try {
+      const normalizedEventDate = buildEventDateValue(eventForm.eventDate, eventForm.eventTime)
+      if (!normalizedEventDate) {
+        setError('يرجى إدخال تاريخ صحيح، مع وقت اختياري بصيغة HH:MM')
+        return
+      }
+
+      const normalizedEventDuration = eventForm.eventDuration.trim()
+
       const payload = {
-        ...eventForm,
+        title: eventForm.title,
+        imageUrl: eventForm.imageUrl,
+        announcement: eventForm.announcement,
+        eventDate: normalizedEventDate,
+        eventDuration: normalizedEventDuration,
+        location: eventForm.location,
         ...(targetBranchId ? { branchId: targetBranchId } : {}),
         urls: eventForm.urls
           .map((item) => ({
@@ -636,6 +686,27 @@ export const AdminPage = () => {
                     value={eventForm.eventDate}
                     onChange={(event) => setEventForm((prev) => ({ ...prev, eventDate: event.target.value }))}
                   />
+                  <p className="text-xs text-slate-500">يمكن ترك الوقت فارغاً ليبقى التاريخ فقط.</p>
+                </label>
+                <label className="space-y-1 text-sm text-slate-600">
+                  <span className="font-semibold">الوقت (اختياري)</span>
+                  <input
+                    type="time"
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    value={eventForm.eventTime}
+                    onChange={(event) => setEventForm((prev) => ({ ...prev, eventTime: event.target.value }))}
+                  />
+                  <p className="text-xs text-slate-500">عند إدخال الوقت يتم حفظ المنطقة الزمنية تلقائياً: {SYRIA_TIMEZONE_OFFSET} (دمشق)</p>
+                </label>
+                <label className="space-y-1 text-sm text-slate-600">
+                  <span className="font-semibold">مدة الفعالية (بالساعات)</span>
+                  <input
+                    type="text"
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    value={eventForm.eventDuration}
+                    onChange={(event) => setEventForm((prev) => ({ ...prev, eventDuration: event.target.value }))}
+                    placeholder="مثال: 2 أو ساعتين"
+                  />
                 </label>
                 <label className="space-y-1 text-sm text-slate-600">
                   <span className="font-semibold">المكان</span>
@@ -769,6 +840,10 @@ export const AdminPage = () => {
                           <MapPin className="h-3.5 w-3.5" />
                           {eventItem.location}
                         </span>
+                        <span className="inline-flex items-center gap-1">
+                          <Clock3 className="h-3.5 w-3.5" />
+                          {eventItem.event_duration ?? '-'} ساعة
+                        </span>
                         <span className="inline-flex items-center gap-1" dir="ltr">
                           <UserCircle className="h-3.5 w-3.5" />
                           <span
@@ -788,6 +863,7 @@ export const AdminPage = () => {
                   <div className="mt-3 flex flex-wrap gap-2 text-sm">
                     <button
                       onClick={() => {
+                        const parsedEventDate = splitEventDateValue(eventItem.event_date)
                         setEditingId(eventItem.id)
                         setEventForm({
                           branchId: user.role === 'superadmin' ? String(eventItem.branch_id) : '',
@@ -795,7 +871,9 @@ export const AdminPage = () => {
                           imageUrl: eventItem.image_url,
                           announcement: eventItem.announcement,
                           urls: eventItem.urls,
-                          eventDate: eventItem.event_date,
+                          eventDate: parsedEventDate.eventDate,
+                          eventTime: parsedEventDate.eventTime,
+                          eventDuration: String(eventItem.event_duration ?? ''),
                           location: eventItem.location,
                         })
                         setShowEventForm(true)

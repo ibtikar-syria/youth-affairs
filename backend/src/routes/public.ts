@@ -109,11 +109,11 @@ publicRoutes.get('/events', async (c) => {
     bindings.push(branchId)
   }
   if (year) {
-    conditions.push("strftime('%Y', e.event_date) = ?")
+    conditions.push("substr(e.event_date, 1, 4) = ?")
     bindings.push(year)
   }
   if (month) {
-    conditions.push("strftime('%m', e.event_date) = ?")
+    conditions.push("substr(e.event_date, 6, 2) = ?")
     bindings.push(month.padStart(2, '0'))
   }
 

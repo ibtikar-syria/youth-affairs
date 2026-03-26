@@ -52,6 +52,7 @@ export type EventRecord = {
   announcement: string
   urls: EventUrl[]
   event_date: string
+  event_duration: string | null
   location: string
   created_by: number
   created_at: string

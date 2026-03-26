@@ -23,16 +23,18 @@ type EventInput = {
   announcement: string
   urls?: EventUrl[]
   eventDate: string
+  eventDuration?: string
   location: string
 }
 
 type EventRecordDb = Omit<EventRecord, 'urls'> & { urls: string }
-type EventIdentityRecord = Pick<EventRecord, 'id' | 'branch_id' | 'title'>
+type EventIdentityRecord = Pick<EventRecord, 'id' | 'branch_id' | 'title' | 'event_duration'>
 
 export const adminRoutes = new Hono<AppEnv>()
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
 const allowedImageTypes = new Set(['image/jpeg', 'image/png', 'image/webp'])
+const SYRIA_TIMEZONE_OFFSET = '+0300'
 
 const extensionForMimeType = (mimeType: string) => {
   if (mimeType === 'image/png') return 'png'
@@ -93,6 +95,28 @@ const parseEventUrlsFromDb = (urlsJson: string | null | undefined): EventUrl[] =
   } catch {
     return []
   }
+}
+
+const normalizeEventDateValue = (value: string): string | null => {
+  const normalized = value.trim().replace('T', ' ')
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
+    return normalized
+  }
+
+  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(normalized)) {
+    return `${normalized}:00 ${SYRIA_TIMEZONE_OFFSET}`
+  }
+
+  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(normalized)) {
+    return `${normalized} ${SYRIA_TIMEZONE_OFFSET}`
+  }
+
+  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} [+-]\d{4}$/.test(normalized)) {
+    return normalized
+  }
+
+  return null
 }
 
 const mapEventRecord = (event: EventRecordDb): EventRecord => ({
@@ -254,6 +278,13 @@ adminRoutes.post('/events', async (c) => {
     return badRequest(c, 'Missing required event fields')
   }
 
+  const normalizedEventDate = normalizeEventDateValue(input.eventDate)
+  if (!normalizedEventDate) {
+    return badRequest(c, 'Invalid eventDate format. Use YYYY-MM-DD or YYYY-MM-DD HH:MM:SS ±HHMM')
+  }
+
+  const normalizedEventDuration = typeof input.eventDuration === 'string' ? input.eventDuration.trim() : ''
+
   let targetBranchId = authUser.branchId
   if (authUser.role === 'superadmin') {
     const parsedBranchId = Number(input.branchId ?? 0)
@@ -280,8 +311,8 @@ adminRoutes.post('/events', async (c) => {
 
   const createResult = await c.env.DB
     .prepare(
-      `INSERT INTO events (branch_id, title, image_url, announcement, urls, event_date, location, created_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO events (branch_id, title, image_url, announcement, urls, event_date, event_duration, location, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .bind(
       targetBranchId,
@@ -289,7 +320,8 @@ adminRoutes.post('/events', async (c) => {
       input.imageUrl.trim(),
       input.announcement.trim(),
       JSON.stringify(normalizedUrls),
-      input.eventDate,
+      normalizedEventDate,
+      normalizedEventDuration || null,
       input.location.trim(),
       authUser.sub
     )
@@ -303,7 +335,8 @@ adminRoutes.post('/events', async (c) => {
       eventId: Number.isFinite(createdEventId) ? createdEventId : null,
       branchId: targetBranchId,
       title: input.title.trim(),
-      eventDate: input.eventDate,
+      eventDate: normalizedEventDate,
+      eventDuration: normalizedEventDuration || null,
       location: input.location.trim(),
     },
   })
@@ -320,6 +353,13 @@ adminRoutes.put('/events/:id', async (c) => {
     return badRequest(c, 'Invalid event data')
   }
 
+  const normalizedEventDate = normalizeEventDateValue(input.eventDate)
+  if (!normalizedEventDate) {
+    return badRequest(c, 'Invalid eventDate format. Use YYYY-MM-DD or YYYY-MM-DD HH:MM:SS ±HHMM')
+  }
+
+  const normalizedEventDuration = typeof input.eventDuration === 'string' ? input.eventDuration.trim() : ''
+
   const normalizedUrls = normalizeEventUrls(input.urls)
   if (!normalizedUrls) {
     return badRequest(c, 'Invalid event urls. Each url must be valid and may include an optional title')
@@ -328,7 +368,7 @@ adminRoutes.put('/events/:id', async (c) => {
   let targetEvent: EventIdentityRecord | null = null
   if (authUser.role === 'superadmin') {
     targetEvent = await c.env.DB
-      .prepare('SELECT id, branch_id, title FROM events WHERE id = ? LIMIT 1')
+      .prepare('SELECT id, branch_id, title, event_duration FROM events WHERE id = ? LIMIT 1')
       .bind(eventId)
       .first<EventIdentityRecord>()
   } else {
@@ -337,7 +377,7 @@ adminRoutes.put('/events/:id', async (c) => {
     }
 
     targetEvent = await c.env.DB
-      .prepare('SELECT id, branch_id, title FROM events WHERE id = ? AND branch_id = ? LIMIT 1')
+      .prepare('SELECT id, branch_id, title, event_duration FROM events WHERE id = ? AND branch_id = ? LIMIT 1')
       .bind(eventId, authUser.branchId)
       .first<EventIdentityRecord>()
   }
@@ -350,7 +390,7 @@ adminRoutes.put('/events/:id', async (c) => {
     await c.env.DB
       .prepare(
         `UPDATE events
-         SET title = ?, image_url = ?, announcement = ?, urls = ?, event_date = ?, location = ?, updated_at = CURRENT_TIMESTAMP
+         SET title = ?, image_url = ?, announcement = ?, urls = ?, event_date = ?, event_duration = ?, location = ?, updated_at = CURRENT_TIMESTAMP
          WHERE id = ?`
       )
       .bind(
@@ -358,7 +398,8 @@ adminRoutes.put('/events/:id', async (c) => {
         input.imageUrl.trim(),
         input.announcement.trim(),
         JSON.stringify(normalizedUrls),
-        input.eventDate,
+        normalizedEventDate,
+        normalizedEventDuration || null,
         input.location.trim(),
         eventId
       )
@@ -367,7 +408,7 @@ adminRoutes.put('/events/:id', async (c) => {
     await c.env.DB
       .prepare(
         `UPDATE events
-         SET title = ?, image_url = ?, announcement = ?, urls = ?, event_date = ?, location = ?, updated_at = CURRENT_TIMESTAMP
+         SET title = ?, image_url = ?, announcement = ?, urls = ?, event_date = ?, event_duration = ?, location = ?, updated_at = CURRENT_TIMESTAMP
          WHERE id = ? AND branch_id = ?`
       )
       .bind(
@@ -375,7 +416,8 @@ adminRoutes.put('/events/:id', async (c) => {
         input.imageUrl.trim(),
         input.announcement.trim(),
         JSON.stringify(normalizedUrls),
-        input.eventDate,
+        normalizedEventDate,
+        normalizedEventDuration || null,
         input.location.trim(),
         eventId,
         authUser.branchId
@@ -391,7 +433,9 @@ adminRoutes.put('/events/:id', async (c) => {
       branchId: targetEvent.branch_id,
       titleBefore: targetEvent.title,
       titleAfter: input.title.trim(),
-      eventDate: input.eventDate,
+      eventDate: normalizedEventDate,
+      eventDurationBefore: targetEvent.event_duration,
+      eventDurationAfter: normalizedEventDuration || null,
       location: input.location.trim(),
     },
   })

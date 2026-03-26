@@ -1,4 +1,4 @@
-import { CalendarDays, Filter, Link2, MapPin } from 'lucide-react'
+import { CalendarDays, Clock3, Filter, Link2, MapPin } from 'lucide-react'
 import type { Branch, EventItem } from '../lib/types'
 
 type EventsFilters = {
@@ -155,6 +155,10 @@ export const EventsExplorer = ({
                     <p className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700">
                       <CalendarDays className="h-3.5 w-3.5" />
                       {eventItem.event_date}
+                    </p>
+                    <p className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700">
+                      <Clock3 className="h-3.5 w-3.5" />
+                      {eventItem.event_duration ?? '-'} ساعة
                     </p>
                     {eventItem.urls.length > 0 && (
                       <p className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700">

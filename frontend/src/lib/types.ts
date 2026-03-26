@@ -35,6 +35,7 @@ export type EventItem = {
   announcement: string
   urls: EventUrlItem[]
   event_date: string
+  event_duration?: string | null
   location: string
   branch_name?: string
   branch_governorate?: string

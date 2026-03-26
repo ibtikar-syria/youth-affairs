@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { CalendarDays, MapPin, Calendar, Building2, ArrowRight, Link2 } from 'lucide-react'
+import { CalendarDays, MapPin, Calendar, Building2, ArrowRight, Link2, Clock3 } from 'lucide-react'
 import { api } from '../lib/api'
 import { applySeo } from '../lib/seo'
 import type { EventItem } from '../lib/types'
@@ -162,6 +162,13 @@ export const EventDetailPage = () => {
                 <div>
                   <p className="text-xs font-semibold text-slate-600">الموقع</p>
                   <p className="mt-1 text-base font-bold text-slate-900">{event.location}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <Clock3 className="mt-0.5 h-5 w-5 text-primary" />
+                <div>
+                  <p className="text-xs font-semibold text-slate-600">المدة</p>
+                  <p className="mt-1 text-base font-bold text-slate-900">{event.event_duration ?? '-'} ساعة</p>
                 </div>
               </div>
             </div>
