@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Eye, EyeOff, ShieldCheck, UserCircle } from 'lucide-react'
+import { Eye, EyeOff, KeyRound, ShieldCheck, UserCircle } from 'lucide-react'
 import { api } from '../lib/api'
 
 const ADMIN_TOKEN_KEY = 'ya_admin_token'
@@ -120,11 +120,12 @@ export const LoginPage = () => {
               />
             </div>
             <div className="relative">
+              <KeyRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 dir="ltr"
                 tabIndex={2}
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 pr-10 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 pl-9 pr-10 text-left outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 placeholder="كلمة المرور"
                 value={form.password}
                 onChange={(event) => setForm((prev) => ({ ...prev, password: event.target.value }))}
