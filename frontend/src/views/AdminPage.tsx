@@ -88,6 +88,7 @@ export const AdminPage = () => {
   const [eventForm, setEventForm] = useState<EventFormState>(emptyEvent)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [uploadingGalleryImages, setUploadingGalleryImages] = useState(false)
   const [showEventForm, setShowEventForm] = useState(false)
   const [eventDeleteState, setEventDeleteState] = useState<{ open: boolean; eventId: number | null; title: string }>({
     open: false,
@@ -219,20 +220,6 @@ export const AdminPage = () => {
     }))
   }
 
-  const setGalleryImage = (index: number, value: string) => {
-    setEventForm((prev) => ({
-      ...prev,
-      galleryImages: prev.galleryImages.map((item, itemIndex) => (itemIndex === index ? value : item)),
-    }))
-  }
-
-  const addGalleryImage = () => {
-    setEventForm((prev) => ({
-      ...prev,
-      galleryImages: [...prev.galleryImages, ''],
-    }))
-  }
-
   const removeGalleryImage = (index: number) => {
     setEventForm((prev) => ({
       ...prev,
@@ -313,24 +300,64 @@ export const AdminPage = () => {
 
   const handleUploadR2Image = async (file: File) => {
     if (!token || !user) {
-      return
+      return null
     }
 
     const targetBranchId = user.role === 'superadmin' ? Number(eventForm.branchId || selectedBranchId) : undefined
     if (user.role === 'superadmin' && !targetBranchId) {
       setError('يرجى اختيار الفرع قبل رفع الصورة')
+      return null
+    }
+
+    const result = await api.uploadAdminR2Image(token, file, targetBranchId)
+    return result.imageUrl
+  }
+
+  const handleUploadMainImage = async (file: File) => {
+    if (!token || !user) {
       return
     }
 
     setUploadingImage(true)
     setError('')
     try {
-      const result = await api.uploadAdminR2Image(token, file, targetBranchId)
-      setEventForm((prev) => ({ ...prev, imageUrl: result.imageUrl }))
+      const imageUrl = await handleUploadR2Image(file)
+      if (imageUrl) {
+        setEventForm((prev) => ({ ...prev, imageUrl }))
+      }
     } catch (uploadError) {
       setError(uploadError instanceof Error ? uploadError.message : 'فشل رفع الصورة')
     } finally {
       setUploadingImage(false)
+    }
+  }
+
+  const handleUploadGalleryImages = async (files: File[]) => {
+    if (!files.length) {
+      return
+    }
+
+    setUploadingGalleryImages(true)
+    setError('')
+    try {
+      const uploadedUrls: string[] = []
+      for (const file of files) {
+        const imageUrl = await handleUploadR2Image(file)
+        if (imageUrl) {
+          uploadedUrls.push(imageUrl)
+        }
+      }
+
+      if (uploadedUrls.length > 0) {
+        setEventForm((prev) => ({
+          ...prev,
+          galleryImages: [...prev.galleryImages, ...uploadedUrls],
+        }))
+      }
+    } catch (uploadError) {
+      setError(uploadError instanceof Error ? uploadError.message : 'فشل رفع صور المعرض')
+    } finally {
+      setUploadingGalleryImages(false)
     }
   }
 
@@ -682,7 +709,7 @@ export const AdminPage = () => {
                     onChange={(event) => {
                       const file = event.target.files?.[0]
                       if (file) {
-                        void handleUploadR2Image(file)
+                        void handleUploadMainImage(file)
                       }
                       event.currentTarget.value = ''
                     }}
@@ -705,19 +732,27 @@ export const AdminPage = () => {
                       <Image className="h-4 w-4" />
                       صور المعرض داخل صفحة الفعالية
                     </div>
-                    <button
-                      type="button"
-                      onClick={addGalleryImage}
-                      className="inline-flex items-center gap-1 rounded-lg border border-primary px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary hover:text-white"
-                    >
-                      <Plus className="h-3.5 w-3.5" />
-                      إضافة صورة
-                    </button>
                   </div>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(event) => {
+                      const files = Array.from(event.target.files ?? [])
+                      if (files.length > 0) {
+                        void handleUploadGalleryImages(files)
+                      }
+                      event.currentTarget.value = ''
+                    }}
+                    className="w-full text-sm"
+                    disabled={loading || uploadingGalleryImages}
+                  />
+                  <p className="text-xs text-slate-500">الأنواع المسموحة: JPG, PNG, WEBP — الحد الأعلى 5MB لكل صورة</p>
+                  {uploadingGalleryImages && <p className="text-sm text-primary">جار رفع صور المعرض...</p>}
                   {eventForm.galleryImages.length === 0 ? (
                     <p className="text-xs text-slate-500">لا توجد صور إضافية بعد.</p>
                   ) : (
-                    <div className="space-y-2">
+                    <div className="grid gap-2 sm:grid-cols-2">
                       {eventForm.galleryImages.map((item, index) => (
                         <div key={index} className="rounded-lg border border-slate-200 bg-slate-50 p-2.5">
                           <div className="mb-2 flex items-center justify-between">
@@ -731,13 +766,7 @@ export const AdminPage = () => {
                               حذف
                             </button>
                           </div>
-                          <input
-                            dir="ltr"
-                            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                            value={item}
-                            onChange={(event) => setGalleryImage(index, event.target.value)}
-                            placeholder="https://example.com/image.jpg"
-                          />
+                          <img src={item} alt={`صورة المعرض ${index + 1}`} className="h-28 w-full rounded-lg object-cover" />
                         </div>
                       ))}
                     </div>
