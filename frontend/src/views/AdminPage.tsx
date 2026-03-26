@@ -11,6 +11,7 @@ type EventFormState = {
   branchId: string
   title: string
   imageUrl: string
+  galleryImages: string[]
   announcement: string
   urls: EventUrlItem[]
   eventDate: string
@@ -30,6 +31,7 @@ const emptyEvent: EventFormState = {
   branchId: '',
   title: '',
   imageUrl: '',
+  galleryImages: [],
   announcement: '',
   urls: [],
   eventDate: '',
@@ -217,6 +219,27 @@ export const AdminPage = () => {
     }))
   }
 
+  const setGalleryImage = (index: number, value: string) => {
+    setEventForm((prev) => ({
+      ...prev,
+      galleryImages: prev.galleryImages.map((item, itemIndex) => (itemIndex === index ? value : item)),
+    }))
+  }
+
+  const addGalleryImage = () => {
+    setEventForm((prev) => ({
+      ...prev,
+      galleryImages: [...prev.galleryImages, ''],
+    }))
+  }
+
+  const removeGalleryImage = (index: number) => {
+    setEventForm((prev) => ({
+      ...prev,
+      galleryImages: prev.galleryImages.filter((_, itemIndex) => itemIndex !== index),
+    }))
+  }
+
   const removeEventUrl = (index: number) => {
     setEventForm((prev) => ({
       ...prev,
@@ -255,6 +278,7 @@ export const AdminPage = () => {
         title: eventForm.title,
         imageUrl: eventForm.imageUrl,
         announcement: eventForm.announcement,
+        galleryImages: eventForm.galleryImages.map((item) => item.trim()).filter(Boolean),
         eventDate: normalizedEventDate,
         eventDuration: normalizedEventDuration,
         location: eventForm.location,
@@ -675,6 +699,50 @@ export const AdminPage = () => {
                     className="h-40 w-full rounded-lg object-cover"
                   />
                 )}
+                <div className="space-y-3 rounded-lg border border-slate-200 bg-white p-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                      <Image className="h-4 w-4" />
+                      صور المعرض داخل صفحة الفعالية
+                    </div>
+                    <button
+                      type="button"
+                      onClick={addGalleryImage}
+                      className="inline-flex items-center gap-1 rounded-lg border border-primary px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary hover:text-white"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      إضافة صورة
+                    </button>
+                  </div>
+                  {eventForm.galleryImages.length === 0 ? (
+                    <p className="text-xs text-slate-500">لا توجد صور إضافية بعد.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {eventForm.galleryImages.map((item, index) => (
+                        <div key={index} className="rounded-lg border border-slate-200 bg-slate-50 p-2.5">
+                          <div className="mb-2 flex items-center justify-between">
+                            <p className="text-xs font-semibold text-slate-600">الصورة {index + 1}</p>
+                            <button
+                              type="button"
+                              onClick={() => removeGalleryImage(index)}
+                              className="inline-flex items-center gap-1 rounded-md border border-red-300 px-2 py-1 text-xs text-red-600 transition hover:bg-red-50"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                              حذف
+                            </button>
+                          </div>
+                          <input
+                            dir="ltr"
+                            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                            value={item}
+                            onChange={(event) => setGalleryImage(index, event.target.value)}
+                            placeholder="https://example.com/image.jpg"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <label className="space-y-1 text-sm text-slate-600">
                   <span className="font-semibold">نص الإعلان</span>
                   <textarea
@@ -880,6 +948,7 @@ export const AdminPage = () => {
                           branchId: user.role === 'superadmin' ? String(eventItem.branch_id) : '',
                           title: eventItem.title,
                           imageUrl: eventItem.image_url,
+                          galleryImages: eventItem.gallery_images ?? [],
                           announcement: eventItem.announcement,
                           urls: eventItem.urls,
                           eventDate: parsedEventDate.eventDate,

@@ -3,7 +3,7 @@ import type { AppEnv, BranchRecord, EventRecord, EventUrl } from '../lib/types'
 
 export const publicRoutes = new Hono<AppEnv>()
 
-type EventRecordDb = Omit<EventRecord, 'urls'> & { urls: string }
+type EventRecordDb = Omit<EventRecord, 'urls' | 'gallery_images'> & { urls: string; gallery_images: string }
 
 const normalizeEventUrls = (value: unknown): EventUrl[] | null => {
   if (!Array.isArray(value)) {
@@ -49,9 +49,46 @@ const parseEventUrlsFromDb = (urlsJson: string | null | undefined): EventUrl[] =
   }
 }
 
+const normalizeGalleryImages = (value: unknown): string[] | null => {
+  if (!Array.isArray(value)) {
+    return null
+  }
+
+  const normalized: string[] = []
+  for (const item of value) {
+    if (typeof item !== 'string') {
+      return null
+    }
+
+    const imageUrl = item.trim()
+    if (!imageUrl) {
+      continue
+    }
+
+    normalized.push(imageUrl)
+  }
+
+  return normalized
+}
+
+const parseGalleryImagesFromDb = (galleryJson: string | null | undefined): string[] => {
+  if (!galleryJson) {
+    return []
+  }
+
+  try {
+    const parsed = JSON.parse(galleryJson)
+    const normalized = normalizeGalleryImages(parsed)
+    return normalized ?? []
+  } catch {
+    return []
+  }
+}
+
 const mapEventRecord = (event: EventRecordDb): EventRecord => ({
   ...event,
   urls: parseEventUrlsFromDb(event.urls),
+  gallery_images: parseGalleryImagesFromDb(event.gallery_images),
 })
 
 publicRoutes.get('/images/*', async (c) => {

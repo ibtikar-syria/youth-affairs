@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { CalendarDays, MapPin, Calendar, Building2, ArrowRight, Link2, Clock3 } from 'lucide-react'
+import { CalendarDays, MapPin, Calendar, Building2, ArrowRight, Link2, Clock3, Image } from 'lucide-react'
 import { api } from '../lib/api'
 import { applySeo } from '../lib/seo'
 import type { EventItem } from '../lib/types'
@@ -201,6 +201,32 @@ export const EventDetailPage = () => {
                       className="block rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-primary transition hover:border-primary/40 hover:bg-primary/5"
                     >
                       {item.title || item.url}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {event.gallery_images.length > 0 && (
+              <div className="mt-6 rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
+                <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-slate-900">
+                  <Image className="h-5 w-5 text-primary" />
+                  معرض الصور
+                </h2>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {event.gallery_images.map((imageUrl, index) => (
+                    <a
+                      key={`${imageUrl}-${index}`}
+                      href={imageUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="group overflow-hidden rounded-lg border border-slate-200 bg-slate-50"
+                    >
+                      <img
+                        src={imageUrl}
+                        alt={`صورة من المعرض ${index + 1}`}
+                        className="h-36 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
                     </a>
                   ))}
                 </div>

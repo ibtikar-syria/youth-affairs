@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS events (
 	image_url TEXT NOT NULL,
 	announcement TEXT NOT NULL,
 	urls TEXT NOT NULL DEFAULT '[]',
+	gallery_images TEXT NOT NULL DEFAULT '[]',
 	event_date TEXT NOT NULL,
 	event_duration TEXT,
 	location TEXT NOT NULL,

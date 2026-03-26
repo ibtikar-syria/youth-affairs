@@ -34,6 +34,7 @@ export type EventItem = {
   image_url: string
   announcement: string
   urls: EventUrlItem[]
+  gallery_images: string[]
   event_date: string
   event_duration?: string | null
   location: string

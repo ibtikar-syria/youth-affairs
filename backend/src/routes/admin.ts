@@ -22,12 +22,13 @@ type EventInput = {
   imageUrl: string
   announcement: string
   urls?: EventUrl[]
+  galleryImages?: string[]
   eventDate: string
   eventDuration?: string
   location: string
 }
 
-type EventRecordDb = Omit<EventRecord, 'urls'> & { urls: string }
+type EventRecordDb = Omit<EventRecord, 'urls' | 'gallery_images'> & { urls: string; gallery_images: string }
 type EventIdentityRecord = Pick<EventRecord, 'id' | 'branch_id' | 'title' | 'event_duration'>
 
 export const adminRoutes = new Hono<AppEnv>()
@@ -97,6 +98,52 @@ const parseEventUrlsFromDb = (urlsJson: string | null | undefined): EventUrl[] =
   }
 }
 
+const normalizeGalleryImages = (value: unknown): string[] | null => {
+  if (value === undefined || value === null) {
+    return []
+  }
+
+  if (!Array.isArray(value)) {
+    return null
+  }
+
+  const normalized: string[] = []
+  for (const item of value) {
+    if (typeof item !== 'string') {
+      return null
+    }
+
+    const imageUrl = item.trim()
+    if (!imageUrl) {
+      continue
+    }
+
+    try {
+      new URL(imageUrl)
+    } catch {
+      return null
+    }
+
+    normalized.push(imageUrl)
+  }
+
+  return normalized
+}
+
+const parseGalleryImagesFromDb = (galleryJson: string | null | undefined): string[] => {
+  if (!galleryJson) {
+    return []
+  }
+
+  try {
+    const parsed = JSON.parse(galleryJson)
+    const normalized = normalizeGalleryImages(parsed)
+    return normalized ?? []
+  } catch {
+    return []
+  }
+}
+
 const isValidDateParts = (year: number, month: number, day: number): boolean => {
   const date = new Date(Date.UTC(year, month - 1, day))
   return date.getUTCFullYear() === year && date.getUTCMonth() + 1 === month && date.getUTCDate() === day
@@ -157,6 +204,7 @@ const normalizeEventDateValue = (value: string): string | null => {
 const mapEventRecord = (event: EventRecordDb): EventRecord => ({
   ...event,
   urls: parseEventUrlsFromDb(event.urls),
+  gallery_images: parseGalleryImagesFromDb(event.gallery_images),
 })
 
 adminRoutes.use('*', requireAuth, requireRole('admin', 'superadmin'))
@@ -347,10 +395,15 @@ adminRoutes.post('/events', async (c) => {
     return badRequest(c, 'Invalid event urls. Each url must be valid and may include an optional title')
   }
 
+  const normalizedGalleryImages = normalizeGalleryImages(input.galleryImages)
+  if (!normalizedGalleryImages) {
+    return badRequest(c, 'Invalid gallery images. Each image must be a valid url')
+  }
+
   const createResult = await c.env.DB
     .prepare(
-      `INSERT INTO events (branch_id, title, image_url, announcement, urls, event_date, event_duration, location, created_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO events (branch_id, title, image_url, announcement, urls, gallery_images, event_date, event_duration, location, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .bind(
       targetBranchId,
@@ -358,6 +411,7 @@ adminRoutes.post('/events', async (c) => {
       input.imageUrl.trim(),
       input.announcement.trim(),
       JSON.stringify(normalizedUrls),
+      JSON.stringify(normalizedGalleryImages),
       normalizedEventDate,
       normalizedEventDuration || null,
       input.location.trim(),
@@ -406,6 +460,11 @@ adminRoutes.put('/events/:id', async (c) => {
     return badRequest(c, 'Invalid event urls. Each url must be valid and may include an optional title')
   }
 
+  const normalizedGalleryImages = normalizeGalleryImages(input.galleryImages)
+  if (!normalizedGalleryImages) {
+    return badRequest(c, 'Invalid gallery images. Each image must be a valid url')
+  }
+
   let targetEvent: EventIdentityRecord | null = null
   if (authUser.role === 'superadmin') {
     targetEvent = await c.env.DB
@@ -431,7 +490,7 @@ adminRoutes.put('/events/:id', async (c) => {
     await c.env.DB
       .prepare(
         `UPDATE events
-         SET title = ?, image_url = ?, announcement = ?, urls = ?, event_date = ?, event_duration = ?, location = ?, updated_at = CURRENT_TIMESTAMP
+         SET title = ?, image_url = ?, announcement = ?, urls = ?, gallery_images = ?, event_date = ?, event_duration = ?, location = ?, updated_at = CURRENT_TIMESTAMP
          WHERE id = ?`
       )
       .bind(
@@ -439,6 +498,7 @@ adminRoutes.put('/events/:id', async (c) => {
         input.imageUrl.trim(),
         input.announcement.trim(),
         JSON.stringify(normalizedUrls),
+        JSON.stringify(normalizedGalleryImages),
         normalizedEventDate,
         normalizedEventDuration || null,
         input.location.trim(),
@@ -449,7 +509,7 @@ adminRoutes.put('/events/:id', async (c) => {
     await c.env.DB
       .prepare(
         `UPDATE events
-         SET title = ?, image_url = ?, announcement = ?, urls = ?, event_date = ?, event_duration = ?, location = ?, updated_at = CURRENT_TIMESTAMP
+         SET title = ?, image_url = ?, announcement = ?, urls = ?, gallery_images = ?, event_date = ?, event_duration = ?, location = ?, updated_at = CURRENT_TIMESTAMP
          WHERE id = ? AND branch_id = ?`
       )
       .bind(
@@ -457,6 +517,7 @@ adminRoutes.put('/events/:id', async (c) => {
         input.imageUrl.trim(),
         input.announcement.trim(),
         JSON.stringify(normalizedUrls),
+        JSON.stringify(normalizedGalleryImages),
         normalizedEventDate,
         normalizedEventDuration || null,
         input.location.trim(),
