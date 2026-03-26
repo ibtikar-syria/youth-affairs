@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { CalendarDays, MapPin, Calendar, Building2, ArrowRight, Link2, Clock3, Image } from 'lucide-react'
+import { CalendarDays, MapPin, Calendar, Building2, ArrowRight, Link2, Clock3, Image, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { api } from '../lib/api'
 import { applySeo } from '../lib/seo'
 import type { EventItem } from '../lib/types'
@@ -10,6 +10,7 @@ export const EventDetailPage = () => {
   const [event, setEvent] = useState<EventItem | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const [activeGalleryIndex, setActiveGalleryIndex] = useState<number | null>(null)
 
   useEffect(() => {
     if (!id) {
@@ -86,6 +87,36 @@ export const EventDetailPage = () => {
       },
     })
   }, [loading, event, error, id])
+
+  useEffect(() => {
+    if (activeGalleryIndex === null || !event?.gallery_images.length) {
+      return
+    }
+
+    const onKeyDown = (keyboardEvent: KeyboardEvent) => {
+      if (keyboardEvent.key === 'Escape') {
+        setActiveGalleryIndex(null)
+        return
+      }
+
+      if (keyboardEvent.key === 'ArrowRight') {
+        setActiveGalleryIndex((prev) => {
+          if (prev === null) return prev
+          return (prev + 1) % event.gallery_images.length
+        })
+      }
+
+      if (keyboardEvent.key === 'ArrowLeft') {
+        setActiveGalleryIndex((prev) => {
+          if (prev === null) return prev
+          return (prev - 1 + event.gallery_images.length) % event.gallery_images.length
+        })
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [activeGalleryIndex, event?.gallery_images])
 
   if (loading) {
     return (
@@ -215,11 +246,10 @@ export const EventDetailPage = () => {
                 </h2>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {event.gallery_images.map((imageUrl, index) => (
-                    <a
+                    <button
                       key={`${imageUrl}-${index}`}
-                      href={imageUrl}
-                      target="_blank"
-                      rel="noreferrer"
+                      type="button"
+                      onClick={() => setActiveGalleryIndex(index)}
                       className="group overflow-hidden rounded-lg border border-slate-200 bg-slate-50"
                     >
                       <img
@@ -227,7 +257,7 @@ export const EventDetailPage = () => {
                         alt={`صورة من المعرض ${index + 1}`}
                         className="h-36 w-full object-cover transition-transform duration-300 group-hover:scale-105"
                       />
-                    </a>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -251,6 +281,67 @@ export const EventDetailPage = () => {
           </div>
         </article>
       </main>
+
+      {activeGalleryIndex !== null && event.gallery_images[activeGalleryIndex] && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/90 p-4"
+          onClick={() => setActiveGalleryIndex(null)}
+        >
+          <button
+            type="button"
+            onClick={() => setActiveGalleryIndex(null)}
+            className="absolute right-4 top-4 rounded-full bg-white/10 p-2 text-white transition hover:bg-white/20"
+            aria-label="إغلاق المعرض"
+          >
+            <X className="h-5 w-5" />
+          </button>
+
+          {event.gallery_images.length > 1 && (
+            <button
+              type="button"
+              onClick={(clickEvent) => {
+                clickEvent.stopPropagation()
+                setActiveGalleryIndex((prev) => {
+                  if (prev === null) return prev
+                  return (prev - 1 + event.gallery_images.length) % event.gallery_images.length
+                })
+              }}
+              className="absolute right-4 rounded-full bg-white/10 p-2 text-white transition hover:bg-white/20 sm:right-8"
+              aria-label="الصورة السابقة"
+            >
+              <ChevronRight className="h-6 w-6" />
+            </button>
+          )}
+
+          <img
+            src={event.gallery_images[activeGalleryIndex]}
+            alt={`معرض الصور ${activeGalleryIndex + 1}`}
+            className="max-h-[85vh] max-w-[90vw] rounded-xl object-contain"
+            onClick={(clickEvent) => clickEvent.stopPropagation()}
+          />
+
+          {event.gallery_images.length > 1 && (
+            <button
+              type="button"
+              onClick={(clickEvent) => {
+                clickEvent.stopPropagation()
+                setActiveGalleryIndex((prev) => {
+                  if (prev === null) return prev
+                  return (prev + 1) % event.gallery_images.length
+                })
+              }}
+              className="absolute left-4 rounded-full bg-white/10 p-2 text-white transition hover:bg-white/20 sm:left-8"
+              aria-label="الصورة التالية"
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </button>
+          )}
+
+          <p className="absolute bottom-4 rounded-lg bg-black/40 px-3 py-1 text-sm text-white">
+            {activeGalleryIndex + 1} / {event.gallery_images.length}
+          </p>
+        </div>
+      )}
 
     </div>
   )
